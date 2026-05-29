@@ -1,3 +1,10 @@
 .tools/
 *.log
 PLANNUS_GIT*.bat
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
