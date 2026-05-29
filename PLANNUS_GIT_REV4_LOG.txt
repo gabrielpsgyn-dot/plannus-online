@@ -1,0 +1,8 @@
+============================================================ 
+PLANNUS - REV_4 Git Portable sem admin - SCRIPT CORRIGIDO 
+Data/hora: 29/05/2026 10:14:05,69 
+Pasta: C:\DEV\PLANNUS - v2 online\ORGANIZADO\ARQUIVOS_ATIVOS 
+============================================================ 
+ 
+git version 2.54.0.windows.1
+fatal: not a git repository: 'C:\DEV\PLANNUS - v2 online\ORGANIZADO\ARQUIVOS_ATIVOS\.tools\PortableGit'

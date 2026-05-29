@@ -1,0 +1,303 @@
+import { APP_KEY } from "../domain/contracts.js";
+import { loadState, saveState } from "./local-repository.js";
+import {
+  getMe,
+  grantObraPermission,
+  createOnlineObra as createOnlineObraRequest,
+  listObraPermissions,
+  listOnlineObras,
+  listUsers,
+  loadOnlineObra,
+  PLANNUS_ONLINE_CONFIG,
+  revokeObraPermission,
+  saveOnlineObra,
+  upsertUser,
+} from "./plannus-online-repository.js";
+
+const ONLINE_META_KEY = "plannus.online.meta";
+const ONLINE_STATUS_KEY = "plannus.online.status";
+
+function logRepo(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_REPOSITORY] ${message}`);
+  else console.log(`[PLANNUS_REPOSITORY] ${message}`, payload);
+}
+
+function logSync(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_SYNC] ${message}`);
+  else console.log(`[PLANNUS_SYNC] ${message}`, payload);
+}
+
+function logObras(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_OBRAS] ${message}`);
+  else console.log(`[PLANNUS_OBRAS] ${message}`, payload);
+}
+function logUsers(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_USERS] ${message}`);
+  else console.log(`[PLANNUS_USERS] ${message}`, payload);
+}
+function logPermissions(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_PERMISSIONS] ${message}`);
+  else console.log(`[PLANNUS_PERMISSIONS] ${message}`, payload);
+}
+function logSave(message, payload) {
+  if (payload === undefined) console.log(`[PLANNUS_SAVE] ${message}`);
+  else console.log(`[PLANNUS_SAVE] ${message}`, payload);
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function loadMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(ONLINE_META_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveMeta(meta) {
+  localStorage.setItem(ONLINE_META_KEY, JSON.stringify(meta));
+}
+
+function setStatus(text) {
+  localStorage.setItem(ONLINE_STATUS_KEY, text || "");
+}
+
+function getStatus() {
+  return localStorage.getItem(ONLINE_STATUS_KEY) || "";
+}
+
+function resolveRemoteState(payload) {
+  if (payload?.state) return payload.state;
+  if (payload?.obra?.state_json) return payload.obra.state_json;
+  if (payload?.obra?.state) return payload.obra.state;
+  return null;
+}
+
+function resolveRemoteRevision(payload) {
+  return Number(payload?.revision ?? payload?.obra?.revision ?? 0) || 0;
+}
+
+function resolveRemoteUpdatedAt(payload) {
+  return payload?.updated_at ?? payload?.obra?.updated_at ?? null;
+}
+
+function resolveRemoteObraNome(payload) {
+  return payload?.obra_nome ?? payload?.obra?.nome ?? null;
+}
+
+function backupCurrentLocalState() {
+  const raw = localStorage.getItem(APP_KEY);
+  if (!raw) return null;
+  const backupKey = `plannus.backup.before_online_load.${Date.now()}`;
+  localStorage.setItem(backupKey, raw);
+  return backupKey;
+}
+
+function extractObrasList(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.obras)) return payload.obras;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+}
+
+export function createPlannusPersistence() {
+  return {
+    config: PLANNUS_ONLINE_CONFIG,
+    hasLocalState() {
+      return Boolean(localStorage.getItem(APP_KEY));
+    },
+    loadLocal() {
+      return loadState();
+    },
+    saveLocal(state) {
+      saveState(state);
+      return { ok: true };
+    },
+    getCurrentConsolidatedPlannusState(currentState) {
+      const source = currentState ? structuredClone(currentState) : structuredClone(loadState());
+      if (!source || typeof source !== "object") return {};
+      // Remove estado puramente visual/transiente (modais, filtros, hover, seleção, etc).
+      delete source.ui;
+      delete source.dashboard;
+      if (source.planning && typeof source.planning === "object") {
+        delete source.planning.lastEngineResult;
+      }
+      logSave("State consolidado capturado para persistencia online.", {
+        keys: Object.keys(source),
+        hasObra: Boolean(source.obra),
+        hasEntities: Boolean(source.entities),
+      });
+      return source;
+    },
+    getSyncSnapshot() {
+      const meta = loadMeta();
+      return { meta, statusText: getStatus(), config: PLANNUS_ONLINE_CONFIG };
+    },
+    getSelectedObraMeta() {
+      return loadMeta();
+    },
+    async listOnlineObras() {
+      logSync("Listando obras online.");
+      const result = await listOnlineObras();
+      if (!result.ok) return result;
+      const obras = extractObrasList(result.data);
+      logObras("Lista recebida.", { total: obras.length });
+      return { ...result, obras };
+    },
+    async createOnlineObra(payload) {
+      const result = await createOnlineObraRequest(payload);
+      if (result.ok) logObras("Obra criada online.", result.data?.obra || payload);
+      return result;
+    },
+    async getMe() {
+      const result = await getMe();
+      if (result.ok) logUsers("Usuario atual carregado.", result.data?.usuario || result.data);
+      return result;
+    },
+    async listUsers() {
+      const result = await listUsers();
+      if (result.ok) logUsers("Lista de usuarios carregada.");
+      return result;
+    },
+    async upsertUser(payload) {
+      const result = await upsertUser(payload);
+      if (result.ok) logUsers("Usuario salvo.", payload);
+      return result;
+    },
+    async listObraPermissions(obraId) {
+      const result = await listObraPermissions(obraId);
+      if (result.ok) logPermissions("Permissoes carregadas.", { obraId });
+      return result;
+    },
+    async grantObraPermission(obraId, payload) {
+      const result = await grantObraPermission(obraId, payload);
+      if (result.ok) logPermissions("Permissao concedida/atualizada.", { obraId, payload });
+      return result;
+    },
+    async revokeObraPermission(obraId, email) {
+      const result = await revokeObraPermission(obraId, email);
+      if (result.ok) logPermissions("Permissao revogada.", { obraId, email });
+      return result;
+    },
+    async connectOnline() {
+      if (!PLANNUS_ONLINE_CONFIG.enabled) return { ok: false, erro: "Modo online desabilitado." };
+      const result = await listOnlineObras();
+      setStatus(result.ok ? "Online conectado." : `Falha de conexao: ${result.erro}`);
+      return result;
+    },
+    async loadOnline(obraId = PLANNUS_ONLINE_CONFIG.defaultObraId, obraNome = null) {
+      if (!PLANNUS_ONLINE_CONFIG.enabled) return { ok: false, erro: "Modo online desabilitado." };
+      logSync("Carregando obra online.", { obraId });
+      const result = await loadOnlineObra(obraId);
+      if (!result.ok) {
+        setStatus(`Falha ao carregar online (${result.status || "rede"}): ${result.erro}`);
+        return result;
+      }
+      const remoteState = resolveRemoteState(result.data);
+      if (!remoteState) {
+        const errorResult = { ok: false, status: result.status, erro: "Resposta online sem campo state." };
+        setStatus(errorResult.erro);
+        return errorResult;
+      }
+      const backupKey = backupCurrentLocalState();
+      saveState(remoteState);
+      const meta = {
+        obraId,
+        obraNome: obraNome || resolveRemoteObraNome(result.data) || remoteState?.obra?.nome || null,
+        revision: resolveRemoteRevision(result.data),
+        updatedAt: resolveRemoteUpdatedAt(result.data),
+        lastSyncAt: nowIso(),
+        lastLocalSaveAt: nowIso(),
+        lastOnlineSaveAt: nowIso(),
+        pendingOnlineSave: false,
+        conflict: false,
+        lastError: null,
+      };
+      saveMeta(meta);
+      setStatus(`Obra ${obraId} carregada online com sucesso.`);
+      logRepo("Carga online aplicada e sincronizada localmente.", { obraId, backupKey, revision: meta.revision });
+      return { ok: true, state: remoteState, meta, backupKey, data: result.data };
+    },
+    async openOnlineObra(obra) {
+      const obraId = obra?.id || obra?.obra_id || obra?.obraId || PLANNUS_ONLINE_CONFIG.defaultObraId;
+      const obraNome = obra?.nome || obra?.obra_nome || obra?.obraNome || null;
+      return this.loadOnline(obraId, obraNome);
+    },
+    async saveHybrid(state, obraId = null) {
+      const currentMeta = loadMeta();
+      const resolvedObraId = obraId || currentMeta.obraId || PLANNUS_ONLINE_CONFIG.defaultObraId;
+      logSync("Iniciando save hibrido (local -> online).", { obraId: resolvedObraId });
+      saveState(state);
+      const previousMeta = loadMeta();
+      const revision = Number(previousMeta.revision || 0);
+      const localSaveAt = nowIso();
+      if (!PLANNUS_ONLINE_CONFIG.enabled) {
+        const metaDisabled = {
+          ...previousMeta,
+          obraId: resolvedObraId,
+          pendingOnlineSave: true,
+          conflict: false,
+          lastSyncAt: nowIso(),
+          lastLocalSaveAt: localSaveAt,
+          lastError: "Modo online desabilitado.",
+        };
+        saveMeta(metaDisabled);
+        setStatus("Online desabilitado. Estado salvo localmente com pendencia online.");
+        return { ok: false, localSaved: true, pendingOnlineSave: true, erro: "Modo online desabilitado." };
+      }
+      const result = await saveOnlineObra(resolvedObraId, state, revision);
+      if (result.ok) {
+        const data = result.data || {};
+        const meta = {
+          obraId: resolvedObraId,
+          obraNome: previousMeta.obraNome || state?.obra?.nome || null,
+          revision: Number(data.revision || revision),
+          updatedAt: data.updated_at || null,
+          lastSyncAt: nowIso(),
+          lastLocalSaveAt: localSaveAt,
+          lastOnlineSaveAt: nowIso(),
+          pendingOnlineSave: false,
+          conflict: false,
+          lastError: null,
+        };
+        saveMeta(meta);
+        setStatus(`Online salvo com sucesso. Revision ${meta.revision}.`);
+        logSync("Save online concluido.", { obraId: resolvedObraId, revisionAnterior: revision, revisionNova: meta.revision });
+        logSave("Salvar online concluido com sucesso.", { obraId: resolvedObraId, revisionAnterior: revision, revisionNova: meta.revision, pendingOnlineSave: false, conflict: false, at: meta.lastOnlineSaveAt });
+        return { ok: true, localSaved: true, onlineSaved: true, meta, data };
+      }
+      if (result.conflito) {
+        const meta = {
+          ...previousMeta,
+          obraId: resolvedObraId,
+          lastSyncAt: nowIso(),
+          lastLocalSaveAt: localSaveAt,
+          pendingOnlineSave: true,
+          conflict: true,
+          revisionConflitoBanco: result.data?.revision_banco ?? null,
+          revisionEnviada: result.data?.revision_enviada ?? revision,
+          lastError: result.erro || "Conflito 409",
+        };
+        saveMeta(meta);
+        setStatus(`Conflito de revisao (${meta.revisionEnviada} -> banco ${meta.revisionConflitoBanco}).`);
+        logSave("Conflito 409 no salvar online.", { obraId: resolvedObraId, revisionEnviada: meta.revisionEnviada, revisionConflitoBanco: meta.revisionConflitoBanco, pendingOnlineSave: true, conflict: true, erro: meta.lastError });
+        return { ok: false, localSaved: true, conflito: true, pendingOnlineSave: true, erro: result.erro, data: result.data, meta };
+      }
+      const meta = {
+        ...previousMeta,
+        obraId: resolvedObraId,
+        lastSyncAt: nowIso(),
+        lastLocalSaveAt: localSaveAt,
+        pendingOnlineSave: true,
+        conflict: false,
+        lastError: result.erro || "Falha no save online.",
+      };
+      saveMeta(meta);
+      setStatus(`Falha no save online: ${result.erro}. Estado mantido localmente.`);
+      logSave("Salvar online falhou; estado local preservado.", { obraId: resolvedObraId, revisionAnterior: revision, pendingOnlineSave: true, conflict: false, erro: result.erro, at: localSaveAt });
+      return { ok: false, localSaved: true, pendingOnlineSave: true, erro: result.erro, status: result.status };
+    },
+  };
+}
