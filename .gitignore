@@ -1,3 +1,6 @@
-.tools/
+﻿.tools/
+.wrangler/
 *.log
 PLANNUS_GIT*.bat
+node_modules/
+.DS_Store
