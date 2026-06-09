@@ -88,6 +88,7 @@ export default {
             COALESCE(ur.can_grant_permissions, 0) AS can_grant_permissions,
             COALESCE(ur.can_manage_users, 0) AS can_manage_users,
             COALESCE(ur.can_create_obras, 0) AS can_create_obras,
+            CASE WHEN COALESCE(ur.role, 'usuario') = 'planejador' THEN 1 ELSE 0 END AS can_delete_obras,
             COALESCE(ur.ativo, u.ativo) AS role_ativo,
             u.created_at,
             u.updated_at
@@ -865,6 +866,89 @@ export default {
       }
 
       // ============================================================
+      // OBRAS — EXCLUIR / DESATIVAR LOGICAMENTE
+      // /api/obras/:id
+      // ============================================================
+
+      if (
+        parts.length === 3 &&
+        parts[0] === "api" &&
+        parts[1] === "obras" &&
+        method === "DELETE"
+      ) {
+        const email = getUserEmail(request);
+        const obraId = parts[2];
+
+        if (!(await canUserDeleteObra(env, email, obraId))) {
+          return json({
+            ok: false,
+            erro: "Usuário sem permissão para excluir a obra."
+          }, 403);
+        }
+
+        const existing = await env.DB.prepare(`
+          SELECT id, status, nome, codigo
+          FROM obras
+          WHERE id = ?
+        `).bind(obraId).first();
+
+        if (!existing || existing.status !== "ativa") {
+          return json({
+            ok: false,
+            erro: "Obra não encontrada ou já excluída."
+          }, 404);
+        }
+
+        const now = new Date().toISOString();
+
+        await env.DB.batch([
+          env.DB.prepare(`
+            UPDATE obras
+            SET status = 'excluida',
+                updated_at = ?
+            WHERE id = ?
+          `).bind(now, obraId),
+
+          env.DB.prepare(`
+            UPDATE usuario_obras
+            SET ativo = 0,
+                updated_at = ?
+            WHERE obra_id = ?
+          `).bind(now, obraId),
+
+          env.DB.prepare(`
+            INSERT INTO audit_log (
+              id,
+              obra_id,
+              usuario_email,
+              acao,
+              entidade,
+              entidade_id,
+              detalhes_json,
+              created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            crypto.randomUUID(),
+            obraId,
+            email,
+            "DELETE_OBRA",
+            "obra",
+            obraId,
+            JSON.stringify({ nome: existing.nome, codigo: existing.codigo, statusAnterior: existing.status }),
+            now
+          )
+        ]);
+
+        return json({
+          ok: true,
+          obra_id: obraId,
+          status: "excluida",
+          updated_at: now
+        });
+      }
+
+      // ============================================================
       // OBRAS — CARREGAR ESPECÍFICA
       // /api/obras/:id
       // ============================================================
@@ -979,17 +1063,18 @@ async function getUserRole(env, email) {
   `).bind(normalizedEmail).first();
 
   if (!row) {
-    return {
-      email: normalizedEmail,
-      nome: null,
-      role: "usuario",
-      can_view_all_obras: 0,
-      can_grant_permissions: 0,
-      can_manage_users: 0,
-      can_create_obras: 0,
-      ativo: 1
-    };
-  }
+  return {
+    email: normalizedEmail,
+    nome: null,
+    role: "usuario",
+    can_view_all_obras: 0,
+    can_grant_permissions: 0,
+    can_manage_users: 0,
+    can_create_obras: 0,
+    can_delete_obras: 0,
+    ativo: 1
+  };
+}
 
   return {
     email: row.email,
@@ -1000,6 +1085,7 @@ async function getUserRole(env, email) {
     can_grant_permissions: Number(row.can_grant_permissions || 0),
     can_manage_users: Number(row.can_manage_users || 0),
     can_create_obras: Number(row.can_create_obras || 0),
+    can_delete_obras: Number(row.can_delete_obras || 0),
     ativo: Number(row.usuario_ativo || 0) === 1 && Number(row.role_ativo || 0) === 1 ? 1 : 0
   };
 }
@@ -1058,6 +1144,20 @@ async function canUserGrantPermissions(env, email) {
 async function canUserManageUsers(env, email) {
   const role = await getUserRole(env, email);
   return toBool(role.ativo) && toBool(role.can_manage_users);
+}
+
+async function canUserDeleteObra(env, email, obraId) {
+  const role = await getUserRole(env, email);
+
+  if (!toBool(role.ativo)) {
+    return false;
+  }
+
+  if (role.role === "planejador" || toBool(role.can_delete_obras)) {
+    return true;
+  }
+
+  return await isOwnerObra(env, email, obraId);
 }
 
 async function isOwnerObra(env, email, obraId) {
@@ -1124,7 +1224,8 @@ function buildRoleFlags(role, body = {}) {
       can_view_all_obras: 1,
       can_grant_permissions: 1,
       can_manage_users: 1,
-      can_create_obras: 1
+      can_create_obras: 1,
+      can_delete_obras: 1
     };
   }
 
@@ -1133,7 +1234,8 @@ function buildRoleFlags(role, body = {}) {
       can_view_all_obras: toFlag(body.can_view_all_obras, 1),
       can_grant_permissions: toFlag(body.can_grant_permissions, 1),
       can_manage_users: toFlag(body.can_manage_users, 0),
-      can_create_obras: toFlag(body.can_create_obras, 1)
+      can_create_obras: toFlag(body.can_create_obras, 1),
+      can_delete_obras: toFlag(body.can_delete_obras, 0)
     };
   }
 
@@ -1141,7 +1243,8 @@ function buildRoleFlags(role, body = {}) {
     can_view_all_obras: toFlag(body.can_view_all_obras, 0),
     can_grant_permissions: toFlag(body.can_grant_permissions, 0),
     can_manage_users: toFlag(body.can_manage_users, 0),
-    can_create_obras: toFlag(body.can_create_obras, 0)
+    can_create_obras: toFlag(body.can_create_obras, 0),
+    can_delete_obras: toFlag(body.can_delete_obras, 0)
   };
 }
 

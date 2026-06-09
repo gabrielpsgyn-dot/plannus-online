@@ -97,6 +97,24 @@ export async function createOnlineObra(payload) {
   }
 }
 
+export async function deleteOnlineObra(obraId) {
+  const url = buildUrl(`/api/obras/${encodeURIComponent(obraId)}`);
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao excluir obra online.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao excluir obra.", { obraId, error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao excluir obra online.", data: null };
+  }
+}
+
 export async function getMe() {
   const url = buildUrl("/api/me");
   try {

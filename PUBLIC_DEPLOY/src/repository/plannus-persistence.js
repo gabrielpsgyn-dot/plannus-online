@@ -2,6 +2,7 @@ import { APP_KEY } from "../domain/contracts.js";
 import { loadState, saveState } from "./local-repository.js";
 import {
   getMe,
+  deleteOnlineObra as deleteOnlineObraRequest,
   grantObraPermission,
   createOnlineObra as createOnlineObraRequest,
   listObraPermissions,
@@ -16,6 +17,8 @@ import {
 
 const ONLINE_META_KEY = "plannus.online.meta";
 const ONLINE_STATUS_KEY = "plannus.online.status";
+const LOCAL_OBRAS_KEY = "plannus.local.obras";
+const LOCAL_OBRA_STATE_PREFIX = "plannus.local.obra.state.";
 
 function logRepo(message, payload) {
   if (payload === undefined) console.log(`[PLANNUS_REPOSITORY] ${message}`);
@@ -102,6 +105,28 @@ function extractObrasList(payload) {
   return [];
 }
 
+function getLocalObraStateKey(obraId) {
+  const id = String(obraId || "").trim();
+  return `${LOCAL_OBRA_STATE_PREFIX}${id || "local"}`;
+}
+
+function readLocalObrasIndex() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_OBRAS_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function writeLocalObrasIndex(index) {
+  try {
+    localStorage.setItem(LOCAL_OBRAS_KEY, JSON.stringify(index || {}));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 export function createPlannusPersistence() {
   return {
     config: PLANNUS_ONLINE_CONFIG,
@@ -151,6 +176,11 @@ export function createPlannusPersistence() {
       if (result.ok) logObras("Obra criada online.", result.data?.obra || payload);
       return result;
     },
+    async deleteOnlineObra(obraId) {
+      const result = await deleteOnlineObraRequest(obraId);
+      if (result.ok) logObras("Obra excluida online.", { obraId });
+      return result;
+    },
     async getMe() {
       const result = await getMe();
       if (result.ok) logUsers("Usuario atual carregado.", result.data?.usuario || result.data);
@@ -180,6 +210,26 @@ export function createPlannusPersistence() {
       const result = await revokeObraPermission(obraId, email);
       if (result.ok) logPermissions("Permissao revogada.", { obraId, email });
       return result;
+    },
+    removeLocalObraCache(obraId) {
+      const id = String(obraId || "").trim();
+      if (!id) return { ok: false, erro: "obraId obrigatorio." };
+      const meta = loadMeta();
+      const index = readLocalObrasIndex();
+      const existed = Boolean(index[id]);
+      delete index[id];
+      const indexOk = writeLocalObrasIndex(index);
+      try {
+        localStorage.removeItem(getLocalObraStateKey(id));
+      } catch (_) {}
+      try {
+        if (String(meta?.obraId || "") === id) {
+          localStorage.removeItem(ONLINE_META_KEY);
+          localStorage.removeItem(ONLINE_STATUS_KEY);
+          localStorage.removeItem("plannus.online.selected");
+        }
+      } catch (_) {}
+      return { ok: true, removed: existed, indexOk };
     },
     async connectOnline() {
       if (!PLANNUS_ONLINE_CONFIG.enabled) return { ok: false, erro: "Modo online desabilitado." };

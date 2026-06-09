@@ -8153,11 +8153,549 @@ function _getActivePlanBlocks(){
   if(Array.isArray(state.blocks) && state.blocks.length) return state.blocks;
   return [];
 }
+function shouldLogFollowUpBlocksResolver(){
+  try{
+    if(window.__PLANNUS_AUDIT_REALIZATION !== true) return false;
+    const now = Date.now();
+    const last = Number(window.__PLANNUS_LAST_FOLLOWUP_BLOCKS_RESOLVER_LOG_AT || 0);
+    if((now - last) < 2000) return false;
+    window.__PLANNUS_LAST_FOLLOWUP_BLOCKS_RESOLVER_LOG_AT = now;
+    return true;
+  }catch(_){
+    return false;
+  }
+}
+function getCanonicalPlannerBlocksForFollowUp(){
+  _ensureStateContracts();
+  const planBlocks = Array.isArray(state?.plan?.blocks) ? state.plan.blocks : [];
+  const stateBlocks = Array.isArray(state?.blocks) ? state.blocks : [];
+  const operationalBlocks = Array.isArray(state?.operational?.blocks) ? state.operational.blocks : [];
+  let source = "empty";
+  let blocks = [];
+  if(planBlocks.length){
+    source = "state.plan.blocks";
+    blocks = planBlocks;
+  }else if(stateBlocks.length){
+    source = "state.blocks";
+    blocks = stateBlocks;
+  }
+  const out = {
+    blocks: Array.isArray(blocks) ? blocks : [],
+    source,
+    counts: {
+      planBlocks: planBlocks.length,
+      stateBlocks: stateBlocks.length,
+      operationalBlocks: operationalBlocks.length
+    }
+  };
+  try{
+    if(shouldLogFollowUpBlocksResolver()){
+      console.log("[FOLLOWUP_BLOCKS_RESOLVER]", {
+        source: out.source,
+        selected: out.blocks.length,
+        counts: out.counts
+      });
+    }
+  }catch(_){}
+  return out;
+}
 function getCanonicalPlanBlocks(){
   // Fonte única para telas de acompanhamento/operacional/dashboard.
-  const arr = _getActivePlanBlocks();
+  const arr = getCanonicalPlannerBlocksForFollowUp().blocks;
   return Array.isArray(arr) ? arr : [];
 }
+function _getStateBlockEditsMap(){
+  try{
+    const m = state?.blockEdits;
+    if(m && typeof m === "object" && !Array.isArray(m)) return m;
+  }catch(_){}
+  return {};
+}
+function buildRealizationStableKey(block){
+  const normalize = (v)=>String(v == null ? "" : v).trim();
+  const sid = (typeof resolveServiceId === "function") ? normalize(resolveServiceId(block)) : normalize(block?.serviceId || block?.svcId || block?.svc || block?.service || block?.serviceKey);
+  const lid = (typeof resolveLocationId === "function") ? normalize(resolveLocationId(block)) : normalize(block?.locationId || block?.locId || block?.location || block?.locationKey);
+  const serviceName = normalize(block?.serviceName || block?.serviceTitle || block?.title || (Array.isArray(state?.services) ? (state.services.find(s=>normalize(s?.id) === sid)?.name || "") : ""));
+  const locationName = normalize(block?.locationName || block?.locationTitle || block?.label || (Array.isArray(state?.locations) ? (state.locations.find(l=>normalize(l?.id) === lid)?.name || "") : ""));
+  if(sid && lid){
+    return { key: typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`, type:"serviceLocation", serviceId:sid, locationId:lid, warning:null };
+  }
+  if(normalize(block?.id)){
+    return {
+      key: normalize(block?.id),
+      type: "blockId",
+      serviceId: sid || null,
+      locationId: lid || null,
+      warning: (!sid || !lid) ? "using_block_id_fallback" : null
+    };
+  }
+  const nameKey = (serviceName || locationName) ? `${serviceName || sid || ""}||${locationName || lid || ""}` : "";
+  return {
+    key: nameKey,
+    type: "nameFallback",
+    serviceId: sid || null,
+    locationId: lid || null,
+    warning: nameKey ? "using_name_fallback" : "missing_realization_key"
+  };
+}
+function _getRealizationEntriesByVersionMap(inputState, versionId){
+  try{
+    const s = ensureRealizationStateContract(inputState);
+    const activeId = String(versionId || s?.realization?.activePlanningVersionId || "").trim();
+    const byVersion = s?.realization?.entriesByVersion || {};
+    const bucket = activeId ? byVersion[activeId] : null;
+    return (bucket && typeof bucket === "object" && !Array.isArray(bucket)) ? bucket : {};
+  }catch(_){
+    return {};
+  }
+}
+function _readRealizationEntryObject(entry){
+  const pickIso = (obj, keys)=>{
+    for(const k of keys){
+      const v = obj && obj[k];
+      if(!v) continue;
+      const iso = (typeof _asISOorNull === "function") ? _asISOorNull(v) : String(v).trim();
+      if(iso) return String(iso).trim();
+    }
+    return "";
+  };
+  const measured = !!(pickIso(entry, ["RF","realEnd","endReal","terminoReal","rf"]) || (pickIso(entry, ["RI","realStart","startReal","inicioReal","ri"]) && pickIso(entry, ["RF","realEnd","endReal","terminoReal","rf"])));
+  return {
+    measured,
+    ri: pickIso(entry, ["RI","realStart","startReal","inicioReal","ri"]),
+    rf: pickIso(entry, ["RF","realEnd","endReal","terminoReal","rf"])
+  };
+}
+function getCanonicalRealizationEntry(block, options){
+  const empty = { measured:false, ri:"", rf:"", source:"none", activePlanningVersionId:null, key:"", keyType:"none", legacyFallbackUsed:false, warning:null };
+  try{
+    const s = ensureRealizationStateContract(state || {});
+    const opts = (options && typeof options === "object") ? options : {};
+    const preferCanonical = window.__PLANNUS_PREFER_ONLINE_REALIZATION === true;
+    const activePlanningVersionId = String(s?.realization?.activePlanningVersionId || "").trim() || null;
+    const stable = buildRealizationStableKey(block);
+    const stateEntries = activePlanningVersionId ? _getRealizationEntriesByVersionMap(s, activePlanningVersionId) : {};
+    const stateMap = _getStateBlockEditsMap();
+    const legacyMap = (typeof _getBlockEditsMap === "function") ? (_getBlockEditsMap() || {}) : {};
+    const read = (entry, source, fallbackUsed, key, keyType)=>{
+      const parsed = _readRealizationEntryObject(entry);
+      const out = {
+        measured: parsed.measured,
+        ri: parsed.ri,
+        rf: parsed.rf,
+        source,
+        activePlanningVersionId,
+        key: String(key || stable.key || "").trim(),
+        keyType: keyType || stable.type || "unknown",
+        legacyFallbackUsed: !!fallbackUsed,
+        warning: stable.warning || null
+      };
+      return out;
+    };
+    const candidateKeys = [];
+    if(stable.key) candidateKeys.push({ key: stable.key, keyType: stable.type });
+    const sid = stable.serviceId || "";
+    const lid = stable.locationId || "";
+    const svcName = String(block?.serviceName || block?.title || (Array.isArray(state?.services) ? (state.services.find(s=>String(s?.id||"").trim()===String(sid||"").trim())?.name || "") : "") || "").trim();
+    const locName = String(block?.locationName || block?.label || (Array.isArray(state?.locations) ? (state.locations.find(l=>String(l?.id||"").trim()===String(lid||"").trim())?.name || "") : "") || "").trim();
+    const fallbackKeys = [];
+    if(sid && lid) fallbackKeys.push({ key: typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`, keyType:"serviceLocation" });
+    if(sid && locName) fallbackKeys.push({ key: typeof makeKey === "function" ? makeKey(sid, locName) : `${sid}||${locName}`, keyType:"serviceLocation" });
+    if(svcName && lid) fallbackKeys.push({ key: typeof makeKey === "function" ? makeKey(svcName, lid) : `${svcName}||${lid}`, keyType:"serviceLocation" });
+    if(svcName && locName) fallbackKeys.push({ key: typeof makeKey === "function" ? makeKey(svcName, locName) : `${svcName}||${locName}`, keyType:"nameFallback" });
+    if(String(sid || "").trim() && String(lid || "").trim() && stable.type !== "serviceLocation") fallbackKeys.push({ key: typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`, keyType:"serviceLocation" });
+    const lookupOrder = [
+      { bucket:"state.realization", map: stateEntries, key: stable.key, keyType: stable.type, fallback:false },
+      { bucket:"state.blockEdits", map: stateMap, key: stable.key, keyType: stable.type, fallback:false },
+      ...fallbackKeys.map(k=>({ bucket:"state.blockEdits", map: stateMap, key:k.key, keyType:k.keyType, fallback:true })),
+      ...(preferCanonical ? [] : [
+        { bucket:"QP_BLOCK_EDIT_V3", map: legacyMap, key: stable.key, keyType: stable.type, fallback:false },
+        ...fallbackKeys.map(k=>({ bucket:"QP_BLOCK_EDIT_V3", map: legacyMap, key:k.key, keyType:k.keyType, fallback:true }))
+      ])
+    ];
+    for(const step of lookupOrder){
+      if(!step.map || !step.key) continue;
+      const hit = step.map[step.key];
+      if(hit){
+        const out = read(hit, step.bucket, step.bucket !== "state.realization", step.key, step.keyType);
+        if(step.bucket === "state.realization") out.warning = null;
+        return out;
+      }
+    }
+    return {
+      ...empty,
+      activePlanningVersionId,
+      key: stable.key || "",
+      keyType: stable.type || "none",
+      warning: stable.warning || (opts.warning || null)
+    };
+  }catch(_){
+    return empty;
+  }
+}
+function getRealizationByBlock(block){
+  const out = getCanonicalRealizationEntry(block);
+  if(window.__PLANNUS_AUDIT_REALIZATION===true){
+    try{ console.log("[FOLLOWUP_REALIZATION_RESOLVER]", { key: out.key, source: out.source, measured: out.measured, fallbackUsed: !!out.legacyFallbackUsed, keyType: out.keyType }); }catch(_){}
+  }
+  return out;
+}
+function auditFollowUpRealizationLinks(){
+  const resolved = getCanonicalPlannerBlocksForFollowUp();
+  const blocks = Array.isArray(resolved?.blocks) ? resolved.blocks : [];
+  const stateEdits = _getStateBlockEditsMap();
+  const legacyEdits = (typeof _getBlockEditsMap === "function") ? (_getBlockEditsMap() || {}) : {};
+  const blockKeys = new Set();
+  blocks.forEach((b)=>{
+    try{
+      const sid = (typeof resolveServiceId === "function") ? resolveServiceId(b) : String(b?.serviceId||"").trim();
+      const lid = (typeof resolveLocationId === "function") ? resolveLocationId(b) : String(b?.locationId||"").trim();
+      const k = (typeof makeKey === "function") ? makeKey(sid, lid) : `${sid}||${lid}`;
+      if(k) blockKeys.add(k);
+    }catch(_){}
+  });
+  const stateKeys = Object.keys(stateEdits || {});
+  const legacyKeys = Object.keys(legacyEdits || {});
+  const matchedState = stateKeys.filter(k=>blockKeys.has(k)).length;
+  const matchedLegacy = legacyKeys.filter(k=>blockKeys.has(k)).length;
+  const orphanState = stateKeys.filter(k=>!blockKeys.has(k));
+  const orphanLegacy = legacyKeys.filter(k=>!blockKeys.has(k));
+  const out = {
+    source: resolved.source,
+    totalCanonicalBlocks: blocks.length,
+    counts: resolved.counts,
+    stateBlockEditsTotal: stateKeys.length,
+    legacyBlockEditsTotal: legacyKeys.length,
+    matchedState,
+    matchedLegacy,
+    orphanStateCount: orphanState.length,
+    orphanLegacyCount: orphanLegacy.length,
+    orphanExamples: {
+      state: orphanState.slice(0,10),
+      legacy: orphanLegacy.slice(0,10)
+    }
+  };
+  try{ console.log("[FOLLOWUP_BLOCKS_RESOLVER]", { event:"audit_links", ...out }); }catch(_){}
+  return out;
+}
+try{ window.PLANNUS_AUDIT_FOLLOWUP_LINKS = auditFollowUpRealizationLinks; }catch(_){}
+
+function auditRealizationVersionLink(){
+  const normalize = (v)=> String(v == null ? "" : v).trim();
+  const s = ensureRealizationStateContract(state || {});
+  const planBlocks = Array.isArray(s?.plan?.blocks) ? s.plan.blocks : [];
+  const stateEdits = _getStateBlockEditsMap();
+  const legacyEdits = (typeof _getBlockEditsMap === "function") ? (_getBlockEditsMap() || {}) : {};
+  const activePlanningVersionId = normalize(s?.realization?.activePlanningVersionId) || null;
+  const planningVersions = Array.isArray(s?.planningVersions) ? s.planningVersions : [];
+  const activeVersion = activePlanningVersionId ? (planningVersions.find(v=>normalize(v?.id) === activePlanningVersionId) || null) : null;
+  const stateRealizationExists = !!(s.realization && typeof s.realization === "object");
+  const canonicalEntries = activePlanningVersionId ? _getRealizationEntriesByVersionMap(s, activePlanningVersionId) : {};
+  const canonicalKeys = Object.keys(canonicalEntries || {});
+  const canonicalKeySet = new Set(canonicalKeys);
+
+  const getServiceName = (sid)=>{
+    const service = Array.isArray(s?.services) ? s.services.find(x=>normalize(x?.id) === normalize(sid)) : null;
+    return normalize(service?.name || service?.title || service?.label);
+  };
+  const getLocationName = (lid)=>{
+    const loc = Array.isArray(s?.locations) ? s.locations.find(x=>normalize(x?.id) === normalize(lid)) : null;
+    return normalize(loc?.name || loc?.title || loc?.label);
+  };
+  const getPlanBlockIndexes = ()=>{
+    const byServiceLocation = new Map();
+    const byBlockId = new Map();
+    const byName = new Map();
+    for(const block of planBlocks){
+      const stable = buildRealizationStableKey(block);
+      const sid = normalize(stable.serviceId || "");
+      const lid = normalize(stable.locationId || "");
+      const svcName = normalize(block?.serviceName || block?.serviceTitle || block?.title || getServiceName(sid));
+      const locName = normalize(block?.locationName || block?.locationTitle || block?.label || getLocationName(lid));
+      const blockId = normalize(block?.id || block?.blockId || block?.blockKey || block?.uid || block?.code);
+      const keys = new Set([
+        stable.key,
+        blockId,
+        sid && lid ? (typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`) : "",
+        sid && locName ? (typeof makeKey === "function" ? makeKey(sid, locName) : `${sid}||${locName}`) : "",
+        svcName && lid ? (typeof makeKey === "function" ? makeKey(svcName, lid) : `${svcName}||${lid}`) : "",
+        svcName && locName ? `${svcName}||${locName}` : ""
+      ].map(normalize).filter(Boolean));
+      for(const k of keys){
+        if(stable.type === "blockId"){
+          if(!byBlockId.has(k)) byBlockId.set(k, block);
+        }else if(stable.type === "nameFallback"){
+          if(!byName.has(k)) byName.set(k, block);
+        }else{
+          if(!byServiceLocation.has(k)) byServiceLocation.set(k, block);
+        }
+        if(blockId && !byBlockId.has(blockId)) byBlockId.set(blockId, block);
+        if(sid && lid){
+          const slKey = typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`;
+          if(!byServiceLocation.has(slKey)) byServiceLocation.set(slKey, block);
+        }
+        if(svcName && locName){
+          const nKey = `${svcName}||${locName}`;
+          if(!byName.has(nKey)) byName.set(nKey, block);
+        }
+      }
+    }
+    return { byServiceLocation, byBlockId, byName };
+  };
+  const indexes = getPlanBlockIndexes();
+  const canonicalSamples = { matched: [], orphan: [] };
+  const legacySamples = { matched: [], orphan: [] };
+  const recordSample = (bucket, item)=>{
+    if(bucket.length < 10) bucket.push(item);
+  };
+  const parseEntry = (entry, storageKey, source)=>{
+    const raw = (entry && typeof entry === "object" && !Array.isArray(entry)) ? entry : {};
+    const get = (...keys)=>{
+      for(const k of keys){
+        const v = raw?.[k];
+        if(v == null) continue;
+        const s2 = normalize(v);
+        if(s2) return s2;
+      }
+      return "";
+    };
+    const sid = get("serviceId","svcId","service_id","svc","serviceKey","service");
+    const lid = get("locationId","locId","location_id","loc","locationKey","location");
+    const sname = get("serviceName","serviceTitle","title","service_label","name");
+    const lname = get("locationName","locationTitle","label","location_label","pavimento","floor");
+    const bid = get("blockId","blockID","id","blockKey","block_id") || normalize(raw?.block?.id || raw?.block?.blockId || raw?.block?.key);
+    const measured = !!(get("RF","realEnd","endReal","terminoReal","rf") || (get("RI","realStart","startReal","inicioReal","ri") && get("RF","realEnd","endReal","terminoReal","rf")));
+    return { source, storageKey: normalize(storageKey), serviceId:sid, locationId:lid, serviceName:sname, locationName:lname, blockId:bid, ri:get("RI","realStart","startReal","inicioReal","ri"), rf:get("RF","realEnd","endReal","terminoReal","rf"), measured };
+  };
+  const matchEntry = (entry, storageKey, source, preferCanonical)=>{
+    const meta = parseEntry(entry, storageKey, source);
+    const candidateKeys = [];
+    if(meta.serviceId && meta.locationId) candidateKeys.push({ key: typeof makeKey === "function" ? makeKey(meta.serviceId, meta.locationId) : `${meta.serviceId}||${meta.locationId}`, type:"serviceLocation" });
+    if(meta.blockId) candidateKeys.push({ key: meta.blockId, type:"blockId" });
+    if(meta.serviceId && meta.locationName) candidateKeys.push({ key: typeof makeKey === "function" ? makeKey(meta.serviceId, meta.locationName) : `${meta.serviceId}||${meta.locationName}`, type:"serviceLocation" });
+    if(meta.serviceName && meta.locationId) candidateKeys.push({ key: typeof makeKey === "function" ? makeKey(meta.serviceName, meta.locationId) : `${meta.serviceName}||${meta.locationId}`, type:"serviceLocation" });
+    if(meta.serviceName && meta.locationName) candidateKeys.push({ key: `${meta.serviceName}||${meta.locationName}`, type:"nameFallback" });
+    if(preferCanonical && meta.storageKey) candidateKeys.unshift({ key: meta.storageKey, type:"serviceLocation" });
+    for(const c of candidateKeys){
+      const hit = indexes.byServiceLocation.get(c.key) || indexes.byBlockId.get(c.key) || indexes.byName.get(c.key);
+      if(hit){
+        return { matched:true, matchType:c.type, matchedKey:c.key, block:hit, ...meta };
+      }
+    }
+    return { matched:false, matchType:"", matchedKey:"", block:null, ...meta };
+  };
+
+  let canonicalMatchedByBlockId = 0;
+  let canonicalMatchedByServiceLocation = 0;
+  let canonicalMatchedByNameFallback = 0;
+  let canonicalOrphans = 0;
+  let legacyMatchedByBlockId = 0;
+  let legacyMatchedByServiceLocation = 0;
+  let legacyMatchedByNameFallback = 0;
+  let legacyMatched = 0;
+  let legacyOrphans = 0;
+  let measuredBlocksCount = 0;
+  const canonicalMatchedSamples = [];
+  const canonicalOrphanSamples = [];
+  const legacyMatchedSamples = [];
+  const legacyOrphanSamples = [];
+
+  for(const key of canonicalKeys){
+    const entry = canonicalEntries[key];
+    const matched = matchEntry(entry, key, "state.realization", true);
+    if(matched.matched){
+      if(matched.matchType === "blockId") canonicalMatchedByBlockId++;
+      else if(matched.matchType === "serviceLocation") canonicalMatchedByServiceLocation++;
+      else if(matched.matchType === "nameFallback") canonicalMatchedByNameFallback++;
+      recordSample(canonicalMatchedSamples, { key, matchType:matched.matchType, measured:matched.measured, ri:matched.ri || null, rf:matched.rf || null });
+    }else{
+      canonicalOrphans++;
+      recordSample(canonicalOrphanSamples, { key, measured:matched.measured, ri:matched.ri || null, rf:matched.rf || null });
+    }
+  }
+
+  const stateKeys = Object.keys(stateEdits || {});
+  const legacyKeys = Object.keys(legacyEdits || {});
+  const legacyOnlyEntries = legacyKeys.filter(k=>!canonicalKeySet.has(k)).length;
+  for(const k of legacyKeys){
+    const matched = matchEntry(legacyEdits[k], k, "QP_BLOCK_EDIT_V3", false);
+    if(matched.matched){
+      legacyMatched++;
+      if(matched.matchType === "blockId") legacyMatchedByBlockId++;
+      else if(matched.matchType === "serviceLocation") legacyMatchedByServiceLocation++;
+      else if(matched.matchType === "nameFallback") legacyMatchedByNameFallback++;
+      recordSample(legacyMatchedSamples, { key:k, matchType:matched.matchType, measured:matched.measured, ri:matched.ri || null, rf:matched.rf || null });
+    }else{
+      legacyOrphans++;
+      recordSample(legacyOrphanSamples, { key:k, measured:matched.measured, ri:matched.ri || null, rf:matched.rf || null });
+    }
+  }
+
+  for(const block of planBlocks){
+    const realized = getCanonicalRealizationEntry(block);
+    if(realized && realized.measured) measuredBlocksCount++;
+  }
+
+  const activeVersionFound = !!activeVersion;
+  const warnings = [];
+  if(!activePlanningVersionId) warnings.push("missing_activePlanningVersionId");
+  if(activePlanningVersionId && !activeVersion) warnings.push("activePlanningVersionId_not_found");
+  if(!stateRealizationExists) warnings.push("missing_state_realization");
+  if(!planBlocks.length) warnings.push("missing_plan_blocks");
+  const unmatchedRealizationEntries = canonicalOrphans + legacyOrphans;
+  const out = {
+    activePlanningVersionId,
+    activeVersionFound,
+    currentPlanBlocksCount: planBlocks.length,
+    stateBlockEditsTotal: stateKeys.length,
+    legacyBlockEditsTotal: legacyKeys.length,
+    matchedByBlockId: canonicalMatchedByBlockId + legacyMatchedByBlockId,
+    matchedByServiceLocation: canonicalMatchedByServiceLocation + legacyMatchedByServiceLocation,
+    matchedByNameFallback: canonicalMatchedByNameFallback + legacyMatchedByNameFallback,
+    unmatchedRealizationEntries,
+    measuredBlocksCount,
+    orphanRealizationCount: unmatchedRealizationEntries,
+    stateRealizationExists,
+    canonicalEntriesForActiveVersion: canonicalKeys.length,
+    canonicalMatchedByServiceLocation,
+    canonicalMatchedByBlockId,
+    canonicalMatchedByNameFallback,
+    canonicalOrphans,
+    legacyOnlyEntries,
+    legacyMatched,
+    legacyOrphans,
+    usingCanonicalFirst: true,
+    samples: {
+      canonical: { matched: canonicalMatchedSamples, orphan: canonicalOrphanSamples },
+      legacy: { matched: legacyMatchedSamples, orphan: legacyOrphanSamples }
+    },
+    warnings
+  };
+  try{ console.log("[REALIZATION_VERSION_AUDIT]", out); }catch(_){}
+  return out;
+}
+try{ window.PLANNUS_AUDIT_REALIZATION_VERSION_LINK = auditRealizationVersionLink; }catch(_){}
+
+function syncLegacyRealizationIntoStateForActiveVersion(inputState, options){
+  const s = ensureRealizationStateContract(inputState || {});
+  const opts = (options && typeof options === "object") ? options : {};
+  const confirm = opts.confirm === true;
+  const activePlanningVersionId = String(s?.realization?.activePlanningVersionId || "").trim() || null;
+  const warnings = [];
+  if(!activePlanningVersionId) warnings.push("missing_activePlanningVersionId");
+  const legacyMap = (typeof _getBlockEditsMap === "function") ? (_getBlockEditsMap() || {}) : {};
+  const legacyKeys = Object.keys(legacyMap || {});
+  const planBlocks = Array.isArray(s?.plan?.blocks) ? s.plan.blocks : [];
+  const blockByServiceLocation = new Map();
+  const blockByBlockId = new Map();
+  for(const block of planBlocks){
+    const stable = buildRealizationStableKey(block);
+    const sid = String(stable.serviceId || "").trim();
+    const lid = String(stable.locationId || "").trim();
+    const blockId = String(block?.id || block?.blockId || block?.blockKey || block?.uid || block?.code || "").trim();
+    if(sid && lid){
+      const k = typeof makeKey === "function" ? makeKey(sid, lid) : `${sid}||${lid}`;
+      if(!blockByServiceLocation.has(k)) blockByServiceLocation.set(k, block);
+    }
+    if(blockId && !blockByBlockId.has(blockId)) blockByBlockId.set(blockId, block);
+  }
+  const targetBucket = activePlanningVersionId ? (
+    s.realization.entriesByVersion[activePlanningVersionId] && typeof s.realization.entriesByVersion[activePlanningVersionId] === "object"
+      ? s.realization.entriesByVersion[activePlanningVersionId]
+      : {}
+  ) : {};
+  const preview = {};
+  let migrated = 0;
+  let skipped = 0;
+  let orphan = 0;
+  const parseLegacy = (entry, storageKey)=>{
+    const raw = (entry && typeof entry === "object" && !Array.isArray(entry)) ? entry : {};
+    const pick = (...keys)=>{
+      for(const k of keys){
+        const v = raw?.[k];
+        if(v == null) continue;
+        const s2 = String(v).trim();
+        if(s2) return s2;
+      }
+      return "";
+    };
+    const sid = pick("serviceId","svcId","service_id","svc","serviceKey","service");
+    const lid = pick("locationId","locId","location_id","loc","locationKey","location");
+    const blockId = pick("blockId","blockID","id","blockKey","block_id") || String(raw?.block?.id || raw?.block?.blockId || raw?.block?.key || "").trim();
+    const ri = pick("RI","realStart","startReal","inicioReal","ri");
+    const rf = pick("RF","realEnd","endReal","terminoReal","rf");
+    const storageParts = String(storageKey || "").split("||");
+    return { sid, lid, blockId, ri, rf, storageParts };
+  };
+  for(const key of legacyKeys){
+    const parsed = parseLegacy(legacyMap[key], key);
+    let matchedBlock = null;
+    let matchType = "";
+    if(parsed.sid && parsed.lid){
+      const k = typeof makeKey === "function" ? makeKey(parsed.sid, parsed.lid) : `${parsed.sid}||${parsed.lid}`;
+      matchedBlock = blockByServiceLocation.get(k) || null;
+      if(matchedBlock) matchType = "serviceLocation";
+    }
+    if(!matchedBlock && parsed.blockId){
+      matchedBlock = blockByBlockId.get(parsed.blockId) || null;
+      if(matchedBlock) matchType = "blockId";
+    }
+    if(!matchedBlock){
+      orphan++;
+      skipped++;
+      continue;
+    }
+    const stable = buildRealizationStableKey(matchedBlock);
+    const targetKey = String(stable.key || "").trim();
+    const normalizedEntry = {
+      serviceId: parsed.sid || stable.serviceId || null,
+      locationId: parsed.lid || stable.locationId || null,
+      blockId: parsed.blockId || String(matchedBlock?.id || matchedBlock?.blockId || "").trim() || null,
+      ri: parsed.ri || "",
+      rf: parsed.rf || "",
+      measured: !!(parsed.ri || parsed.rf),
+      source: "legacy-sync",
+      updatedAtISO: now()
+    };
+    if(!targetKey){
+      skipped++;
+      continue;
+    }
+    if(Object.prototype.hasOwnProperty.call(targetBucket || {}, targetKey)){
+      skipped++;
+      continue;
+    }
+    preview[targetKey] = normalizedEntry;
+    migrated++;
+  }
+  if(confirm && activePlanningVersionId){
+    s.realization.entriesByVersion[activePlanningVersionId] = {
+      ...preview,
+      ...(targetBucket && typeof targetBucket === "object" ? targetBucket : {})
+    };
+    s.realization.updatedAtISO = now();
+    console.log("[REALIZATION_CANONICAL_WRITE]", {
+      event: "legacy_sync_committed",
+      activePlanningVersionId,
+      migrated
+    });
+  }
+  const out = {
+    migrated,
+    skipped,
+    orphan,
+    activePlanningVersionId,
+    warnings: warnings.concat(confirm ? [] : ["simulation_only"]),
+    simulated: !confirm
+  };
+  console.log("[REALIZATION_LEGACY_SYNC_AUDIT]", out);
+  return out;
+}
+try{
+  window.PLANNUS_SYNC_LEGACY_REALIZATION_TO_STATE = function(confirm){
+    return syncLegacyRealizationIntoStateForActiveVersion(window.state, { confirm: confirm === true });
+  };
+}catch(_){}
 
 function _setActivePlanBlocks(blocks){
   _ensureStateContracts();
@@ -8511,6 +9049,17 @@ function syncCalendarRangeToBlocks(blocks, opts){
   if(!state.calendar.fullEndISO || String(maxEnd) > String(state.calendar.fullEndISO)){
     state.calendar.fullEndISO = maxEnd;
     changed = true;
+  }
+
+  if(cfg.applyToVisible){
+    if(!state.calendar.startDateISO || String(minStart) < String(state.calendar.startDateISO)){
+      state.calendar.startDateISO = minStart;
+      changed = true;
+    }
+    if(!state.calendar.endDateISO || String(maxEnd) > String(state.calendar.endDateISO)){
+      state.calendar.endDateISO = maxEnd;
+      changed = true;
+    }
   }
 
   return { ok:true, changed, minStart, maxEnd };
@@ -9340,13 +9889,17 @@ const svcMap=new Map(state.services.map(s=>[s.id,s]));
   const blocks=[];
 
   // ===== BASELINE PAIRS GUARD (evita cartesian product e travamento) =====
-  // Se existir baseline/plan importada do MSP, geramos blocos APENAS para pares (serviceId, locationId) existentes.
+  // IMPORTANTE: esse guard só deve atuar em modo de estrutura fixa (MSP import).
+  // No fluxo guiado normal, restringir por pares antigos derruba serviços do acompanhamento.
   const __pairsBySvc = new Map(); // svcId -> Set(locId)
   const __pairsOrderBySvc = new Map(); // svcId -> Array(locId) na ordem dos locations
   try{
-    const src = (state && state.plan && Array.isArray(state.plan.blocks) && state.plan.blocks.length) ? state.plan.blocks
-              : (state && state.baseline && Array.isArray(state.baseline.blocks) && state.baseline.blocks.length) ? state.baseline.blocks
-              : null;
+    const fixedImportMode = (typeof _isFixedStructureImportMode === "function") ? !!_isFixedStructureImportMode() : false;
+    const src = fixedImportMode
+      ? ((state && state.plan && Array.isArray(state.plan.blocks) && state.plan.blocks.length) ? state.plan.blocks
+        : (state && state.baseline && Array.isArray(state.baseline.blocks) && state.baseline.blocks.length) ? state.baseline.blocks
+        : null)
+      : null;
     if(src){
       for(const b of src){
         const s = String(b.serviceId||"").trim();
@@ -9362,9 +9915,9 @@ const svcMap=new Map(state.services.map(s=>[s.id,s]));
         arr.sort((a,b)=> (locOrder.get(a)||999999) - (locOrder.get(b)||999999));
         __pairsOrderBySvc.set(s, arr);
       }
-      log(`[BASELINE_PAIRS] ativo: services=${__pairsBySvc.size} pares=${src.length}`);
+      log(`[BASELINE_PAIRS] ativo (fixedImportMode): services=${__pairsBySvc.size} pares=${src.length}`);
     }else{
-      log(`[BASELINE_PAIRS] inativo (sem baseline/plan.blocks importados)`);
+      log(`[BASELINE_PAIRS] inativo (modo guiado sem restrição por pares)`);
     }
   }catch(e){
     try{ log(`[BASELINE_PAIRS] erro ao montar pares: ${e && e.message ? e.message : e}`); }catch(_){}
@@ -9559,6 +10112,51 @@ function _writeBlockEditsMap(data){
   try{
     const out = (data && typeof data === "object") ? data : {};
     localStorage.setItem("QP_BLOCK_EDIT_V3", JSON.stringify(out));
+    try{
+      const s = ensureRealizationStateContract(state || {});
+      const activeId = String(s?.realization?.activePlanningVersionId || "").trim();
+      if(activeId){
+        if(!s.realization.entriesByVersion || typeof s.realization.entriesByVersion !== "object" || Array.isArray(s.realization.entriesByVersion)) s.realization.entriesByVersion = {};
+        const nextVersionEntries = {};
+        Object.entries(out).forEach(([storageKey, entry])=>{
+          const rawEntry = (entry && typeof entry === "object") ? entry : {};
+          const storageParts = String(storageKey || "").split("||");
+          const sid = String(rawEntry.serviceId || rawEntry.svcId || storageParts[0] || "").trim();
+          const lid = String(rawEntry.locationId || rawEntry.locId || storageParts[1] || "").trim();
+          const blockId = String(rawEntry.blockId || rawEntry.blockID || rawEntry.id || "").trim() || null;
+          const stable = buildRealizationStableKey({
+            id: blockId || undefined,
+            serviceId: sid || undefined,
+            locationId: lid || undefined,
+            serviceName: String(rawEntry.serviceName || rawEntry.serviceTitle || "").trim(),
+            locationName: String(rawEntry.locationName || rawEntry.locationTitle || "").trim()
+          });
+          const key = stable.key || String(storageKey || "").trim();
+          nextVersionEntries[key] = {
+            serviceId: sid || null,
+            locationId: lid || null,
+            blockId,
+            ri: String(rawEntry.RI || rawEntry.realStart || rawEntry.startReal || rawEntry.inicioReal || rawEntry.ri || "").trim(),
+            rf: String(rawEntry.RF || rawEntry.realEnd || rawEntry.endReal || rawEntry.terminoReal || rawEntry.rf || "").trim(),
+            measured: !!(rawEntry.measured || rawEntry.realizado || rawEntry.done || rawEntry.completed || rawEntry.RF || rawEntry.realEnd || rawEntry.endReal || rawEntry.terminoReal),
+            source: "user-edit",
+            updatedAtISO: now()
+          };
+        });
+        s.realization.entriesByVersion[activeId] = nextVersionEntries;
+        s.realization.activePlanningVersionId = activeId;
+        s.realization.updatedAtISO = now();
+        console.log("[REALIZATION_CANONICAL_WRITE]", {
+          event:"synced_from_legacy_map",
+          activePlanningVersionId: activeId,
+          entries: Object.keys(nextVersionEntries).length
+        });
+      }else{
+        console.warn("[REALIZATION_CANONICAL_WRITE]", { event:"skip_no_active_version" });
+      }
+    }catch(e){
+      console.warn("[REALIZATION_CANONICAL_WRITE]", { event:"sync_failed", error:String(e && e.message || e) });
+    }
     return true;
   }catch(_){
     return false;
@@ -9854,7 +10452,7 @@ function generateBlocksRespectingEdits(){
 
       const __cycleOv = (cycle && cycle.durationByLocation) ? cycle.durationByLocation[locId] : null;
       const duration = Math.max(1, Number((__durOv!=null && __durOv!=="" ) ? __durOv : ((__cycleOv!=null && __cycleOv!=="" ) ? __cycleOv : (cycle.durationDefault ?? 5))));
-      const k = String(svcId)+"||"+String(locId);
+      const k = makeKey(svcId, locId);
       const ed = editsByKey[k] || null;
       const forcedTeam = (ed && ed.teamId) ? String(ed.teamId).trim() : "";
 
@@ -12870,12 +13468,26 @@ function renderGuidedApplyView(){
   const readiness = _guidedBuildReadiness(model, { requireLocations:true });
   if(applyHint) applyHint.textContent = "Selecione a base e o grupo para montar o planejamento.";
   if(applySummary){
-    applySummary.innerHTML = "";
-    applySummary.style.display = "none";
+    const scopeLabel = targetLabel || "Base inteira";
+    const depCount = Array.isArray(model?.dependencies) ? model.dependencies.length : 0;
+    const locTotal = Array.isArray(model?.locations) ? model.locations.length : 0;
+    const locScoped = Array.isArray(filteredLocations) ? filteredLocations.length : 0;
+    applySummary.innerHTML = [
+      `<span class="planningAssemblyChip">Servicos base: ${escapeHtml(String(Array.isArray(model?.services) ? model.services.length : 0))}</span>`,
+      `<span class="planningAssemblyChip">Dependencias: ${escapeHtml(String(depCount))}</span>`,
+      `<span class="planningAssemblyChip">Escopo: ${escapeHtml(scopeLabel)} (${escapeHtml(String(isFilteredApply ? locScoped : locTotal))} locais)</span>`,
+      `<span class="planningAssemblyChip">Modo: ${escapeHtml(isReplaceMode ? "Substituir" : "Adicionar")}</span>`
+    ].join(" ");
+    applySummary.style.display = "flex";
   }
   if(applyReadiness){
-    applyReadiness.innerHTML = "";
-    applyReadiness.style.display = "none";
+    const issues = Array.isArray(readiness?.issues) ? readiness.issues : [];
+    if(issues.length){
+      applyReadiness.innerHTML = `<div class="planningAssemblyPanelNote" style="color:#b91c1c;">${escapeHtml(issues.join(" | "))}</div>`;
+    }else{
+      applyReadiness.innerHTML = `<div class="planningAssemblyPanelNote" style="color:#0f766e;">Pronto para aplicar. Revise o fluxo operacional e confirme.</div>`;
+    }
+    applyReadiness.style.display = "block";
   }
   const applyAction = ()=> _applyGuidedPlanningModel();
   if(btnApply) btnApply.onclick = applyAction;
@@ -13019,6 +13631,8 @@ function _normalizePlanningAssemblyState(raw){
 }
 function _planningProjectKey(meta){
   const safe = meta && typeof meta === "object" ? meta : _getProjectMeta() || {};
+  const obraId = String(safe?.obraId || safe?.obra_id || safe?.obraIdOnline || "").trim();
+  if(obraId) return `obra_${obraId}`;
   const uid = String(safe?.uid || safe?.id || safe?.projectId || "").trim();
   if(uid) return uid;
   return _planningProjectFingerprintKey(safe);
@@ -13036,6 +13650,15 @@ function _planningProjectFingerprintKey(meta){
 function _planningProjectLegacyKey(meta){
   const safe = meta && typeof meta === "object" ? meta : _getProjectMeta() || {};
   return _planningProjectFingerprintKey(safe);
+}
+function _planningScopedKeysFromMeta(meta){
+  const onlineMeta = (typeof readMeta === "function") ? (readMeta() || {}) : {};
+  const projectMeta = (typeof _getProjectMeta === "function") ? (_getProjectMeta() || {}) : {};
+  const safe = Object.assign({}, projectMeta, onlineMeta, (meta && typeof meta === "object") ? meta : {});
+  const obraId = String(safe?.obraId || safe?.obra_id || safe?.obraIdOnline || "").trim();
+  const scopeKey = obraId ? `obra_${obraId}` : _planningProjectKey(safe);
+  const legacyKey = _planningProjectLegacyKey(safe);
+  return { obraId: obraId || null, scopeKey, legacyKey };
 }
 function _readPlanningAssemblyStore(){
   try{
@@ -13057,8 +13680,9 @@ function _savePlanningAssemblyStore(store){
 function _readPlanningAssemblyState(){
   try{
     const projectMeta = _getProjectMeta() || {};
-    const projectKey = _planningProjectKey(projectMeta);
-    const legacyKey = _planningProjectLegacyKey(projectMeta);
+    const scope = _planningScopedKeysFromMeta(projectMeta);
+    const projectKey = scope.scopeKey;
+    const legacyKey = scope.legacyKey;
     const store = _readPlanningAssemblyStore();
     const byProject = store.byProject && typeof store.byProject === "object" ? store.byProject : {};
     let rawState = byProject[projectKey];
@@ -13093,12 +13717,16 @@ function _readPlanningAssemblyState(){
 }
 function _savePlanningAssemblyState(next){
   const safe = _normalizePlanningAssemblyState(_planningMergeTopLevelIntoActivePhase(next));
-  const projectKey = _planningProjectKey();
+  const scope = _planningScopedKeysFromMeta(_getProjectMeta() || {});
+  const projectKey = scope.scopeKey;
   const store = _readPlanningAssemblyStore();
   store.version = 1;
   store.lastProjectKey = projectKey;
   store.byProject = store.byProject && typeof store.byProject === "object" ? store.byProject : {};
   store.byProject[projectKey] = safe;
+  if(scope.legacyKey && scope.legacyKey !== projectKey && store.byProject[scope.legacyKey]){
+    store.byProject[scope.legacyKey] = safe;
+  }
   _savePlanningAssemblyStore(store);
   try{ localStorage.setItem(PLANNUS_PLANNING_ASSEMBLY_KEY, JSON.stringify(safe)); }catch(_){}
   return safe;
@@ -14177,9 +14805,28 @@ function renderPlanningAssemblyView(model, locations){
 
   const assembly = _readPlanningAssemblyState();
   const baseSnapshot = assembly?.baseSnapshot && typeof assembly.baseSnapshot === "object" ? assembly.baseSnapshot : null;
-  const sourceModel = baseSnapshot?.model && typeof baseSnapshot.model === "object"
-    ? baseSnapshot.model
-    : (model && typeof model === "object" ? model : { services:[], dependencies:[], locations:[] });
+  const snapshotModel = baseSnapshot?.model && typeof baseSnapshot.model === "object" ? baseSnapshot.model : null;
+  const liveModel = model && typeof model === "object" ? model : null;
+  const snapshotServices = Array.isArray(snapshotModel?.services) ? snapshotModel.services : [];
+  const liveServices = Array.isArray(liveModel?.services) ? liveModel.services : [];
+  const snapshotServicesCount = snapshotServices.length;
+  const liveServicesCount = liveServices.length;
+  const snapshotIds = new Set(snapshotServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+  const liveIds = new Set(liveServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+  const liveHasMissingInSnapshot = Array.from(liveIds).some(id=>!snapshotIds.has(id));
+  const useLiveModel = !!(liveModel && (liveServicesCount > snapshotServicesCount || liveHasMissingInSnapshot));
+  const sourceModel = useLiveModel
+    ? liveModel
+    : (snapshotModel || liveModel || { services:[], dependencies:[], locations:[] });
+  if(useLiveModel){
+    console.warn("[PLANNING_APPLY_AUDIT]", {
+      event:"planning_render_using_live_model",
+      snapshotServices:snapshotServicesCount,
+      liveServices:liveServicesCount,
+      liveHasMissingInSnapshot,
+      activePhaseId:String(assembly?.activePhaseId || "")
+    });
+  }
   const services = Array.isArray(sourceModel?.services) ? sourceModel.services : [];
   const baseDeps = Array.isArray(sourceModel?.dependencies) ? sourceModel.dependencies : [];
   const locCount = Array.isArray(sourceModel?.locations) ? sourceModel.locations.length : (Array.isArray(locations) ? locations.length : 0);
@@ -15223,6 +15870,7 @@ function _guidedDeleteTemplateByKey(templateKey){
     return false;
   }
   if(!confirm(`Excluir o modelo "${currentTemplate.label}"?`)) return false;
+  const preservedServiceBase = _getServiceBaseCatalogForStorage().map(x=>Object.assign({}, x));
   const library = _readGuidedEapLibrary();
   delete library[key];
   _saveGuidedEapLibrary(library);
@@ -15244,6 +15892,16 @@ function _guidedDeleteTemplateByKey(templateKey){
   }else{
     _saveGuidedPlanDraft(Object.assign({}, _guidedDefaultDraft(), { templateKey:"residencial_vertical_padrao" }));
   }
+  try{
+    if(preservedServiceBase.length){
+      state.serviceBaseCatalog = preservedServiceBase.map(x=>Object.assign({}, x));
+      _syncServiceBaseCatalogToStateServicesWhenSafe();
+      saveServicesToStorage(state.serviceBaseCatalog);
+      console.log("[PLANNUS_EAP]", { event:"template_delete_preserved_service_base", count:state.serviceBaseCatalog.length });
+    }
+  }catch(e){
+    console.warn("[PLANNUS_EAP]", { event:"template_delete_preserve_failed", error:String(e && e.message || e) });
+  }
   renderGuidedPlanningView();
   return true;
 }
@@ -15255,9 +15913,20 @@ function _guidedClearSavedTemplates(){
     return false;
   }
   if(!confirm(`Limpar todos os modelos salvos?\n\nModelos encontrados: ${keys.length}\n\nIsso remove apenas os modelos salvos na biblioteca. Os modelos padrão continuam disponíveis.`)) return false;
+  const preservedServiceBase = _getServiceBaseCatalogForStorage().map(x=>Object.assign({}, x));
   const next = {};
   _saveGuidedEapLibrary(next);
   _saveGuidedPlanDraft(_guidedDefaultDraft());
+  try{
+    if(preservedServiceBase.length){
+      state.serviceBaseCatalog = preservedServiceBase.map(x=>Object.assign({}, x));
+      _syncServiceBaseCatalogToStateServicesWhenSafe();
+      saveServicesToStorage(state.serviceBaseCatalog);
+      console.log("[PLANNUS_EAP]", { event:"clear_templates_preserved_service_base", count:state.serviceBaseCatalog.length });
+    }
+  }catch(e){
+    console.warn("[PLANNUS_EAP]", { event:"clear_templates_preserve_failed", error:String(e && e.message || e) });
+  }
   renderGuidedPlanningView();
   return true;
 }
@@ -15430,6 +16099,24 @@ function _guidedBuildOperationalPlanningModel(model, assembly, filteredServiceLo
   const nodeToService = new Map();
   const opMetaById = new Map();
   const baseToOperationalIds = new Map();
+  const usedOperationalIds = new Set();
+  const makeUniqueOperationalId = (rawId)=>{
+    const baseRaw = String(rawId || "").trim();
+    if(!baseRaw) return "";
+    if(!usedOperationalIds.has(baseRaw)){
+      usedOperationalIds.add(baseRaw);
+      return baseRaw;
+    }
+    let idx = 2;
+    let candidate = `${baseRaw}__${idx}`;
+    while(usedOperationalIds.has(candidate)){
+      idx += 1;
+      candidate = `${baseRaw}__${idx}`;
+    }
+    usedOperationalIds.add(candidate);
+    console.warn("[PLANNING_APPLY_AUDIT]", { event:"operational_service_id_collision", baseId:baseRaw, resolvedId:candidate });
+    return candidate;
+  };
 
   for(const svc of baseServices){
     const baseId = _planningServiceId(svc);
@@ -15449,7 +16136,8 @@ function _guidedBuildOperationalPlanningModel(model, assembly, filteredServiceLo
     const opIds = [];
     segments.forEach((seg, segIdx)=>{
       const segId = String(seg?.id || `etapa_${segIdx+1}`).trim() || `etapa_${segIdx+1}`;
-      const opId = _guidedOperationalServiceId(baseId, segId, hasExplicitSegments);
+      const opIdRaw = _guidedOperationalServiceId(baseId, segId, hasExplicitSegments);
+      const opId = makeUniqueOperationalId(opIdRaw);
       if(!opId) return;
       const opName = hasExplicitSegments
         ? `${String(svc?.name || baseId).trim()} - ${String(seg?.name || `Etapa ${segIdx+1}`).trim()}`
@@ -15571,8 +16259,146 @@ function _guidedBuildOperationalPlanningModel(model, assembly, filteredServiceLo
   });
   const cycleCheck = _guidedCheckOperationalDependencyCycle(services, dedupedDeps);
   const dependencies = _guidedSortOperationalDependencies(services, dedupedDeps);
+  console.log("[PLANNING_APPLY_AUDIT]", {
+    event:"operational_model_built",
+    baseServices:baseServices.length,
+    generatedServices:services.length,
+    generatedCycles:cycles.length,
+    generatedDeps:dependencies.length
+  });
 
   return { services, cycles, dependencies, cycleCheck, serviceLocationMap };
+}
+function syncVisiblePlanningStageRowsBeforeApply(){
+  try{
+    const segRoot = document.getElementById("planningAssemblySegments");
+    const rows = Array.from(segRoot?.querySelectorAll("[data-planning-stage-id]") || []);
+    if(!rows.length) return false;
+    const ctx = window.__planningAssemblyCtx || {};
+    const selectedId = String(document.getElementById("planningAssemblyServiceSelect")?.value || ctx.selectedId || "").trim().split("::")[0].trim();
+    if(!selectedId) return false;
+    const nextRows = rows.map((row, idx)=>({
+      id:String(row.getAttribute("data-planning-stage-id") || `etapa_${idx+1}`).trim(),
+      name:String(row.querySelector('[data-planning-stage-field="name"]')?.value || `Etapa ${idx+1}`).trim() || `Etapa ${idx+1}`,
+      durationDays:Math.max(1, Number(row.querySelector('[data-planning-stage-field="durationDays"]')?.value || 1) || 1),
+      order:Math.max(1, Number(row.querySelector('[data-planning-stage-field="order"]')?.value || idx+1) || idx+1)
+    }));
+    const assembly = _planningSyncActivePhaseToAssembly(_readPlanningAssemblyState());
+    assembly.segmentsByService = assembly.segmentsByService || {};
+    if(nextRows.length) assembly.segmentsByService[selectedId] = _planningExplicitSegments(nextRows);
+    else delete assembly.segmentsByService[selectedId];
+    assembly.selectedServiceId = selectedId;
+    _savePlanningAssemblyState(assembly);
+    try{
+      state.ui = state.ui || {};
+      state.ui.planningAssemblyServiceId = selectedId;
+    }catch(_){}
+    console.log("[PLANNING_APPLY_AUDIT]", { event:"visible_stage_rows_synced", serviceId:selectedId, rows:nextRows.length });
+    return true;
+  }catch(e){
+    console.warn("[PLANNING_APPLY_AUDIT]", { event:"visible_stage_rows_sync_failed", error:String(e && e.message || e) });
+    return false;
+  }
+}
+function syncActivePhaseSnapshotBeforeApply(draftModelArg){
+  const diag = {
+    ok: false,
+    activePhaseId: "",
+    beforeSnapshotServices: 0,
+    afterSnapshotServices: 0,
+    liveServices: 0,
+    source: "none",
+    warning: null
+  };
+  try{
+    const draftModel = (draftModelArg && typeof draftModelArg === "object") ? draftModelArg : _guidedBuildModel(_guidedReadDraftFromUI());
+    const liveServices = Array.isArray(draftModel?.services) ? draftModel.services : [];
+    const liveDeps = Array.isArray(draftModel?.dependencies) ? draftModel.dependencies : [];
+    const liveLocs = Array.isArray(draftModel?.locations) ? draftModel.locations : [];
+    diag.liveServices = liveServices.length;
+
+    const assembly = _planningSyncActivePhaseToAssembly(_readPlanningAssemblyState());
+    const phases = Array.isArray(assembly?.phases) ? assembly.phases.slice() : [];
+    if(!phases.length){
+      diag.warning = "no_phases";
+      console.warn("[PLANNING_PHASE_SNAPSHOT]", diag);
+      return diag;
+    }
+    const activePhaseId = String(assembly?.activePhaseId || phases[0]?.id || "").trim() || String(phases[0]?.id || "").trim();
+    diag.activePhaseId = activePhaseId;
+    const activeIdx = Math.max(0, phases.findIndex(p=>String(p?.id || "").trim() === activePhaseId));
+    const activePhase = phases[activeIdx] || phases[0] || null;
+    if(!activePhase){
+      diag.warning = "no_active_phase";
+      console.warn("[PLANNING_PHASE_SNAPSHOT]", diag);
+      return diag;
+    }
+    const currentSnapshot = _planningNormalizeBaseSnapshot(activePhase.baseSnapshot || null) || null;
+    const currentModel = currentSnapshot?.model && typeof currentSnapshot.model === "object" ? currentSnapshot.model : null;
+    const currentServices = Array.isArray(currentModel?.services) ? currentModel.services : [];
+    diag.beforeSnapshotServices = currentServices.length;
+
+    const currentIds = new Set(currentServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+    const liveIds = new Set(liveServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+    const liveHasMissingInSnapshot = Array.from(liveIds).some(id=>!currentIds.has(id));
+    const shouldSync = liveServices.length > 0 && (!currentServices.length || liveHasMissingInSnapshot);
+
+    if(!shouldSync){
+      diag.ok = true;
+      diag.afterSnapshotServices = currentServices.length;
+      diag.source = "activePhaseSnapshot_kept";
+      return diag;
+    }
+
+    const nextSnapshot = _planningNormalizeBaseSnapshot({
+      templateKey: String(currentSnapshot?.templateKey || draftModel?.template?.key || draftModel?.templateKey || "").trim(),
+      templateLabel: String(currentSnapshot?.templateLabel || draftModel?.label || draftModel?.name || activePhase?.label || "EAP").trim(),
+      capturedAtISO: new Date().toISOString(),
+      originLabel: String(currentSnapshot?.originLabel || activePhase?.originLabel || "Planejamento").trim() || "Planejamento",
+      model: {
+        label: String(draftModel?.label || draftModel?.name || activePhase?.label || "EAP").trim(),
+        name: String(draftModel?.name || draftModel?.label || activePhase?.label || "EAP").trim(),
+        services: _planningCloneDeep(liveServices, []),
+        dependencies: _planningCloneDeep(liveDeps, []),
+        locations: _planningCloneDeep(liveLocs, []),
+        serviceLocationMap: draftModel?.serviceLocationMap && typeof draftModel.serviceLocationMap === "object"
+          ? _planningCloneDeep(draftModel.serviceLocationMap, {})
+          : {}
+      }
+    });
+
+    const nextPhase = _planningNormalizePhase(Object.assign({}, activePhase, {
+      baseSnapshot: nextSnapshot,
+      capturedAtISO: String(activePhase?.capturedAtISO || nextSnapshot?.capturedAtISO || new Date().toISOString()).trim() || new Date().toISOString()
+    }), activeIdx);
+    phases[activeIdx] = nextPhase;
+    const nextAssembly = Object.assign({}, assembly, {
+      phases,
+      activePhaseId: String(nextPhase.id || activePhaseId).trim(),
+      phaseLabel: String(nextPhase.label || assembly.phaseLabel || "").trim(),
+      originLabel: String(nextPhase.originLabel || assembly.originLabel || "").trim(),
+      capturedAtISO: String(nextPhase.capturedAtISO || assembly.capturedAtISO || "").trim(),
+      baseSnapshot: _planningNormalizeBaseSnapshot(nextPhase.baseSnapshot) || null,
+      segmentsByService: _planningCloneDeep(nextPhase.segmentsByService, {}),
+      deps: _planningCloneDeep(nextPhase.deps, []),
+      laneByNode: _planningCloneDeep(nextPhase.laneByNode, {}),
+      blockedDepKeys: _planningCloneDeep(nextPhase.blockedDepKeys, []),
+      selectedServiceId: String(nextPhase.selectedServiceId || "").trim()
+    });
+    _savePlanningAssemblyState(nextAssembly);
+    diag.ok = true;
+    diag.afterSnapshotServices = Array.isArray(nextPhase?.baseSnapshot?.model?.services) ? nextPhase.baseSnapshot.model.services.length : 0;
+    diag.source = !currentServices.length ? "snapshot_filled_from_live" : "snapshot_refreshed_from_live";
+    if(diag.afterSnapshotServices === 0 && liveServices.length > 0){
+      diag.warning = "snapshot_still_empty_after_sync";
+    }
+    console.log("[PLANNING_PHASE_SNAPSHOT]", diag);
+    return diag;
+  }catch(e){
+    diag.warning = String(e && e.message || e);
+    console.warn("[PLANNING_PHASE_SNAPSHOT]", diag);
+    return diag;
+  }
 }
 function _clearGuidedOperationalPlanning(){
   if(!confirm("Limpar o planejamento atual?\n\nIsso remove atividades operacionais, blocos, ciclos e predecessoras aplicadas. A biblioteca de EAP e a base de pavimentos permanecem.")) return false;
@@ -15595,6 +16421,49 @@ function _clearGuidedOperationalPlanning(){
   return true;
 }
 function _applyGuidedPlanningModel(){
+  const nowMs = Date.now();
+  const startedAtMs = Number(window.__guidedApplyStartedAtMs || 0) || 0;
+  if(window.__guidedApplyInFlight){
+    const elapsedMs = startedAtMs > 0 ? (nowMs - startedAtMs) : 0;
+    if(elapsedMs > 12000){
+      console.warn("[PLANNING_APPLY_TRANSACTION]", { event:"stale_lock_auto_released", elapsedMs });
+      window.__guidedApplyInFlight = false;
+      window.__guidedApplyStartedAtMs = 0;
+    }else{
+      console.warn("[PLANNING_APPLY_TRANSACTION]", { event:"blocked_reentry", elapsedMs });
+      alert("A aplicacao da fase ativa ja esta em andamento. Aguarde finalizar.");
+      return false;
+    }
+  }
+  window.__guidedApplyInFlight = true;
+  window.__guidedApplyStartedAtMs = nowMs;
+  try{
+    document.body.classList.add("guidedApplyBusy");
+  }catch(_){}
+  try{
+    return _applyGuidedPlanningModelCore();
+  }catch(e){
+    console.error("[PLANNING_APPLY_TRANSACTION]", { event:"fatal_error", error:String(e && e.message || e) });
+    alert("Falha ao aplicar fase ativa. O planejamento nao foi finalizado. Verifique os dados da fase e tente novamente.");
+    return false;
+  }finally{
+    window.__guidedApplyInFlight = false;
+    window.__guidedApplyStartedAtMs = 0;
+    try{
+      document.body.classList.remove("guidedApplyBusy");
+    }catch(_){}
+  }
+}
+window.__resetGuidedApplyLock = function(){
+  try{
+    window.__guidedApplyInFlight = false;
+    window.__guidedApplyStartedAtMs = 0;
+    document.body.classList.remove("guidedApplyBusy");
+    console.warn("[PLANNING_APPLY_TRANSACTION]", { event:"manual_lock_reset" });
+  }catch(_){}
+};
+function _applyGuidedPlanningModelCore(){
+  syncVisiblePlanningStageRowsBeforeApply();
   // Garante que a data informada na aba de planejamento seja aplicada
   // mesmo quando o evento "change" do input ainda não disparou.
   try{
@@ -15615,12 +16484,75 @@ function _applyGuidedPlanningModel(){
   const draft = _guidedReadDraftFromUI();
   _saveGuidedPlanDraft(draft);
   const draftModel = _guidedBuildModel(draft);
+  const snapshotSyncDiag = syncActivePhaseSnapshotBeforeApply(draftModel);
+  if(snapshotSyncDiag && snapshotSyncDiag.warning){
+    console.warn("[PLANNING_PHASE_SNAPSHOT]", snapshotSyncDiag);
+  }
   const assembly = _planningSyncActivePhaseToAssembly(_readPlanningAssemblyState());
-  const activePhaseModel = assembly?.baseSnapshot?.model && typeof assembly.baseSnapshot.model === "object"
+  const activePhaseModelRaw = assembly?.baseSnapshot?.model && typeof assembly.baseSnapshot.model === "object"
     ? assembly.baseSnapshot.model
     : null;
-  const model = activePhaseModel || draftModel;
-  state.serviceBaseCatalog = _getServiceBaseCatalogForStorage(model.services).map(x=>Object.assign({}, x));
+  const activePhaseServices = Array.isArray(activePhaseModelRaw?.services) ? activePhaseModelRaw.services : [];
+  const draftServices = Array.isArray(draftModel?.services) ? draftModel.services : [];
+  const activePhaseIds = new Set(activePhaseServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+  const draftIds = new Set(draftServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
+  const draftHasMissingInActive = Array.from(draftIds).some(id=>!activePhaseIds.has(id));
+  let modelSource = "activePhaseModel";
+  let model = activePhaseModelRaw || draftModel;
+  if(!activePhaseModelRaw){
+    modelSource = "draftModel";
+    model = draftModel;
+  }else if(draftServices.length > activePhaseServices.length || draftHasMissingInActive){
+    modelSource = "draftModel_more_complete";
+    model = draftModel;
+    console.warn("[PLANNING_APPLY_AUDIT]", {
+      event:"active_phase_snapshot_stale",
+      activePhaseServices:activePhaseServices.length,
+      draftServices:draftServices.length,
+      draftHasMissingInActive,
+      activePhaseId:String(assembly?.activePhaseId || "")
+    });
+  }
+  if(Array.isArray(draftModel?.services) && draftModel.services.length > 0 && (!Array.isArray(activePhaseModelRaw?.services) || activePhaseServices.length === 0)){
+    console.warn("[PLANNING_APPLY_SOURCE]", {
+      event:"fallback_to_draft_due_empty_snapshot",
+      activePhaseId:String(assembly?.activePhaseId || ""),
+      snapshotServices:activePhaseServices.length,
+      draftServices:draftServices.length,
+      snapshotSync: snapshotSyncDiag || null
+    });
+  }else{
+    console.log("[PLANNING_APPLY_SOURCE]", {
+      event:"source_selected",
+      activePhaseId:String(assembly?.activePhaseId || ""),
+      source:modelSource,
+      snapshotServices:activePhaseServices.length,
+      draftServices:draftServices.length
+    });
+  }
+  const activePhase = (Array.isArray(assembly?.phases) ? assembly.phases : []).find(p=>String(p?.id||"").trim()===String(assembly?.activePhaseId||"").trim()) || null;
+  console.log("[PLANNING_APPLY_AUDIT]", {
+    event:"apply_start",
+    activePhaseId:String(assembly?.activePhaseId||""),
+    activePhaseLabel:String(activePhase?.label || assembly?.phaseLabel || ""),
+    hasActivePhase:!!activePhase,
+    source: modelSource,
+    modelServices:Array.isArray(model?.services) ? model.services.length : 0,
+    modelLocations:Array.isArray(model?.locations) ? model.locations.length : 0
+  });
+  // Não reduzir a base de serviços ao conjunto da fase/EAP ativa.
+  // Mescla serviços do modelo atual com o catálogo já existente.
+  const _baseExisting = _getServiceBaseCatalogForStorage().map(x=>Object.assign({}, x));
+  const _baseFromModel = _getServiceBaseCatalogForStorage(model.services).map(x=>Object.assign({}, x));
+  const _baseMergedMap = new Map();
+  _baseExisting.forEach(s=>{ const id = String(s?.id || "").trim(); if(id) _baseMergedMap.set(id, s); });
+  _baseFromModel.forEach(s=>{
+    const id = String(s?.id || "").trim();
+    if(!id) return;
+    if(!_baseMergedMap.has(id)) _baseMergedMap.set(id, s);
+  });
+  state.serviceBaseCatalog = Array.from(_baseMergedMap.values())
+    .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
   try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
   const targetGroup = String(state?.ui?.guidedTargetGroup || "").trim();
   const applyMode = String(document.getElementById("guidedApplyMode")?.value || "replace").trim() === "append" ? "append" : "replace";
@@ -15676,6 +16608,24 @@ function _applyGuidedPlanningModel(){
     importPathStore: JSON.parse(JSON.stringify(state.importPathStore || { byService:{} })),
     importMeta: JSON.parse(JSON.stringify(state.importMeta || {}))
   };
+  const restorePreviousPlanningState = (reason)=>{
+    state.services = previousPlanningState.services;
+    state.cycles = previousPlanningState.cycles;
+    state.dependencies = previousPlanningState.dependencies;
+    state.serviceLocationMap = previousPlanningState.serviceLocationMap;
+    state.blocks = previousPlanningState.blocks;
+    state.plan = previousPlanningState.plan;
+    state.baseline = previousPlanningState.baseline;
+    state.activityGraph = previousPlanningState.activityGraph;
+    state.depsOverrides = previousPlanningState.depsOverrides;
+    state.importPathStore = previousPlanningState.importPathStore;
+    state.importMeta = previousPlanningState.importMeta;
+    try{ saveServicesToStorage(); }catch(_){}
+    try{ saveDepsToStorage(); }catch(_){}
+    try{ savePlannerPrefsToStorage(); }catch(_){}
+    try{ saveLocs(); }catch(_){}
+    console.warn("[PLANNING_APPLY_TRANSACTION]", { event:"rollback", reason:String(reason || "unknown") });
+  };
   const operationalIds = new Set(operational.services.map(s=>String(s?.id || "").trim()).filter(Boolean));
   if(isReplaceMode){
     state.services = operational.services.slice();
@@ -15726,24 +16676,14 @@ function _applyGuidedPlanningModel(){
   try{ buildCalendarDays(); }catch(_){}
   const topoCheck = validateDependencyGraphActivities(state.dependencies, state);
   if(!topoCheck.ok){
-    state.services = previousPlanningState.services;
-    state.cycles = previousPlanningState.cycles;
-    state.dependencies = previousPlanningState.dependencies;
-    state.serviceLocationMap = previousPlanningState.serviceLocationMap;
-    state.blocks = previousPlanningState.blocks;
-    state.plan = previousPlanningState.plan;
-    state.baseline = previousPlanningState.baseline;
-    state.activityGraph = previousPlanningState.activityGraph;
-    state.depsOverrides = previousPlanningState.depsOverrides;
-    state.importPathStore = previousPlanningState.importPathStore;
-    state.importMeta = previousPlanningState.importMeta;
+    restorePreviousPlanningState("dependency_cycle_after_apply");
     alert(`A EAP não foi aplicada porque o grafo combinado ficaria em ciclo.\n\nNada foi alterado no planejamento.\n\nCiclo: ${topoCheck.cycleHint.join(", ")}`);
     return false;
   }else{
     try{
       state.ui = state.ui || {};
       state.ui.__guidedApplyingPhase = true;
-      try{ generateBlocks(); }catch(e){ console.warn("[GUIDED] generateBlocks after apply failed", e); }
+      try{ generateBlocks(); }catch(e){ console.warn("[GUIDED] generateBlocks after apply failed", e); restorePreviousPlanningState("generateBlocks_exception"); alert("A fase não foi aplicada porque a geração de blocos falhou. O planejamento anterior foi preservado."); return false; }
       try{
         const sync = syncCalendarRangeToBlocks(_getActivePlanBlocks(), {});
         if(sync && sync.changed){
@@ -15752,13 +16692,14 @@ function _applyGuidedPlanningModel(){
         }
       }catch(_){}
       if(!(_getActivePlanBlocks() || []).length){
-        alert("A EAP foi aplicada, mas nenhum bloco foi gerado para a linha de balanço. Revise pavimentos, duração e predecessoras.");
+        restorePreviousPlanningState("zero_blocks_after_generate");
+        alert("A fase não foi aplicada porque nenhum bloco foi gerado. O planejamento anterior foi preservado. Revise pavimentos, duração e predecessoras.");
+        return false;
       }else{
-        try{
-          if(typeof saveOperational === "function") saveOperational();
-        }catch(e){
-          console.warn("[GUIDED] saveOperational after apply failed", e);
-        }
+        console.log("[PLANNING_APPLY_TRANSACTION]", { event:"commit", blocks:(_getActivePlanBlocks()||[]).length, services:operational.services.length, deps:operational.dependencies.length });
+        // Regra: aplicar planejamento não cria snapshot operacional automaticamente.
+        // Snapshot operacional deve ocorrer apenas por ação explícita do usuário.
+        console.log("[PLANNING_APPLY_AUDIT]", { event:"skip_auto_operational_snapshot_after_apply" });
       }
     }finally{
       try{ state.ui.__guidedApplyingPhase = false; }catch(_){}
@@ -16297,6 +17238,18 @@ function renderProjectHeader(){
   // Fim projetado = max(finish) dos blocos do PLANO atual
   const baseBlocks = (state && state.baseline && Array.isArray(state.baseline.blocks)) ? state.baseline.blocks : [];
   const planBlocks = _getActivePlanBlocks();
+  const baselineVersions = (typeof _readBaselineVersions === "function") ? _readBaselineVersions() : [];
+  const activeBaselineVersionId = (typeof _getActiveBaselineVersionId === "function") ? String(_getActiveBaselineVersionId() || "").trim() : "";
+  const hasVersionedBaseline = baselineVersions.length > 0 && (
+    !!baselineVersions.find(v=>String(v?.id || "").trim() === activeBaselineVersionId) || !activeBaselineVersionId
+  );
+  const hasBaselineDateData = baseBlocks.some((b)=>{
+    const s = String(b?.baselineStartISO || b?.startDateISO || b?.startISO || "").slice(0,10);
+    const e = String(b?.baselineEndISO || b?.endDateISO || b?.endISO || "").slice(0,10);
+    return !!(s || e);
+  });
+  // Aceita baseline legada (sem versionamento formal) se houver blocos com datas válidas.
+  const hasUsableBaseline = baseBlocks.length > 0 && hasBaselineDateData;
 
   const _minISO = (arr)=> arr.reduce((a,b)=> (a && String(a) < String(b)) ? a : b, "");
   const _maxISO = (arr)=> arr.reduce((a,b)=> (a && String(a) > String(b)) ? a : b, "");
@@ -16304,7 +17257,7 @@ function renderProjectHeader(){
   // baseline range
   let baseStartISO = "";
   let baseEndISO = "";
-  if(baseBlocks.length){
+  if(hasUsableBaseline){
     const starts = [];
     const ends = [];
     for(const b of baseBlocks){
@@ -16329,7 +17282,7 @@ function renderProjectHeader(){
   }
 
   // data da baseline (quando salvou)
-  const baseSavedISO = (state && state.baseline && state.baseline.savedAtISO) ? String(state.baseline.savedAtISO).slice(0,10) : "";
+  const baseSavedISO = (hasUsableBaseline && state && state.baseline && state.baseline.savedAtISO) ? String(state.baseline.savedAtISO).slice(0,10) : "";
 
   // KPIs (IDs existentes): kpiStart / kpiEnd / kpiBaselineDate / kpiWorkdays
   // Aqui: kpiStart = INÍCIO (LB), kpiEnd = FIM (LB)
@@ -16342,7 +17295,7 @@ function renderProjectHeader(){
     if(el){
       const v = el.querySelector(".v");
       let txt="—";
-      if(baseEndISO && projEndISO){
+      if(hasUsableBaseline && baseEndISO && projEndISO){
         const d0 = new Date(String(baseEndISO).slice(0,10)+"T00:00:00");
         const d1 = new Date(String(projEndISO).slice(0,10)+"T00:00:00");
         const diff = Math.round((d1.getTime()-d0.getTime())/86400000);
@@ -16354,6 +17307,18 @@ function renderProjectHeader(){
       if(v) v.textContent = txt;
     }
   }catch(_){}
+  console.log("[PLANNUS_BASELINE]", {
+    event:"header_kpi_eval",
+    hasVersionedBaseline,
+    baselineVersions:baselineVersions.length,
+    activeBaselineVersionId,
+    hasBaselineDateData,
+    baseBlocks:baseBlocks.length,
+    hasUsableBaseline,
+    baseStartISO,
+    baseEndISO,
+    projEndISO
+  });
 
   // Extra: Fim projetado (plano atual) - se existir o KPI kpiProjectedEnd, preenche; senão, injeta no chip de "Fim"
   try{
@@ -16412,7 +17377,11 @@ function renderTodayLine(){
         let idx = meta.days.findIndex(d=>String(d?.dateISO||d?.iso||d?.dayISO||"")===todayISO);
         if(idx < 0){
           idx = meta.days.findIndex(d=>String(d?.dateISO||d?.iso||d?.dayISO||"") >= todayISO);
-          if(idx < 0) idx = Math.max(0, meta.days.length - 1);
+          if(idx < 0){
+            // Se "hoje" estiver fora da janela de dias renderizada, não forçar marcador no último dia.
+            line.style.display = 'none';
+            return;
+          }
         }
         if(idx < 0 || !meta.days.length){
           line.style.display = 'none';
@@ -16833,11 +17802,17 @@ function _normalizeLocationId(x){
   }catch(e){ return String(x||"").trim(); }
 }
 
-function makeKey(serviceId, locationId){
+function __plannusCanonicalMakeKey(serviceId, locationId){
   const sid = _normalizeServiceId(serviceId);
   const lid = _normalizeLocationId(locationId);
   return String(sid||"") + "||" + String(lid||"");
 }
+function makeKey(serviceId, locationId){
+  return __plannusCanonicalMakeKey(serviceId, locationId);
+}
+try{
+  window.__plannusCanonicalMakeKey = __plannusCanonicalMakeKey;
+}catch(_e){}
 
 function findBaselineBlock(serviceId, locationId){
   try{
@@ -18034,6 +19009,14 @@ for(const svc of services){
       return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
     };
 
+    try{
+      if(typeof getRealizationByBlock === "function"){
+        const rz = getRealizationByBlock(b);
+        if(rz && rz.rf) return true;
+        if(rz && rz.ri && rz.rf) return true;
+      }
+    }catch(_){}
+
     // RI/RF frequentemente ficam no mapa de edições (por chave servico+pavimento), não diretamente no bloco.
     try{
       if(typeof _getBlockEditsMap === "function" && typeof makeKey === "function"){
@@ -18285,13 +19268,9 @@ const top0 = (Math.min(d0,d1) * rowH);
       cell.style.backgroundColor = _baseBg;
 
       // baseline: se medido, deixa verde escuro; caso contrário, bem claro/transparente
-      const _k = makeKey(resolveServiceId(b), resolveLocationId(b));
-      const _ed = editsByKey[_k] || null;
-
-      const _hasRI = !!(_ed && (_ed.RI || _ed.realStart || _ed.startReal || _ed.inicioReal || _ed.ri)) ||
-                     !!(b && (b.RI || b.realStart || b.startReal || b.inicioReal));
-      const _hasRF = !!(_ed && (_ed.RF || _ed.realEnd   || _ed.endReal   || _ed.terminoReal || _ed.rf)) ||
-                     !!(b && (b.RF || b.realEnd   || b.endReal   || b.terminoReal));
+      const _real = getRealizationByBlock(b);
+      const _hasRI = !!(_real.ri || b?.RI || b?.realStart || b?.startReal || b?.inicioReal);
+      const _hasRF = !!(_real.rf || b?.RF || b?.realEnd || b?.endReal || b?.terminoReal);
 
       const _isMeasured = (_hasRI && _hasRF);
 
@@ -18461,12 +19440,11 @@ const top0 = (Math.min(d0,d1) * rowH);
       // Key do modal é serviceId||locationId (sem equipe). Garantir compatibilidade com plano e baseline.
       const _svcId = resolveServiceId(b) || b.serviceId || b.svcId || b.svc_id || b.svc || "";
       const _locId = resolveLocationId(b) || b.locationId || b.locId || b.loc_id || b.loc || "";
-      const key = String(b.key || (String(_svcId) + "||" + String(_locId)));
-      const ed = editsByKey[key] || null;
+      const real = getRealizationByBlock(b);
       const isMeasured = !!(typeof isMeasuredBlock === "function"
         ? isMeasuredBlock(b)
         : (
-          (ed && ((ed.RI || ed.realStart || ed.startReal || ed.inicioReal) && (ed.RF || ed.realEnd || ed.endReal || ed.terminoReal))) ||
+          ((real.ri || real.rf) && (real.rf || real.ri)) ||
           (b && ((b.RI || b.realStart || b.startReal || b.inicioReal) && (b.RF || b.realEnd || b.endReal || b.terminoReal)))
         )
       );
@@ -18556,8 +19534,9 @@ const top0 = (Math.min(d0,d1) * rowH);
   }
 
   // Baseline atrás, planejamento na frente
+  const __followupResolved = getCanonicalPlannerBlocksForFollowUp();
   let nBase = 0, nPlan = 0;
-  const activePlanBlocks = _getActivePlanBlocks();
+  const activePlanBlocks = Array.isArray(__followupResolved?.blocks) ? __followupResolved.blocks : [];
   const measuredSet = new Set((activePlanBlocks||[])
     .filter(b=> (typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b.measured||b.realStart||b.realEnd)))
     .map(_blkKey));
@@ -19607,7 +20586,8 @@ function _getPlannerLobMeta(){
         return name.includes(locationTerm) || cluster.includes(locationTerm) || pipe.includes(locationTerm);
       }).map(l=>String(l?.id||"").trim()).filter(Boolean))
     : null;
-  const activePlanBlocks = (Array.isArray(_getActivePlanBlocks()) ? _getActivePlanBlocks() : []).filter(block=>{
+  const __followupResolved = getCanonicalPlannerBlocksForFollowUp();
+  const activePlanBlocks = (Array.isArray(__followupResolved?.blocks) ? __followupResolved.blocks : []).filter(block=>{
     if(!allowedServiceIds) return true;
     return allowedServiceIds.has(_lobResolveServiceId(block));
   });
@@ -22908,14 +23888,130 @@ function _getServiceBaseCatalogForStorage(sourceList){
     ? explicit.filter(s=>!_isOperationalPlanningServiceRecord(s)).map(_stripServiceBaseRecord).filter(s=>s.id && s.name)
     : [];
   if(baseFromExplicit.length) return baseFromExplicit;
+  const baseFromCatalog = (Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
+    .map(_stripServiceBaseRecord)
+    .filter(s=>s.id && s.name);
+  if(baseFromCatalog.length) return baseFromCatalog;
   const baseFromState = (Array.isArray(state?.services) ? state.services : [])
     .filter(s=>!_isOperationalPlanningServiceRecord(s))
     .map(_stripServiceBaseRecord)
     .filter(s=>s.id && s.name);
   if(baseFromState.length) return baseFromState;
-  return (Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
-    .map(_stripServiceBaseRecord)
-    .filter(s=>s.id && s.name);
+  return [];
+}
+function _buildServiceBaseFromGuidedDraftForUi(draftObj){
+  const src = (draftObj && typeof draftObj === "object") ? draftObj : null;
+  const arr = Array.isArray(src?.services) ? src.services : [];
+  return arr.map((svc, idx)=>_stripServiceBaseRecord({
+    id: String(svc?.id || svc?.key || "").trim(),
+    name: String(svc?.name || "").trim(),
+    order: Number(svc?.order || idx + 1) || idx + 1,
+    code: String(svc?.code || "").trim(),
+    classification: String(svc?.classification || "").trim(),
+    scopeKind: _guidedScopeKey(String(svc?.scopeKind || "todos")),
+    teams: Math.max(1, Number(svc?.teams || 1) || 1),
+    durationDefault: Math.max(1, Number(svc?.durationDefault || 5) || 5),
+    companyDefault: String(svc?.companyDefault || "").trim(),
+    templateKey: String(svc?.templateKey || "").trim(),
+    sourceKind: "custom",
+    color: String(svc?.color || svc?.serviceColor || "").trim()
+  })).filter(s=>s.id && s.name);
+}
+function _ensureServiceBaseCatalogVisible(){
+  try{
+    const current = Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [];
+    if(current.length) return current.length;
+    const fromStorage = _readServiceBaseCatalogFromStorageRaw();
+    if(fromStorage.length){
+      state.serviceBaseCatalog = fromStorage.map(x=>Object.assign({}, x));
+      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_storage", count:state.serviceBaseCatalog.length });
+      return state.serviceBaseCatalog.length;
+    }
+    let fromDraft = [];
+    try{
+      const raw = localStorage.getItem("PLANNUS_GUIDED_EAP_DRAFT_V1");
+      if(raw) fromDraft = _buildServiceBaseFromGuidedDraftForUi(JSON.parse(raw));
+    }catch(_){}
+    if(!fromDraft.length){
+      try{
+        fromDraft = _buildServiceBaseFromGuidedDraftForUi(state?.__plannusAux?.guidedEap?.draft || null);
+      }catch(_){}
+    }
+    if(fromDraft.length){
+      state.serviceBaseCatalog = fromDraft
+        .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
+      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_guided_draft", count:state.serviceBaseCatalog.length });
+      return state.serviceBaseCatalog.length;
+    }
+    const operational = Array.isArray(state?.services) ? state.services : [];
+    const recovered = Array.from(new Map(operational
+      .map((x, idx)=>{
+        const id = String(x?.parentServiceId || "").trim();
+        if(!id) return null;
+        return [id, _stripServiceBaseRecord({
+          id,
+          name: String(x?.parentServiceName || x?.name || id).replace(/\s+-\s+.+$/, "").trim(),
+          order: Number(x?.order || idx + 1) || idx + 1,
+          code: String(x?.code || "").replace(/\.\d+$/, "").trim(),
+          classification: String(x?.classification || "").trim(),
+          scopeKind: _guidedScopeKey(String(x?.scopeKind || "todos")),
+          teams: Math.max(1, Number(x?.teams || 1) || 1),
+          durationDefault: Math.max(1, Number(x?.durationDefault || 5) || 5),
+          companyDefault: String(x?.companyDefault || "").trim(),
+          templateKey: String(x?.templateKey || "").trim(),
+          sourceKind: "custom",
+          color: String(x?.color || x?.serviceColor || "").trim()
+        })];
+      })
+      .filter(Boolean)).values())
+      .filter(s=>s.id && s.name);
+    if(recovered.length){
+      state.serviceBaseCatalog = recovered
+        .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
+      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_operational", count:state.serviceBaseCatalog.length });
+      return state.serviceBaseCatalog.length;
+    }
+    return 0;
+  }catch(e){
+    console.warn("[PLANNUS_EAP]", { event:"service_base_visible_failed", error:String(e && e.message || e) });
+    return 0;
+  }
+}
+function _readServiceBaseCatalogFromStorageRaw(){
+  try{
+    const raw = localStorage.getItem(SERVICES_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    if(!Array.isArray(arr)) return [];
+    return arr
+      .filter(s=>!_isOperationalPlanningServiceRecord(s))
+      .map(_stripServiceBaseRecord)
+      .filter(s=>s.id && s.name);
+  }catch(_){
+    return [];
+  }
+}
+function _getMergedServiceBaseCatalogSnapshot(){
+  const map = new Map();
+  const addAll = (list)=>{
+    (Array.isArray(list) ? list : []).forEach((svc, idx)=>{
+      const clean = _stripServiceBaseRecord(svc, idx);
+      const id = String(clean?.id || "").trim();
+      if(!id || !clean?.name) return;
+      if(!map.has(id)) map.set(id, clean);
+      else{
+        const prev = map.get(id) || {};
+        map.set(id, Object.assign({}, prev, clean));
+      }
+    });
+  };
+  addAll(_readServiceBaseCatalogFromStorageRaw());
+  addAll(Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : []);
+  return Array.from(map.values())
+    .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
 }
 function _syncServiceBaseCatalogToStateServicesWhenSafe(){
   const current = Array.isArray(state?.services) ? state.services : [];
@@ -24269,6 +25365,7 @@ function renderServiceCatalogView(){
   const nameEl = document.getElementById("serviceCatalogName");
   const codeEl = document.getElementById("serviceCatalogCode");
   if(!root || !btnAdd || !btnOpenEap || !nameEl || !codeEl) return;
+  try{ _ensureServiceBaseCatalogVisible(); }catch(_){}
   const services = _getServiceBaseCatalogForStorage().slice().sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
   const selectedId = String(state?.ui?.selectedServiceId || services[0]?.id || "").trim();
   state.ui = state.ui || {};
@@ -24420,7 +25517,10 @@ function renderServiceCatalogView(){
       sourceKind: "custom"
     };
     _ensureServiceColorRecord(item);
-    const items = [..._getServiceBaseCatalogForStorage(), item];
+    const existing = (typeof _getMergedServiceBaseCatalogSnapshot === "function")
+      ? _getMergedServiceBaseCatalogSnapshot()
+      : _getServiceBaseCatalogForStorage();
+    const items = [...existing, item];
     items.sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
     items.forEach((svc, i)=>{ svc.order = i + 1; });
     state.serviceBaseCatalog = items;
@@ -25821,11 +26921,30 @@ function clearBaseline(){
   scheduleRenderAll();
 }
 
-function loadOperational(){
+function loadOperational(options){
+  const opts = (options && typeof options === "object") ? options : {};
+  const expectedObraId = String(opts?.obraId || "").trim();
+  const strictObraId = !!opts?.strictObraId;
+  const allowApplyToActivePlan = !!opts?.allowApplyToActivePlan;
+  const previousOperational = (state?.operational && typeof state.operational === "object") ? state.operational : {};
+  const preservedActivePlanningVersionId = String(previousOperational?.activePlanningVersionId || "").trim() || null;
+  const preservedServiceLocationMap = (previousOperational?.serviceLocationMap && typeof previousOperational.serviceLocationMap === "object")
+    ? JSON.parse(JSON.stringify(previousOperational.serviceLocationMap))
+    : {};
+  const preservedSnapshots = (previousOperational?.snapshots && typeof previousOperational.snapshots === "object")
+    ? JSON.parse(JSON.stringify(previousOperational.snapshots))
+    : {};
   try{
     const raw = localStorage.getItem(OPERATIONAL_KEY);
     if(!raw){
-      state.operational = { blocks:[], savedAtISO:null };
+      state.operational = {
+        blocks:[],
+        savedAtISO:null,
+        meta:{},
+        activePlanningVersionId: preservedActivePlanningVersionId,
+        serviceLocationMap: preservedServiceLocationMap,
+        snapshots: preservedSnapshots
+      };
       return false;
     }
     const obj = JSON.parse(raw);
@@ -25833,20 +26952,56 @@ function loadOperational(){
     state.operational = {
       savedAtISO: obj?.savedAtISO || null,
       blocks,
-      meta: (obj && typeof obj.meta === "object") ? JSON.parse(JSON.stringify(obj.meta)) : {}
+      meta: (obj && typeof obj.meta === "object") ? JSON.parse(JSON.stringify(obj.meta)) : {},
+      activePlanningVersionId: preservedActivePlanningVersionId,
+      serviceLocationMap: Object.keys(preservedServiceLocationMap).length
+        ? preservedServiceLocationMap
+        : ((state?.serviceLocationMap && typeof state.serviceLocationMap === "object") ? JSON.parse(JSON.stringify(state.serviceLocationMap)) : {}),
+      snapshots: preservedSnapshots
     };
+    const payloadObraId = String(state?.operational?.meta?.obraId || "").trim();
+    const shouldApplyBlocks = (() => {
+      if(!allowApplyToActivePlan) return false;
+      if(!blocks.length) return false;
+      if(!expectedObraId) return true;
+      if(payloadObraId && payloadObraId === expectedObraId) return true;
+      if(strictObraId) return false;
+      return !payloadObraId;
+    })();
     // IMPORTANTE:
     // Não sobrescrever automaticamente cadastro/base viva (services/cycles/dependencies/map)
     // ao carregar operacional salvo. O operacional é leitura de execução (blocos), não dono da EAP/base.
     // Mantemos snapshots no payload apenas para auditoria/export, sem aplicar no state aqui.
-    if(blocks.length){
+    if(shouldApplyBlocks){
       _setActivePlanBlocks(blocks);
+      console.warn("[OPERATIONAL_LOAD_GUARD]", {
+        event:"apply_blocks_explicit",
+        expectedObraId,
+        payloadObraId: payloadObraId || null,
+        strictObraId,
+        allowApplyToActivePlan
+      });
+    }else if(blocks.length){
+      console.warn("[OPERATIONAL_LOAD_GUARD]", {
+        event:"skip_apply_blocks_auto_guard",
+        expectedObraId,
+        payloadObraId: payloadObraId || null,
+        strictObraId,
+        allowApplyToActivePlan
+      });
     }
     log(`[OPERATIONAL] carregado do navegador (${blocks.length} blocos).`);
     return true;
   }catch(e){
     console.warn("[OPERATIONAL] loadOperational error", e);
-    state.operational = { blocks:[], savedAtISO:null };
+    state.operational = {
+      blocks:[],
+      savedAtISO:null,
+      meta:{},
+      activePlanningVersionId: preservedActivePlanningVersionId,
+      serviceLocationMap: preservedServiceLocationMap,
+      snapshots: preservedSnapshots
+    };
     return false;
   }
 }
@@ -25875,6 +27030,7 @@ function saveOperational(){
   let activePhaseId = "";
   let activePhaseLabel = "";
   let projectKey = "";
+  let activeObraId = "";
   try{
     const asm = (typeof _readPlanningAssemblyState === "function") ? _readPlanningAssemblyState() : null;
     const phases = Array.isArray(asm?.phases) ? asm.phases : [];
@@ -25885,12 +27041,31 @@ function saveOperational(){
   try{
     projectKey = (typeof _planningProjectKey === "function") ? String(_planningProjectKey() || "").trim() : "";
   }catch(_){}
+  try{
+    const _meta = JSON.parse(localStorage.getItem("plannus.online.meta") || "{}");
+    activeObraId = String(_meta?.obraId || "").trim();
+  }catch(_){}
   payload.meta.phaseId = activePhaseId;
   payload.meta.phaseLabel = activePhaseLabel;
   payload.meta.projectKey = projectKey;
+  payload.meta.obraId = activeObraId || "";
   try{
+    const beforeActivePlanningVersionId = getCurrentActivePlanningVersionId(state);
+    const nextOperational = JSON.parse(JSON.stringify(payload));
+    const preservedInfo = preserveOperationalPlanningVersionId(nextOperational, state);
+    payload.activePlanningVersionId = preservedInfo.operational.activePlanningVersionId || null;
     localStorage.setItem(OPERATIONAL_KEY, JSON.stringify(payload));
     state.operational = JSON.parse(JSON.stringify(payload));
+    try{
+      state.operational = preserveOperationalPlanningVersionId(state.operational, state).operational;
+    }catch(_){}
+    console.log("[OPERATIONAL_VERSION_GUARD]", {
+      event:"saveOperational",
+      preserved: !!preservedInfo.preserved,
+      activePlanningVersionIdBefore: beforeActivePlanningVersionId,
+      activePlanningVersionIdAfter: String(state?.operational?.activePlanningVersionId || "").trim() || null,
+      warning: preservedInfo.warning || null
+    });
     try{
       const relMonthRaw = String(document.getElementById("relMonth")?.value || "").trim();
       const monthKey = /^\d{4}-\d{2}$/.test(relMonthRaw)
@@ -25943,7 +27118,17 @@ function saveOperational(){
 function clearOperational(){
   if(!confirm("Remover o planejamento operacional salvo deste navegador?")) return;
   try{ localStorage.removeItem(OPERATIONAL_KEY); }catch(e){}
-  state.operational = { blocks:[], savedAtISO:null };
+  const beforeActivePlanningVersionId = getCurrentActivePlanningVersionId(state);
+  const nextOperational = { blocks:[], savedAtISO:null, meta:{} };
+  const preservedInfo = preserveOperationalPlanningVersionId(nextOperational, state);
+  state.operational = preservedInfo.operational;
+  console.log("[OPERATIONAL_VERSION_GUARD]", {
+    event:"clearOperational",
+    preserved: !!preservedInfo.preserved,
+    activePlanningVersionIdBefore: beforeActivePlanningVersionId,
+    activePlanningVersionIdAfter: String(state?.operational?.activePlanningVersionId || "").trim() || null,
+    warning: preservedInfo.warning || null
+  });
   log("[OPERATIONAL] removido.");
   scheduleRenderAll();
 }
@@ -31930,11 +33115,17 @@ function applyMSPImport(parsed){
   }
   window._slugifyName = _slugifyName;
   function _nextServiceOrder(){
-    return Math.max(0, ...(window.state?.services||[]).map(s=>Number(s.order||0)||0)) + 1;
+    const base = (typeof _getMergedServiceBaseCatalogSnapshot === "function")
+      ? _getMergedServiceBaseCatalogSnapshot()
+      : (window.state?.serviceBaseCatalog || []);
+    return Math.max(0, ...base.map(s=>Number(s?.order||0)||0)) + 1;
   }
   window._nextServiceOrder = _nextServiceOrder;
   function _makeUniqueServiceId(base){
-    const ids = new Set((window.state?.services||[]).map(s=>String(s.id||"").trim()).filter(Boolean));
+    const baseList = (typeof _getMergedServiceBaseCatalogSnapshot === "function")
+      ? _getMergedServiceBaseCatalogSnapshot()
+      : (window.state?.serviceBaseCatalog || []);
+    const ids = new Set((baseList||[]).map(s=>String(s?.id||"").trim()).filter(Boolean));
     let id = base;
     let n = 2;
     while(ids.has(id)) id = `${base}_${n++}`;
@@ -34036,7 +35227,12 @@ log("installed.");
   "use strict";
   if(typeof window.PredEngine==="undefined") return;
 
-  function _key(svcId, locId){ return String(svcId)+"||"+String(locId); }
+  function _key(svcId, locId){
+    if(typeof window.__plannusCanonicalMakeKey === "function"){
+      return window.__plannusCanonicalMakeKey(svcId, locId);
+    }
+    return String(svcId)+"||"+String(locId);
+  }
 
   function _topoSortTasks(tasks){
     const map = new Map(tasks.map(t=>[t.id,t]));
@@ -35409,10 +36605,9 @@ if(typeof window.$$ === "undefined"){
     return Number.isNaN(d.getTime()) ? null : d;
   };
 
-  const __legacyMakeKey = (typeof window.makeKey === "function") ? window.makeKey.bind(window) : null;
   Core.utils.makeKey = function makeKey(serviceId, locationId){
-    if(__legacyMakeKey && __legacyMakeKey !== Core.utils.makeKey){
-      return __legacyMakeKey(serviceId, locationId);
+    if(typeof window.__plannusCanonicalMakeKey === "function"){
+      return window.__plannusCanonicalMakeKey(serviceId, locationId);
     }
     const sid = (typeof window._normalizeServiceId === 'function') ? window._normalizeServiceId(serviceId) : String(serviceId||'').trim();
     const lid = (typeof window._normalizeLocationId === 'function') ? window._normalizeLocationId(locationId) : String(locationId||'').trim();
@@ -36725,6 +37920,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
   const SYNC_STATE_KEY = "plannus.online.sync.state";
   const SELECTED_KEY = "plannus.online.selected";
   const LOCAL_OBRAS_KEY = "plannus.local.obras";
+  const LOCAL_OBRA_STATE_PREFIX = "plannus.local.obra.state.";
   const SYNC_STATES = Object.freeze({
     ONLINE_SYNCED: "ONLINE_SYNCED",
     ONLINE_DIRTY: "ONLINE_DIRTY",
@@ -36751,9 +37947,172 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
   });
   const __pingCooldownMs = 20000;
   function readMeta(){ try { return JSON.parse(localStorage.getItem(META_KEY) || "{}"); } catch(_) { return {}; } }
-  function writeMeta(meta){ localStorage.setItem(META_KEY, JSON.stringify(meta)); }
-  function readLocalObras(){ try { return JSON.parse(localStorage.getItem(LOCAL_OBRAS_KEY) || "{}"); } catch(_) { return {}; } }
-  function writeLocalObras(v){ localStorage.setItem(LOCAL_OBRAS_KEY, JSON.stringify(v || {})); }
+  function safeSetLocalStorage(key, value, options){
+    const opts = (options && typeof options === "object") ? options : {};
+    const payload = typeof value === "string" ? value : JSON.stringify(value);
+    try{
+      localStorage.setItem(key, payload);
+      return { ok:true, quotaExceeded:false, fallbackUsed:false };
+    }catch(e){
+      const quotaExceeded = String(e?.name || "").toLowerCase().includes("quota") || String(e?.message || "").toLowerCase().includes("quota");
+      console.warn("[LOCAL_STORAGE_QUOTA]", { event:"set_item_failed", key, quotaExceeded, error:String(e && e.message || e) });
+      if(key === LOCAL_OBRAS_KEY && quotaExceeded){
+        try{
+          const parsed = (typeof value === "object" && value) ? value : JSON.parse(String(payload || "{}"));
+          const compact = {};
+          Object.entries(parsed || {}).forEach(([id, item])=>{
+            compact[id] = toLocalObraIndexItem(item || {});
+          });
+          localStorage.setItem(key, JSON.stringify(compact));
+          console.warn("[LOCAL_BACKUP_COMPACT]", { event:"local_obras_compacted_after_quota", size:Object.keys(compact).length });
+          return { ok:true, quotaExceeded:true, fallbackUsed:true };
+        }catch(e2){
+          console.warn("[LOCAL_STORAGE_QUOTA]", { event:"compact_fallback_failed", key, error:String(e2 && e2.message || e2) });
+        }
+      }
+      return { ok:false, quotaExceeded, fallbackUsed:false };
+    }
+  }
+  function writeMeta(meta){
+    safeSetLocalStorage(META_KEY, JSON.stringify(meta || {}));
+  }
+  function getLocalObraStateKey(obraId){
+    const id = String(obraId || "").trim();
+    return `${LOCAL_OBRA_STATE_PREFIX}${id || "local"}`;
+  }
+  function toCompactPreOnlineLoadBackup(stateObj){
+    const st = (stateObj && typeof stateObj === "object") ? stateObj : {};
+    const services = Array.isArray(st?.services) ? st.services : [];
+    const blocks = Array.isArray(st?.blocks) ? st.blocks : [];
+    const planBlocks = Array.isArray(st?.plan?.blocks) ? st.plan.blocks : [];
+    const deps = Array.isArray(st?.dependencies) ? st.dependencies : [];
+    const baselineBlocks = Array.isArray(st?.baseline?.blocks) ? st.baseline.blocks : [];
+    return {
+      type: "compact-pre-online-load-backup",
+      createdAtISO: now(),
+      obraId: String(readMeta()?.obraId || "").trim() || null,
+      revision: Number(readMeta()?.revision || 0) || 0,
+      summary: {
+        servicesCount: services.length,
+        dependenciesCount: deps.length,
+        blocksCount: blocks.length,
+        planBlocksCount: planBlocks.length,
+        baselineBlocksCount: baselineBlocks.length,
+        calendarStartISO: String(st?.calendar?.startDateISO || "").trim() || null,
+        calendarEndISO: String(st?.calendar?.endDateISO || "").trim() || null
+      },
+      ids: {
+        serviceIds: services.slice(0, 300).map(x=>String(x?.id || "").trim()).filter(Boolean),
+        blockServiceIds: blocks.slice(0, 600).map(x=>String(x?.serviceId || "").trim()).filter(Boolean)
+      },
+      ui: {
+        currentViewName: String(st?.ui?.currentViewName || "").trim() || null
+      },
+      notes: "Compact backup; full state stored by obra key when available."
+    };
+  }
+  function cleanupOldPreOnlineLoadBackups(maxCount){
+    const keep = Math.max(1, Number(maxCount || 3) || 3);
+    try{
+      const keys = [];
+      for(let i=0;i<localStorage.length;i++){
+        const k = String(localStorage.key(i) || "");
+        if(k.startsWith("plannus.backup.before_online_load.")) keys.push(k);
+      }
+      keys.sort((a,b)=>{
+        const ta = Number(a.split(".").pop() || 0) || 0;
+        const tb = Number(b.split(".").pop() || 0) || 0;
+        return tb - ta;
+      });
+      const drop = keys.slice(keep);
+      drop.forEach((k)=>{
+        try{ localStorage.removeItem(k); }catch(_){}
+      });
+      if(drop.length){
+        console.log("[PRE_ONLINE_LOAD_BACKUP]", { event:"cleanup_old_backups", removed:drop.length, kept:keep });
+      }
+      return { ok:true, removed:drop.length, kept:keep };
+    }catch(e){
+      console.warn("[PRE_ONLINE_LOAD_BACKUP]", { event:"cleanup_failed", error:String(e && e.message || e) });
+      return { ok:false, removed:0, kept:keep };
+    }
+  }
+  function safeCreatePreOnlineLoadBackup(currentState, options){
+    const opts = (options && typeof options === "object") ? options : {};
+    try{ cleanupOldPreOnlineLoadBackups(Number(opts.maxCount || 3) || 3); }catch(_){}
+    try{
+      if(!currentState || typeof currentState !== "object"){
+        return { ok:false, skipped:true, quotaExceeded:false, key:null, sizeMB:0, reason:"empty_state" };
+      }
+      const fullPayload = JSON.stringify(currentState);
+      if(!fullPayload || fullPayload === "{}"){
+        return { ok:false, skipped:true, quotaExceeded:false, key:null, sizeMB:0, reason:"empty_payload" };
+      }
+      const key = `plannus.backup.before_online_load.${Date.now()}`;
+      const sizeMB = Number((fullPayload.length / 1024 / 1024).toFixed(3));
+      const full = safeSetLocalStorage(key, fullPayload, { allowCompactFallback:false });
+      if(full.ok){
+        console.log("[PRE_ONLINE_LOAD_BACKUP]", { event:"created_full", key, sizeMB });
+        return { ok:true, skipped:false, quotaExceeded:false, key, sizeMB, reason:null };
+      }
+      const compact = toCompactPreOnlineLoadBackup(currentState);
+      const compactPayload = JSON.stringify(compact);
+      const compactWrite = safeSetLocalStorage(key, compactPayload, { allowCompactFallback:false });
+      if(compactWrite.ok){
+        console.warn("[PRE_ONLINE_LOAD_BACKUP]", { event:"created_compact_after_quota", key, fullSizeMB:sizeMB, compactSizeMB:Number((compactPayload.length/1024/1024).toFixed(3)) });
+        return { ok:true, skipped:false, quotaExceeded:!!full.quotaExceeded, key, sizeMB, reason:"compact_backup_used" };
+      }
+      console.warn("[PRE_ONLINE_LOAD_BACKUP]", { event:"skipped_quota", key:null, sizeMB, reason:"quota_exceeded" });
+      return { ok:false, skipped:true, quotaExceeded:true, key:null, sizeMB, reason:"quota_exceeded" };
+    }catch(e){
+      console.warn("[PRE_ONLINE_LOAD_BACKUP]", { event:"failed_non_fatal", error:String(e && e.message || e) });
+      return { ok:false, skipped:true, quotaExceeded:false, key:null, sizeMB:0, reason:String(e && e.message || e) };
+    }
+  }
+  function toLocalObraIndexItem(obra){
+    return {
+      id: String(obra?.id || obra?.obraId || obra?.obra_id || "").trim(),
+      nome: String(obra?.nome || obra?.obra_nome || obra?.title || "").trim(),
+      title: String(obra?.title || obra?.nome || "").trim(),
+      descricao: String(obra?.descricao || "").trim(),
+      revision: Number(obra?.revision || 0) || 0,
+      updatedAt: obra?.updatedAt || obra?.updated_at || null,
+      updatedAtISO: obra?.updatedAtISO || obra?.updatedAt || obra?.updated_at || null,
+      lastOpenedAtISO: obra?.lastOpenedAtISO || null,
+      hasLocalBackup: !!obra?.hasLocalBackup,
+      source: String(obra?.source || "local_index").trim() || "local_index"
+    };
+  }
+  function readLocalObras(){
+    try{
+      const parsed = JSON.parse(localStorage.getItem(LOCAL_OBRAS_KEY) || "{}");
+      const out = {};
+      Object.entries(parsed || {}).forEach(([id, item])=>{
+        const idx = toLocalObraIndexItem(item || {});
+        idx.id = idx.id || String(id || "").trim();
+        if(!idx.id) return;
+        idx.hasLocalBackup = idx.hasLocalBackup || !!item?.state || !!localStorage.getItem(getLocalObraStateKey(idx.id));
+        out[idx.id] = idx;
+      });
+      return out;
+    }catch(_){
+      return {};
+    }
+  }
+  function writeLocalObras(v){
+    const src = (v && typeof v === "object") ? v : {};
+    const light = {};
+    Object.entries(src).forEach(([id, item])=>{
+      const idx = toLocalObraIndexItem(item || {});
+      idx.id = idx.id || String(id || "").trim();
+      if(!idx.id) return;
+      idx.hasLocalBackup = !!idx.hasLocalBackup;
+      light[idx.id] = idx;
+    });
+    const r = safeSetLocalStorage(LOCAL_OBRAS_KEY, JSON.stringify(light));
+    console.log("[LOCAL_OBRAS_INDEX]", { event:"write_index", count:Object.keys(light).length, ok:r.ok, quotaExceeded:r.quotaExceeded, fallbackUsed:r.fallbackUsed });
+    return r;
+  }
   function fmtTime(ts){
     if(!ts) return "-";
     const d = new Date(ts);
@@ -36855,6 +38214,12 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
         body: JSON.stringify(payload || {})
       });
     },
+    async deleteObra(obraId){
+      return this.request(`${API_BASE}/api/obras/${encodeURIComponent(obraId)}`, {
+        method: "DELETE",
+        headers: { "Content-Type":"application/json" }
+      });
+    },
     async getMe(){
       return this.request(`${API_BASE}/api/me`);
     },
@@ -36934,6 +38299,8 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
   function cacheLocalObra(obra, state){
     const id = obraId(obra);
     if(!id) return;
+    const stateKey = getLocalObraStateKey(id);
+    const stateWrite = safeSetLocalStorage(stateKey, JSON.stringify(state || {}), { allowCompactFallback:false });
     const all = readLocalObras();
     all[id] = {
       id,
@@ -36943,27 +38310,123 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       updated_at: obra?.updated_at || obra?.updatedAt || now(),
       permissao: obra?.permissao || "local",
       localOnly: true,
-      state
+      hasLocalBackup: !!stateWrite.ok,
+      lastOpenedAtISO: now(),
+      source: "online_cache"
     };
-    writeLocalObras(all);
+    const indexWrite = writeLocalObras(all);
+    if(!stateWrite.ok){
+      console.warn("[LOCAL_STORAGE_QUOTA]", { event:"state_backup_not_saved", obraId:id, key:stateKey });
+      if(indexWrite.ok){
+        setStatus("Salvo online. Backup local parcial nao foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+      }
+    }
+  }
+  function removeCachedObra(obraId){
+    const id = String(obraId || "").trim();
+    if(!id) return { ok:false, removed:false };
+    const all = readLocalObras();
+    const existed = !!all[id];
+    delete all[id];
+    const indexWrite = writeLocalObras(all);
+    try{ localStorage.removeItem(getLocalObraStateKey(id)); }catch(_){}
+    try{
+      if(String(localStorage.getItem(SELECTED_KEY) || "").trim() === id){
+        localStorage.removeItem(SELECTED_KEY);
+      }
+    }catch(_){}
+    try{
+      const meta = readMeta();
+      if(String(meta?.obraId || "").trim() === id){
+        writeMeta({});
+      }
+    }catch(_){}
+    return { ok:true, removed:existed, indexOk: !!indexWrite.ok };
+  }
+  function buildObraStateSummary(stateObj){
+    const st = stateObj && typeof stateObj === "object" ? stateObj : {};
+    const planBlocks = Array.isArray(st?.plan?.blocks) ? st.plan.blocks.length : 0;
+    const flatBlocks = Array.isArray(st?.blocks) ? st.blocks.length : 0;
+    const baselineBlocks = Array.isArray(st?.baseline?.blocks) ? st.baseline.blocks.length : 0;
+    const services = Array.isArray(st?.services) ? st.services.length : 0;
+    const locations = Array.isArray(st?.locations) ? st.locations.length : 0;
+    const deps = Array.isArray(st?.dependencies) ? st.dependencies.length : 0;
+    const calStart = String(st?.calendar?.startDateISO || "").trim() || "-";
+    const calEnd = String(st?.calendar?.endDateISO || "").trim() || "-";
+    return {
+      services,
+      locations,
+      dependencies: deps,
+      planBlocks,
+      stateBlocks: flatBlocks,
+      baselineBlocks,
+      calendarStart: calStart,
+      calendarEnd: calEnd
+    };
+  }
+  function showObraLoadSummaryPopup(opts){
+    try{
+      const obraId = String(opts?.obraId || "").trim();
+      const source = String(opts?.source || "").trim() || "unknown";
+      const revision = Number(opts?.revision || 0) || 0;
+      const s = buildObraStateSummary(opts?.state);
+      const msg =
+`Obra carregada (${source})
+ID: ${obraId}
+Revision: ${revision}
+
+Serviços: ${s.services}
+Pavimentos: ${s.locations}
+Dependências: ${s.dependencies}
+Blocos (plan): ${s.planBlocks}
+Blocos (state): ${s.stateBlocks}
+Blocos (baseline): ${s.baselineBlocks}
+Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
+      alert(msg);
+      console.log("[ONLINE_STATE_HYDRATION]", { event:"obra_load_summary_popup", obraId, source, revision, summary:s });
+    }catch(_){}
   }
   function openCachedObra(id){
     const all = readLocalObras();
     const entry = all[id];
-    if(!entry || !entry.state) return false;
-    const current = localStorage.getItem(APP_KEY);
-    if(current) localStorage.setItem(`plannus.backup.before_online_load.${Date.now()}`, current);
-    localStorage.setItem(APP_KEY, JSON.stringify(entry.state));
+    if(!entry) return false;
+    let localState = null;
+    try{
+      const raw = localStorage.getItem(getLocalObraStateKey(id));
+      if(raw) localState = JSON.parse(raw);
+    }catch(_){}
+    if(!localState){
+      try{
+        if(entry.state && typeof entry.state === "object") localState = entry.state;
+      }catch(_){}
+    }
+    if(!localState) return false;
+    const current = readJsonLocalStorage(APP_KEY);
+    const backup = safeCreatePreOnlineLoadBackup(current, { maxCount:3 });
+    if(backup.quotaExceeded){
+      console.warn("[ONLINE_OPEN_OBRA]", { event:"pre_backup_quota_warning_local_cache", obraId:id, reason:backup.reason });
+    }
+    const appWrite = safeSetLocalStorage(APP_KEY, JSON.stringify(localState), { allowCompactFallback:false });
+    if(!appWrite.ok){
+      console.warn("[LOCAL_STORAGE_QUOTA]", { event:"open_cached_app_state_write_failed", obraId:id, quotaExceeded:appWrite.quotaExceeded });
+    }
     writeMeta({
       obraId: entry.id,
       obraNome: entry.nome,
       revision: Number(entry.revision || 0),
       updatedAt: entry.updated_at || null,
       lastSyncAt: now(),
+      source: "local_cache",
       pendingOnlineSave: true,
       conflict: false
     });
     localStorage.setItem(SELECTED_KEY, entry.id);
+    showObraLoadSummaryPopup({
+      obraId: entry.id,
+      source: "local_cache",
+      revision: Number(entry.revision || 0),
+      state: localState
+    });
     const gate = q("#plannusObrasGate");
     if(gate) gate.remove();
     return true;
@@ -36983,17 +38446,807 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
   function obraPerm(o){ return o?.permissao || o?.permission || o?.role || "-"; }
   function fmt(v){ if(!v) return "-"; const d=new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString("pt-BR"); }
   function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+  function readJsonLocalStorage(key){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch(e){
+      console.warn("[ONLINE_STATE_CONSOLIDATION]", { event:"invalid_local_storage_json", key, error:String(e && e.message || e) });
+      return null;
+    }
+  }
+  function backupLocalStorageKeyBeforeHydrate(key){
+    try{
+      const raw = localStorage.getItem(key);
+      if(raw != null) localStorage.setItem(`plannus.backup.before_aux_hydration.${Date.now()}.${key}`, raw);
+    }catch(_){}
+  }
+  function ensurePlanningStateContract(inputState){
+    const s = (inputState && typeof inputState === "object") ? inputState : {};
+    if(!s.eap || typeof s.eap !== "object") s.eap = {};
+    if(s.eap.draft === undefined) s.eap.draft = null;
+    if(!Array.isArray(s.eap.library)) s.eap.library = [];
+    if(s.eap.activeTemplateId === undefined) s.eap.activeTemplateId = null;
+    if(s.eap.lastSavedTemplate === undefined) s.eap.lastSavedTemplate = null;
+    if(s.eap.updatedAtISO === undefined) s.eap.updatedAtISO = null;
+
+    if(!s.planningAssembly || typeof s.planningAssembly !== "object") s.planningAssembly = {};
+    if(s.planningAssembly.activePhaseId === undefined) s.planningAssembly.activePhaseId = null;
+    if(!Array.isArray(s.planningAssembly.phases)) s.planningAssembly.phases = [];
+    if(s.planningAssembly.updatedAtISO === undefined) s.planningAssembly.updatedAtISO = null;
+
+    if(!Array.isArray(s.planningVersions)) s.planningVersions = [];
+
+    if(!s.operational || typeof s.operational !== "object") s.operational = {};
+    if(s.operational.activePlanningVersionId === undefined) s.operational.activePlanningVersionId = null;
+    if(!s.operational.serviceLocationMap || typeof s.operational.serviceLocationMap !== "object") s.operational.serviceLocationMap = {};
+    if(!s.operational.snapshots || typeof s.operational.snapshots !== "object") s.operational.snapshots = {};
+
+    if(!s.blockEdits || typeof s.blockEdits !== "object" || Array.isArray(s.blockEdits)) s.blockEdits = {};
+    if(!s._migrations || typeof s._migrations !== "object") s._migrations = {};
+    ensureRealizationStateContract(s);
+    return s;
+  }
+  function ensureRealizationStateContract(inputState){
+    const s = (inputState && typeof inputState === "object") ? inputState : {};
+    const directActiveId = String(s?.operational?.activePlanningVersionId || "").trim();
+    const existingActiveId = String(s?.realization?.activePlanningVersionId || "").trim();
+    let resolvedActiveId = directActiveId || existingActiveId || null;
+    if(!resolvedActiveId && Array.isArray(s?.planningVersions)){
+      const activeVersion = s.planningVersions.find(v=>{
+        const status = String(v?.status || "").trim().toLowerCase();
+        const type = String(v?.type || "").trim().toLowerCase();
+        return status === "active" || type === "applied" || type === "active";
+      });
+      resolvedActiveId = String(activeVersion?.id || "").trim() || null;
+    }
+    const before = s.realization && typeof s.realization === "object" ? s.realization : null;
+    if(!before || typeof before !== "object" || Array.isArray(before)){
+      s.realization = {
+        version: 1,
+        activePlanningVersionId: resolvedActiveId,
+        entriesByVersion: {},
+        updatedAtISO: null
+      };
+      console.log("[REALIZATION_STATE_CONTRACT]", { event:"initialized", activePlanningVersionId: resolvedActiveId, hadState:false });
+    }else{
+      if(before.version == null) before.version = 1;
+      if(before.activePlanningVersionId === undefined) before.activePlanningVersionId = resolvedActiveId;
+      if(!before.entriesByVersion || typeof before.entriesByVersion !== "object" || Array.isArray(before.entriesByVersion)) before.entriesByVersion = {};
+      if(before.updatedAtISO === undefined) before.updatedAtISO = null;
+      if(resolvedActiveId && String(before.activePlanningVersionId || "").trim() !== resolvedActiveId){
+        before.activePlanningVersionId = resolvedActiveId;
+      }
+      s.realization = before;
+    }
+    const activeId = String(s.realization.activePlanningVersionId || "").trim() || null;
+    if(activeId && !s.realization.entriesByVersion[activeId]) s.realization.entriesByVersion[activeId] = {};
+    if((activeId || Object.keys(s.realization.entriesByVersion || {}).length) && !s.realization.updatedAtISO){
+      s.realization.updatedAtISO = now();
+    }
+    return s;
+  }
+  function getObraScopedStorageKey(obraId, domain){
+    const cleanDomain = String(domain || "unknown").trim() || "unknown";
+    const cleanObraId = String(obraId || "").trim();
+    if(!cleanObraId){
+      console.warn("[PLANNING_SCOPED_CACHE]", { event:"missing_obra_id_fallback_key", domain:cleanDomain });
+      return `plannus.obra.local.${cleanDomain}`;
+    }
+    return `plannus.obra.${cleanObraId}.${cleanDomain}`;
+  }
+  function migrateLegacyPlanningLocalStorageIntoState(inputState, obraId){
+    const s = ensurePlanningStateContract(inputState);
+    const legacyKeys = {
+      guidedDraft:"PLANNUS_GUIDED_EAP_DRAFT_V1",
+      guidedLibrary:"PLANNUS_GUIDED_EAP_LIBRARY_V1",
+      guidedLastSavedTemplate:"PLANNUS_GUIDED_EAP_LAST_SAVED_TEMPLATE_V1",
+      planningStore:"PLANNUS_PLANNING_ASSEMBLY_STORE_V1",
+      planningLegacy:"PLANNUS_PLANNING_ASSEMBLY_V1",
+      operationalCurrent:"QP_OPERATIONAL_V1",
+      operationalMonthly:"QP_OPERATIONAL_MONTHLY_V1",
+      blockEdits:"QP_BLOCK_EDIT_V3"
+    };
+    const fromLS = (key)=>readJsonLocalStorage(key);
+    const legacyAux = (s.__plannusAux && typeof s.__plannusAux === "object") ? s.__plannusAux : null;
+    const pick = (existing, legacyValue)=>{
+      if(existing == null) return legacyValue;
+      if(Array.isArray(existing)) return existing.length ? existing : (Array.isArray(legacyValue) ? legacyValue : existing);
+      if(typeof existing === "object") return Object.keys(existing).length ? existing : ((legacyValue && typeof legacyValue === "object") ? legacyValue : existing);
+      if(existing === "") return (legacyValue == null ? existing : legacyValue);
+      return existing;
+    };
+    const legacyDraft = fromLS(legacyKeys.guidedDraft) ?? legacyAux?.guidedEap?.draft ?? null;
+    const legacyLibrary = fromLS(legacyKeys.guidedLibrary) ?? legacyAux?.guidedEap?.library ?? [];
+    const legacyLastSavedTemplate = fromLS(legacyKeys.guidedLastSavedTemplate) ?? legacyAux?.guidedEap?.lastSavedTemplate ?? null;
+    const legacyPlanningStore = fromLS(legacyKeys.planningStore) ?? legacyAux?.planningAssembly?.store ?? null;
+    const legacyPlanningLegacy = fromLS(legacyKeys.planningLegacy) ?? legacyAux?.planningAssembly?.legacy ?? null;
+    const legacyOperationalCurrent = fromLS(legacyKeys.operationalCurrent) ?? legacyAux?.operationalSnapshots?.current ?? null;
+    const legacyOperationalMonthly = fromLS(legacyKeys.operationalMonthly) ?? legacyAux?.operationalSnapshots?.monthly ?? null;
+    const legacyBlockEdits = fromLS(legacyKeys.blockEdits) ?? legacyAux?.blockEdits ?? null;
+
+    s.eap.draft = pick(s.eap.draft, legacyDraft);
+    s.eap.library = pick(s.eap.library, legacyLibrary);
+    s.eap.lastSavedTemplate = pick(s.eap.lastSavedTemplate, legacyLastSavedTemplate);
+    if((s.eap.activeTemplateId == null || s.eap.activeTemplateId === "") && s.eap.draft && typeof s.eap.draft === "object"){
+      s.eap.activeTemplateId = String(s.eap.draft.templateKey || "").trim() || null;
+    }
+    if(s.eap.updatedAtISO == null && (s.eap.draft || (Array.isArray(s.eap.library) && s.eap.library.length))) s.eap.updatedAtISO = now();
+
+    const legacyAssemblySource = (legacyPlanningStore && typeof legacyPlanningStore === "object")
+      ? legacyPlanningStore
+      : ((legacyPlanningLegacy && typeof legacyPlanningLegacy === "object") ? legacyPlanningLegacy : null);
+    if(legacyAssemblySource){
+      if((s.planningAssembly.activePhaseId == null || s.planningAssembly.activePhaseId === "") && legacyAssemblySource.activePhaseId){
+        s.planningAssembly.activePhaseId = String(legacyAssemblySource.activePhaseId || "").trim() || null;
+      }
+      if((!Array.isArray(s.planningAssembly.phases) || !s.planningAssembly.phases.length) && Array.isArray(legacyAssemblySource.phases)){
+        s.planningAssembly.phases = deepClone(legacyAssemblySource.phases);
+      }
+      if((s.planningAssembly.updatedAtISO == null || s.planningAssembly.updatedAtISO === "") && (legacyAssemblySource.updatedAtISO || legacyAssemblySource.capturedAtISO)){
+        s.planningAssembly.updatedAtISO = String(legacyAssemblySource.updatedAtISO || legacyAssemblySource.capturedAtISO || now());
+      }
+    }
+    if((s.planningAssembly.updatedAtISO == null || s.planningAssembly.updatedAtISO === "") && (s.planningAssembly.activePhaseId || (Array.isArray(s.planningAssembly.phases) && s.planningAssembly.phases.length))){
+      s.planningAssembly.updatedAtISO = now();
+    }
+
+    if(legacyOperationalCurrent && (typeof legacyOperationalCurrent === "object")){
+      if(!Object.keys(s.operational.snapshots || {}).length){
+        s.operational.snapshots.current = deepClone(legacyOperationalCurrent);
+      }else if(s.operational.snapshots.current == null){
+        s.operational.snapshots.current = deepClone(legacyOperationalCurrent);
+      }
+    }
+    if(legacyOperationalMonthly && (typeof legacyOperationalMonthly === "object")){
+      if(s.operational.snapshots.monthly == null){
+        s.operational.snapshots.monthly = deepClone(legacyOperationalMonthly);
+      }
+    }
+    if((!Object.keys(s.operational.serviceLocationMap || {}).length) && s.serviceLocationMap && typeof s.serviceLocationMap === "object"){
+      s.operational.serviceLocationMap = deepClone(s.serviceLocationMap);
+    }
+
+    s._migrations = s._migrations || {};
+    if(!s._migrations.planningStateContractV1){
+      s._migrations.planningStateContractV1 = {
+        appliedAtISO: now(),
+        source: "legacy-localStorage",
+        obraId: String(obraId || "").trim() || "local"
+      };
+      console.log("[PLANNING_LEGACY_MIGRATION]", { event:"applied", obraId:String(obraId || "").trim() || "local" });
+    }
+    return s;
+  }
+  function rehydratePlanningAssemblyIfMissing(inputState, obraId){
+    const s = ensurePlanningStateContract(inputState);
+    const phasesBefore = Array.isArray(s?.planningAssembly?.phases) ? s.planningAssembly.phases.length : 0;
+    const activeBefore = String(s?.planningAssembly?.activePhaseId || "").trim();
+    const servicesCount = Array.isArray(s?.services) ? s.services.length : 0;
+    const planBlocksCount = Array.isArray(s?.plan?.blocks) ? s.plan.blocks.length : 0;
+    const out = {
+      applied: false,
+      source: "none",
+      activePhaseId: activeBefore || null,
+      phasesBefore,
+      phasesAfter: phasesBefore,
+      servicesCount,
+      planBlocksCount,
+      warning: null
+    };
+    if(phasesBefore > 0 && activeBefore){
+      return out;
+    }
+    const readObj = (key)=>{
+      try{
+        const raw = localStorage.getItem(key);
+        if(!raw) return null;
+        const parsed = JSON.parse(raw);
+        return (parsed && typeof parsed === "object") ? parsed : null;
+      }catch(_){
+        return null;
+      }
+    };
+    const clone = (v)=>deepClone(v);
+    const ensureArray = (v)=>Array.isArray(v) ? v : [];
+    const ensureObj = (v)=>(v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+
+    const candidates = [];
+    const auxStore = s?.__plannusAux?.planningAssembly?.store;
+    if(auxStore && typeof auxStore === "object") candidates.push({ source:"state.__plannusAux.planningAssembly.store", value:auxStore });
+    const lsStore = readObj("PLANNUS_PLANNING_ASSEMBLY_STORE_V1");
+    if(lsStore) candidates.push({ source:"localStorage.PLANNUS_PLANNING_ASSEMBLY_STORE_V1", value:lsStore });
+    const lsLegacy = readObj("PLANNUS_PLANNING_ASSEMBLY_V1");
+    if(lsLegacy) candidates.push({ source:"localStorage.PLANNUS_PLANNING_ASSEMBLY_V1", value:lsLegacy });
+    const eapDraftState = (s?.eap?.draft && typeof s.eap.draft === "object") ? s.eap.draft : null;
+    if(eapDraftState) candidates.push({ source:"state.eap.draft", value:eapDraftState });
+    const eapDraftLegacy = readObj("PLANNUS_GUIDED_EAP_DRAFT_V1");
+    if(eapDraftLegacy) candidates.push({ source:"localStorage.PLANNUS_GUIDED_EAP_DRAFT_V1", value:eapDraftLegacy });
+
+    const normalizeAssemblyCandidate = (rawCandidate)=>{
+      if(!rawCandidate || typeof rawCandidate !== "object") return null;
+      let candidate = rawCandidate;
+      if(candidate.byProject && typeof candidate.byProject === "object"){
+        const projectKey = (typeof _planningProjectKey === "function") ? _planningProjectKey() : "";
+        const legacyKey = (typeof _planningProjectLegacyKey === "function") ? _planningProjectLegacyKey() : "";
+        const fromStore = candidate.byProject[String(projectKey || "").trim()]
+          || candidate.byProject[String(legacyKey || "").trim()]
+          || candidate.byProject[String(candidate.lastProjectKey || "").trim()]
+          || Object.values(candidate.byProject)[0]
+          || null;
+        candidate = fromStore && typeof fromStore === "object" ? fromStore : null;
+      }
+      if(!candidate || typeof candidate !== "object") return null;
+      if((!candidate.phases || !Array.isArray(candidate.phases)) && Array.isArray(candidate.services)){
+        const phaseId = `phase_rehydrated_${Date.now()}`;
+        return {
+          activePhaseId: phaseId,
+          phases: [{
+            id: phaseId,
+            label: String(candidate.templateLabel || candidate.label || "Fase reidratada").trim() || "Fase reidratada",
+            createdAtISO: now(),
+            updatedAtISO: now(),
+            source: "rehydrated-from-draft",
+            baseSnapshot: {
+              templateKey: String(candidate.templateKey || "rehydrated").trim() || "rehydrated",
+              templateLabel: String(candidate.templateLabel || candidate.label || "Fase reidratada").trim() || "Fase reidratada",
+              capturedAtISO: now(),
+              originLabel: "rehydrated-from-draft",
+              model: {
+                label: String(candidate.templateLabel || candidate.label || "Fase reidratada").trim() || "Fase reidratada",
+                name: String(candidate.templateLabel || candidate.label || "Fase reidratada").trim() || "Fase reidratada",
+                services: clone(ensureArray(candidate.services)),
+                dependencies: clone(ensureArray(candidate.dependencies)),
+                locations: clone(ensureArray(candidate.locations)),
+                serviceLocationMap: clone(ensureObj(candidate.serviceLocationMap))
+              }
+            },
+            segmentsByService: {},
+            deps: [],
+            laneByNode: {},
+            blockedDepKeys: [],
+            selectedServiceId: ""
+          }],
+          updatedAtISO: now()
+        };
+      }
+      const normalized = (typeof _normalizePlanningAssemblyState === "function")
+        ? _normalizePlanningAssemblyState(candidate)
+        : candidate;
+      const phases = ensureArray(normalized?.phases);
+      const activePhaseId = String(normalized?.activePhaseId || phases[0]?.id || "").trim();
+      if(!phases.length || !activePhaseId) return null;
+      const active = phases.find(p=>String(p?.id || "").trim() === activePhaseId) || phases[0] || null;
+      const snapServices = Array.isArray(active?.baseSnapshot?.model?.services) ? active.baseSnapshot.model.services.length : 0;
+      if(snapServices <= 0 && servicesCount > 0) return null;
+      return {
+        activePhaseId,
+        phases: clone(phases),
+        updatedAtISO: String(normalized?.updatedAtISO || now())
+      };
+    };
+
+    for(const c of candidates){
+      const normalized = normalizeAssemblyCandidate(c.value);
+      if(!normalized) continue;
+      s.planningAssembly = ensureObj(s.planningAssembly);
+      s.planningAssembly.activePhaseId = normalized.activePhaseId;
+      s.planningAssembly.phases = normalized.phases;
+      s.planningAssembly.updatedAtISO = normalized.updatedAtISO;
+      out.applied = true;
+      out.source = c.source;
+      out.activePhaseId = normalized.activePhaseId;
+      out.phasesAfter = normalized.phases.length;
+      console.log("[PLANNING_ASSEMBLY_REHYDRATE]", out);
+      return out;
+    }
+
+    if(servicesCount > 0){
+      const ts = Date.now();
+      const phaseId = `phase_rehydrated_${ts}`;
+      const minimalPhase = {
+        id: phaseId,
+        label: "Fase reidratada",
+        createdAtISO: now(),
+        updatedAtISO: now(),
+        source: "rehydrated-from-current-state",
+        baseSnapshot: {
+          templateKey: "rehydrated",
+          templateLabel: "Fase reidratada",
+          capturedAtISO: now(),
+          originLabel: "rehydrated-from-current-state",
+          model: {
+            label: "Fase reidratada",
+            name: "Fase reidratada",
+            services: clone(ensureArray(s.services)),
+            cycles: clone(ensureArray(s.cycles)),
+            dependencies: clone(ensureArray(s.dependencies)),
+            locations: clone(ensureArray(s.locations)),
+            serviceLocationMap: clone(ensureObj(s.serviceLocationMap))
+          }
+        },
+        segmentsByService: {},
+        deps: [],
+        laneByNode: {},
+        blockedDepKeys: [],
+        selectedServiceId: ""
+      };
+      s.planningAssembly = ensureObj(s.planningAssembly);
+      s.planningAssembly.activePhaseId = phaseId;
+      s.planningAssembly.phases = [minimalPhase];
+      s.planningAssembly.updatedAtISO = now();
+      out.applied = true;
+      out.source = "rehydrated-from-current-state";
+      out.activePhaseId = phaseId;
+      out.phasesAfter = 1;
+      console.log("[PLANNING_ASSEMBLY_REHYDRATE]", out);
+      return out;
+    }
+
+    out.warning = "missing_sources_and_no_state_services";
+    console.log("[PLANNING_ASSEMBLY_REHYDRATE]", out);
+    return out;
+  }
+  function consolidateRehydratedPlanningPhase(inputState){
+    const s = ensurePlanningStateContract(inputState);
+    const pa = (s.planningAssembly && typeof s.planningAssembly === "object") ? s.planningAssembly : {};
+    const phases = Array.isArray(pa.phases) ? pa.phases : [];
+    const activePhaseId = String(pa.activePhaseId || "").trim();
+    const diag = {
+      applied: false,
+      activePhaseId: activePhaseId || null,
+      phasesCount: phases.length,
+      source: "none",
+      warning: null
+    };
+    if(!activePhaseId){
+      diag.warning = "missing_active_phase_id";
+      console.log("[PLANNING_PHASE_CONSOLIDATE]", diag);
+      return diag;
+    }
+    const idx = phases.findIndex(p=>String(p?.id || "").trim() === activePhaseId);
+    if(idx < 0){
+      diag.warning = "active_phase_not_found";
+      console.log("[PLANNING_PHASE_CONSOLIDATE]", diag);
+      return diag;
+    }
+    const phase = phases[idx] && typeof phases[idx] === "object" ? phases[idx] : {};
+    const phaseSource = String(phase.source || "").trim();
+    if(phaseSource !== "rehydrated-from-current-state" && phaseSource !== "rehydrated-from-draft"){
+      diag.source = phaseSource || "non_rehydrated_phase";
+      console.log("[PLANNING_PHASE_CONSOLIDATE]", diag);
+      return diag;
+    }
+    const clone = (v)=>deepClone(v);
+    const arr = (v)=>Array.isArray(v) ? v : [];
+    const obj = (v)=>(v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+
+    const nextPhase = clone(phase);
+    const snap = (nextPhase.baseSnapshot && typeof nextPhase.baseSnapshot === "object") ? nextPhase.baseSnapshot : {};
+    const model = (snap.model && typeof snap.model === "object") ? snap.model : {};
+    const stateSvc = arr(s.services);
+    const stateCyc = arr(s.cycles);
+    const stateDep = arr(s.dependencies);
+    const stateLoc = arr(s.locations);
+    const stateSLM = obj(s.serviceLocationMap);
+
+    if(!nextPhase.id) nextPhase.id = activePhaseId;
+    if(!String(nextPhase.label || "").trim()) nextPhase.label = "Fase reidratada";
+    if(!String(nextPhase.createdAtISO || "").trim()) nextPhase.createdAtISO = now();
+    nextPhase.updatedAtISO = now();
+    if(!String(nextPhase.source || "").trim()) nextPhase.source = phaseSource || "rehydrated-from-current-state";
+    if(!String(nextPhase.status || "").trim()) nextPhase.status = "recovered";
+    if(!String(nextPhase.type || "").trim()) nextPhase.type = "rehydrated";
+
+    const nextModel = {
+      label: String(model.label || nextPhase.label || "Fase reidratada").trim() || "Fase reidratada",
+      name: String(model.name || model.label || nextPhase.label || "Fase reidratada").trim() || "Fase reidratada",
+      services: arr(model.services).length ? clone(arr(model.services)) : clone(stateSvc),
+      cycles: arr(model.cycles).length ? clone(arr(model.cycles)) : clone(stateCyc),
+      dependencies: arr(model.dependencies).length ? clone(arr(model.dependencies)) : clone(stateDep),
+      locations: arr(model.locations).length ? clone(arr(model.locations)) : clone(stateLoc),
+      serviceLocationMap: Object.keys(obj(model.serviceLocationMap)).length ? clone(obj(model.serviceLocationMap)) : clone(stateSLM)
+    };
+    nextPhase.baseSnapshot = {
+      templateKey: String(snap.templateKey || "rehydrated").trim() || "rehydrated",
+      templateLabel: String(snap.templateLabel || nextPhase.label || "Fase reidratada").trim() || "Fase reidratada",
+      capturedAtISO: String(snap.capturedAtISO || now()).trim() || now(),
+      originLabel: String(snap.originLabel || nextPhase.source || "rehydrated-from-current-state").trim() || "rehydrated-from-current-state",
+      model: nextModel
+    };
+
+    if(!nextPhase.segmentsByService || typeof nextPhase.segmentsByService !== "object") nextPhase.segmentsByService = {};
+    if(!Array.isArray(nextPhase.deps)) nextPhase.deps = [];
+    if(!nextPhase.laneByNode || typeof nextPhase.laneByNode !== "object") nextPhase.laneByNode = {};
+    if(!Array.isArray(nextPhase.blockedDepKeys)) nextPhase.blockedDepKeys = [];
+    if(nextPhase.selectedServiceId === undefined) nextPhase.selectedServiceId = "";
+
+    phases[idx] = nextPhase;
+    s.planningAssembly.phases = phases;
+    s.planningAssembly.activePhaseId = String(nextPhase.id || activePhaseId).trim() || activePhaseId;
+    s.planningAssembly.updatedAtISO = now();
+    diag.applied = true;
+    diag.source = String(nextPhase.source || "rehydrated").trim();
+    diag.activePhaseId = s.planningAssembly.activePhaseId;
+    console.log("[PLANNING_PHASE_CONSOLIDATE]", diag);
+    return diag;
+  }
+  function buildPlanningVersionSignature(inputState){
+    const s = ensurePlanningStateContract(inputState);
+    const planBlocks = Array.isArray(s?.plan?.blocks) ? s.plan.blocks : [];
+    const stateBlocks = Array.isArray(s?.blocks) ? s.blocks : [];
+    const services = Array.isArray(s?.services) ? s.services : [];
+    const cycles = Array.isArray(s?.cycles) ? s.cycles : [];
+    const deps = Array.isArray(s?.dependencies) ? s.dependencies : [];
+    const useBlocks = planBlocks.length ? planBlocks : stateBlocks;
+    const stableHash = (value)=>{
+      const txt = JSON.stringify(value || "");
+      let h = 2166136261 >>> 0;
+      for(let i=0;i<txt.length;i++){
+        h ^= txt.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      return `h${h.toString(16)}`;
+    };
+    const blocksLite = useBlocks.map(b=>[
+      String(b?.id || ""),
+      String(b?.serviceId || b?.svcId || ""),
+      String(b?.locationId || b?.locId || ""),
+      String(b?.startDateISO || b?.startISO || ""),
+      String(b?.endDateISO || b?.endISO || ""),
+      Number(b?.durationDays || b?.dur || 0) || 0
+    ]);
+    const servicesLite = services.map(svc=>[
+      String(svc?.id || svc?.serviceId || ""),
+      String(svc?.name || svc?.serviceName || ""),
+      Number(svc?.durationDays || svc?.duration || 0) || 0
+    ]);
+    return {
+      blocksCount: useBlocks.length,
+      servicesCount: services.length,
+      cyclesCount: cycles.length,
+      dependenciesCount: deps.length,
+      blocksHash: stableHash(blocksLite),
+      servicesHash: stableHash(servicesLite)
+    };
+  }
+  function getCurrentActivePlanningVersionId(inputState){
+    const s = ensurePlanningStateContract(inputState);
+    const direct = String(s?.operational?.activePlanningVersionId || "").trim();
+    if(direct) return direct;
+    const legacy = String(s?.activePlanningVersionId || "").trim();
+    if(legacy) return legacy;
+    const versions = Array.isArray(s?.planningVersions) ? s.planningVersions : [];
+    const activeFromContract = versions.find(v=>{
+      const status = String(v?.status || "").trim().toLowerCase();
+      const type = String(v?.type || "").trim().toLowerCase();
+      return status === "active" || type === "applied" || type === "active";
+    });
+    const activeId = String(activeFromContract?.id || "").trim();
+    if(activeId) return activeId;
+    const appliedVersions = versions.filter(v=>{
+      const status = String(v?.status || "").trim().toLowerCase();
+      const type = String(v?.type || "").trim().toLowerCase();
+      return status === "active" || type === "applied" || type === "active";
+    });
+    if(appliedVersions.length === 1){
+      const onlyId = String(appliedVersions[0]?.id || "").trim();
+      if(onlyId) return onlyId;
+    }
+    return null;
+  }
+  function preserveOperationalPlanningVersionId(nextOperational, prevState){
+    const next = (nextOperational && typeof nextOperational === "object") ? nextOperational : {};
+    const prev = ensurePlanningStateContract(prevState);
+    const before = String(next?.activePlanningVersionId || "").trim() || null;
+    const preserved = getCurrentActivePlanningVersionId(prev);
+    if(!String(next.activePlanningVersionId || "").trim() && preserved){
+      next.activePlanningVersionId = preserved;
+    }
+    return {
+      operational: next,
+      preserved: !!preserved,
+      before,
+      after: String(next.activePlanningVersionId || "").trim() || null,
+      warning: preserved ? null : "missing_active_planning_version_id"
+    };
+  }
+  function ensureAppliedPlanningVersionContract(inputState, options){
+    const s = ensurePlanningStateContract(inputState);
+    const opts = (options && typeof options === "object") ? options : {};
+    const planBlocks = Array.isArray(s?.plan?.blocks) ? s.plan.blocks : [];
+    const stateBlocks = Array.isArray(s?.blocks) ? s.blocks : [];
+    const useBlocks = planBlocks.length ? planBlocks : stateBlocks;
+    const versionsBefore = Array.isArray(s.planningVersions) ? s.planningVersions.length : 0;
+    const diag = {
+      applied: false,
+      created: false,
+      reused: false,
+      activePlanningVersionId: String(s?.operational?.activePlanningVersionId || "").trim() || null,
+      versionsBefore,
+      versionsAfter: versionsBefore,
+      blocksCount: useBlocks.length,
+      servicesCount: Array.isArray(s?.services) ? s.services.length : 0,
+      originPhaseId: null,
+      source: String(opts.source || "unknown"),
+      warning: null
+    };
+    if(!Array.isArray(s.planningVersions)) s.planningVersions = [];
+    s.operational = (s.operational && typeof s.operational === "object") ? s.operational : {};
+    const pa = (s.planningAssembly && typeof s.planningAssembly === "object") ? s.planningAssembly : {};
+    const phases = Array.isArray(pa.phases) ? pa.phases : [];
+    const originPhaseId = String(pa.activePhaseId || "").trim();
+    const originPhase = originPhaseId ? (phases.find(p=>String(p?.id || "").trim() === originPhaseId) || null) : null;
+    diag.originPhaseId = originPhaseId || null;
+    if(!originPhase){
+      diag.warning = "missing_origin_phase";
+      console.warn("[PLANNING_VERSION_CONTRACT]", diag);
+      return diag;
+    }
+
+    const activeId = String(s.operational.activePlanningVersionId || "").trim();
+    const activeVersion = activeId ? (s.planningVersions.find(v=>String(v?.id || "").trim() === activeId) || null) : null;
+    const sig = buildPlanningVersionSignature(s);
+    if(activeVersion){
+      const sameShape = Number(activeVersion?.blocksCount || 0) === sig.blocksCount
+        && String(activeVersion?.blocksHash || "") === String(sig.blocksHash || "");
+      if(sameShape){
+        diag.applied = true;
+        diag.reused = true;
+        diag.versionsAfter = s.planningVersions.length;
+        diag.activePlanningVersionId = activeId;
+        s.operational.activePlanningVersionId = activeId;
+        console.log("[PLANNING_VERSION_CONTRACT]", diag);
+        return diag;
+      }
+    }
+
+    const existingBySig = s.planningVersions.find(v=>
+      Number(v?.blocksCount || 0) === sig.blocksCount
+      && String(v?.blocksHash || "") === String(sig.blocksHash || "")
+      && String(v?.servicesHash || "") === String(sig.servicesHash || "")
+    ) || null;
+    if(existingBySig){
+      const reuseId = String(existingBySig.id || "").trim();
+      if(reuseId){
+        s.operational.activePlanningVersionId = reuseId;
+        diag.applied = true;
+        diag.reused = true;
+        diag.activePlanningVersionId = reuseId;
+        diag.versionsAfter = s.planningVersions.length;
+        console.log("[PLANNING_VERSION_CONTRACT]", diag);
+        return diag;
+      }
+    }
+
+    const versionId = `planver_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+    const version = {
+      id: versionId,
+      name: `Versao aplicada ${new Date().toLocaleString("pt-BR")}`,
+      status: "active",
+      type: "applied",
+      source: String(opts.source || "unknown"),
+      createdAtISO: now(),
+      updatedAtISO: now(),
+      appliedAtISO: now(),
+      originPhaseId: originPhaseId,
+      originPhaseSource: String(originPhase?.source || "").trim() || null,
+      originPhaseType: String(originPhase?.type || "").trim() || null,
+      originPhaseStatus: String(originPhase?.status || "").trim() || null,
+      blocksCount: sig.blocksCount,
+      servicesCount: sig.servicesCount,
+      cyclesCount: sig.cyclesCount,
+      dependenciesCount: sig.dependenciesCount,
+      blocksHash: sig.blocksHash,
+      servicesHash: sig.servicesHash,
+      snapshot: {
+        services: deepClone(Array.isArray(s.services) ? s.services : []),
+        cycles: deepClone(Array.isArray(s.cycles) ? s.cycles : []),
+        dependencies: deepClone(Array.isArray(s.dependencies) ? s.dependencies : []),
+        serviceLocationMap: deepClone((s.serviceLocationMap && typeof s.serviceLocationMap === "object") ? s.serviceLocationMap : {})
+      },
+      blocksRef: {
+        source: planBlocks.length ? "state.plan.blocks" : "state.blocks",
+        count: sig.blocksCount
+      }
+    };
+    s.planningVersions.push(version);
+    s.operational.activePlanningVersionId = versionId;
+    diag.applied = true;
+    diag.created = true;
+    diag.activePlanningVersionId = versionId;
+    diag.versionsAfter = s.planningVersions.length;
+    console.log("[PLANNING_VERSION_CONTRACT]", diag);
+    return diag;
+  }
+  function auditPlanningVersionContract(){
+    const s = ensurePlanningStateContract(window.state || {});
+    const warnings = [];
+    const versions = Array.isArray(s.planningVersions) ? s.planningVersions : [];
+    const activeId = String(s?.operational?.activePlanningVersionId || "").trim() || null;
+    const active = activeId ? (versions.find(v=>String(v?.id || "").trim() === activeId) || null) : null;
+    const pa = s?.planningAssembly && typeof s.planningAssembly === "object" ? s.planningAssembly : {};
+    const phases = Array.isArray(pa.phases) ? pa.phases : [];
+    const originPhaseId = String(active?.originPhaseId || pa?.activePhaseId || "").trim() || null;
+    const originPhaseFound = !!(originPhaseId && phases.find(p=>String(p?.id || "").trim() === originPhaseId));
+    const currentPlanBlocksCount = Array.isArray(s?.plan?.blocks) ? s.plan.blocks.length : 0;
+    const currentStateBlocksCount = Array.isArray(s?.blocks) ? s.blocks.length : 0;
+    const activeVersionBlocksCount = Number(active?.blocksCount || 0) || 0;
+    if(!activeId) warnings.push("missing_activePlanningVersionId");
+    if(activeId && !active) warnings.push("active_version_not_found");
+    if(active && currentPlanBlocksCount && activeVersionBlocksCount !== currentPlanBlocksCount){
+      warnings.push("active_version_blocks_mismatch_plan");
+    }
+    return {
+      operationalExists: !!s?.operational,
+      operationalActivePlanningVersionId: String(s?.operational?.activePlanningVersionId || "").trim() || null,
+      activePlanningVersionIdFromContract: activeId,
+      activePlanningVersionId: activeId,
+      planningVersionsCount: versions.length,
+      activeVersionFound: !!active,
+      activeVersionBlocksCount,
+      currentPlanBlocksCount,
+      currentStateBlocksCount,
+      mismatch: !!(active && currentPlanBlocksCount && activeVersionBlocksCount !== currentPlanBlocksCount),
+      originPhaseId,
+      originPhaseFound,
+      warnings
+    };
+  }
+  try{ window.PLANNUS_AUDIT_PLANNING_VERSION_CONTRACT = auditPlanningVersionContract; }catch(_){}
+  function writePlanningStateScopedCache(stateObj, obraId){
+    const s = ensurePlanningStateContract(stateObj);
+    const payloadByDomain = {
+      eap: s.eap,
+      planningAssembly: s.planningAssembly,
+      operational: s.operational,
+      blockEdits: s.blockEdits,
+      realization: s.realization
+    };
+    Object.entries(payloadByDomain).forEach(([domain, payload])=>{
+      try{
+        const key = getObraScopedStorageKey(obraId, domain);
+        localStorage.setItem(key, JSON.stringify(payload));
+      }catch(e){
+        console.warn("[PLANNING_SCOPED_CACHE]", { event:"write_failed", domain, obraId:String(obraId || "").trim() || "local", error:String(e && e.message || e) });
+      }
+    });
+    console.log("[PLANNING_SCOPED_CACHE]", { event:"written", obraId:String(obraId || "").trim() || "local" });
+    return s;
+  }
+  function buildLegacyAuxBackupFromState(stateObj, obraId){
+    const s = ensurePlanningStateContract(stateObj);
+    const eapLibLen = Array.isArray(s?.eap?.library) ? s.eap.library.length : 0;
+    const phaseLen = Array.isArray(s?.planningAssembly?.phases) ? s.planningAssembly.phases.length : 0;
+    const opBlocksLen = Array.isArray(s?.operational?.blocks) ? s.operational.blocks.length : 0;
+    const planBlocksLen = Array.isArray(s?.plan?.blocks) ? s.plan.blocks.length : 0;
+    const blockEditsLen = (s?.blockEdits && typeof s.blockEdits === "object") ? Object.keys(s.blockEdits).length : 0;
+    return {
+      version: 1,
+      deprecated: true,
+      obraId: String(obraId || "").trim() || "local",
+      savedAtISO: now(),
+      guidedEap: {
+        draft: null,
+        library: [],
+        lastSavedTemplate: null
+      },
+      planningAssembly: {
+        store: null,
+        legacy: null
+      },
+      operationalSnapshots: {
+        current: null,
+        monthly: null
+      },
+      blockEdits: {},
+      summary: {
+        eapLibraryCount: eapLibLen,
+        planningPhasesCount: phaseLen,
+        operationalBlocksCount: opBlocksLen,
+        planBlocksCount: planBlocksLen,
+        blockEditsCount: blockEditsLen
+      }
+    };
+  }
+  function collectAuxiliaryPlanningStateForOnlineSave(){
+    const meta = readMeta();
+    const aux = buildLegacyAuxBackupFromState(window.state || {}, String(meta?.obraId || "").trim() || "local");
+    console.log("[ONLINE_STATE_CONSOLIDATION]", {
+      event:"aux_collected_deprecated_backup",
+      obraId: aux.obraId,
+      hasGuidedDraft:!!aux.guidedEap.draft,
+      hasPlanningStore:!!aux.planningAssembly.store,
+      hasOperational:!!aux.operationalSnapshots.current,
+      hasBlockEdits:!!aux.blockEdits
+    });
+    return aux;
+  }
+  function hydrateAuxiliaryPlanningStateFromOnlineState(loadedState){
+    const aux = loadedState && typeof loadedState === "object" ? loadedState.__plannusAux : null;
+    if(!aux || typeof aux !== "object"){
+      console.log("[ONLINE_STATE_HYDRATION]", { event:"no_aux_state" });
+      return false;
+    }
+    const writes = [
+      ["PLANNUS_GUIDED_EAP_DRAFT_V1", aux.guidedEap?.draft],
+      ["PLANNUS_GUIDED_EAP_LIBRARY_V1", aux.guidedEap?.library],
+      ["PLANNUS_GUIDED_EAP_LAST_SAVED_TEMPLATE_V1", aux.guidedEap?.lastSavedTemplate],
+      ["PLANNUS_PLANNING_ASSEMBLY_STORE_V1", aux.planningAssembly?.store],
+      ["PLANNUS_PLANNING_ASSEMBLY_V1", aux.planningAssembly?.legacy],
+      ["QP_OPERATIONAL_V1", aux.operationalSnapshots?.current],
+      ["QP_OPERATIONAL_MONTHLY_V1", aux.operationalSnapshots?.monthly],
+      ["QP_BLOCK_EDIT_V3", aux.blockEdits]
+    ];
+    let restored = 0;
+    writes.forEach(([key, value])=>{
+      if(value == null) return;
+      try{
+        backupLocalStorageKeyBeforeHydrate(key);
+        localStorage.setItem(key, JSON.stringify(value));
+        restored++;
+      }catch(e){
+        console.warn("[ONLINE_STATE_HYDRATION]", { event:"aux_restore_failed", key, error:String(e && e.message || e) });
+      }
+    });
+    console.log("[ONLINE_STATE_HYDRATION]", { event:"aux_restored", restored, version:aux.version || null });
+    return restored > 0;
+  }
   function getCurrentConsolidatedPlannusState(){
+    let out = null;
+    const meta = readMeta();
+    const scopedObraId = String(meta?.obraId || "").trim() || "local";
     try{
       if(window.state && typeof window.state === "object"){
-        return deepClone(window.state);
+        out = deepClone(window.state);
       }
     }catch(_){}
+    if(!out){
+      try{
+        const raw = localStorage.getItem(APP_KEY);
+        if(raw) out = JSON.parse(raw);
+      }catch(_){}
+    }
+    if(out && typeof out === "object"){
+      out = ensurePlanningStateContract(out);
+      out = migrateLegacyPlanningLocalStorageIntoState(out, scopedObraId);
+      rehydratePlanningAssemblyIfMissing(out, scopedObraId);
+      consolidateRehydratedPlanningPhase(out);
+      ensureAppliedPlanningVersionContract(out, { source:"saveOnline" });
+      writePlanningStateScopedCache(out, scopedObraId);
+      out.__plannusAux = buildLegacyAuxBackupFromState(out, scopedObraId);
+      console.log("[ONLINE_STATE_CONSOLIDATION]", {
+        event:"state_consolidated_with_contract",
+        obraId: scopedObraId,
+        hasEap: !!out.eap,
+        hasPlanningAssembly: !!out.planningAssembly,
+        hasPlanningVersions: Array.isArray(out.planningVersions),
+        hasOperational: !!out.operational,
+        hasBlockEdits: !!out.blockEdits,
+        hasAux: !!out.__plannusAux
+      });
+    }
+    return out || null;
+  }
+  function ensureServiceBaseCatalogAfterOpen(loadedState){
     try{
-      const raw = localStorage.getItem(APP_KEY);
-      if(raw) return JSON.parse(raw);
-    }catch(_){}
-    return null;
+      if(loadedState && typeof loadedState === "object" && window.state && typeof window.state === "object"){
+        if(!Array.isArray(window.state.serviceBaseCatalog) || !window.state.serviceBaseCatalog.length){
+          if(Array.isArray(loadedState.serviceBaseCatalog) && loadedState.serviceBaseCatalog.length){
+            window.state.serviceBaseCatalog = loadedState.serviceBaseCatalog.map(x=>Object.assign({}, x));
+          }
+        }
+      }
+      const count = (typeof _ensureServiceBaseCatalogVisible === "function")
+        ? _ensureServiceBaseCatalogVisible()
+        : 0;
+      console.log("[ONLINE_STATE_HYDRATION]", { event:"service_base_after_open", count });
+      return count;
+    }catch(e){
+      console.warn("[ONLINE_STATE_HYDRATION]", { event:"service_base_after_open_failed", error:String(e && e.message || e) });
+      return 0;
+    }
   }
   const PlannusOnlineSaveAdapter = {
     getSaveContext(){
@@ -37020,7 +39273,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       const stateJson = JSON.stringify(ctx.state);
       const apiOk = await checkApiOnline(false);
       if(!apiOk){
-        localStorage.setItem(APP_KEY, stateJson);
+        const localWrite = safeSetLocalStorage(APP_KEY, stateJson);
         writeMeta({
           ...ctx.meta,
           lastLocalSaveAt: now(),
@@ -37028,16 +39281,23 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
           conflict: false,
           lastError: "Sem conexao/API indisponivel"
         });
+        if(!localWrite.ok && localWrite.quotaExceeded){
+          setStatus("Offline. Backup local nao atualizado por limite do navegador.", "warn", SYNC_STATES.OFFLINE);
+          return;
+        }
         notifyStatus(ONLINE_MESSAGES.OFFLINE_LOCAL, "error", SYNC_STATES.OFFLINE, ONLINE_MESSAGES.OFFLINE_LOCAL);
         return;
       }
-      localStorage.setItem(APP_KEY, stateJson);
+      const localWrite = safeSetLocalStorage(APP_KEY, stateJson);
       writeMeta({
         ...ctx.meta,
         lastLocalSaveAt: now(),
         pendingOnlineSave: true,
         conflict: false
       });
+      if(!localWrite.ok && localWrite.quotaExceeded){
+        console.warn("[LOCAL_STORAGE_QUOTA]", { event:"app_state_cache_quota_exceeded_before_online_save", obraId:ctx.obraId });
+      }
       ONLINE_PANEL_CTX.isSaving = true;
       setStatus(`Salvando online (${ctx.obraId})...`, "saving", SYNC_STATES.SAVING);
       console.log("[PLANNUS_SAVE]", { obraId: ctx.obraId, revisionAntes: ctx.revision, at: now() });
@@ -37057,6 +39317,9 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
             lastError: ""
           });
           setStatus(`${ONLINE_MESSAGES.SAVE_OK} Revision ${revisionNova}.`, "ok", SYNC_STATES.ONLINE_SYNCED);
+          if(!localWrite.ok && localWrite.quotaExceeded){
+            setStatus("Salvo online. Backup local parcial nao foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+          }
           console.log("[PLANNUS_SYNC]", { ok:true, obraId: ctx.obraId, revisionDepois: revisionNova, pendingOnlineSave:false, conflict:false, at: now() });
           ONLINE_PANEL_CTX.lastPingOk = true;
           return;
@@ -37162,11 +39425,63 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       setStatus(`Carregando ${id}...`, "warn", SYNC_STATES.SAVING);
       const {res,data} = await PlannusOnlineRepository.loadObra(id);
       if(!res.ok || data?.ok===false){ setStatus(`Falha: ${data?.erro||res.status}`, "error", SYNC_STATES.SAVE_ERROR); return; }
-      const state = data?.state || data?.obra?.state || data?.obra?.state_json;
-      if(!state){ setStatus("Resposta sem state.", "error", SYNC_STATES.SAVE_ERROR); return; }
-      const current = localStorage.getItem(APP_KEY);
-      if(current) localStorage.setItem(`plannus.backup.before_online_load.${Date.now()}`, current);
-      localStorage.setItem(APP_KEY, JSON.stringify(state));
+      let state = data?.state || data?.obra?.state || data?.obra?.state_json;
+      if(typeof state === "string"){
+        try{ state = JSON.parse(state); }catch(_){}
+      }
+      if(!state || typeof state !== "object"){ setStatus("Resposta sem state.", "error", SYNC_STATES.SAVE_ERROR); return; }
+      const current = readJsonLocalStorage(APP_KEY);
+      const backup = safeCreatePreOnlineLoadBackup(current, { maxCount:3 });
+      if(backup.quotaExceeded){
+        console.warn("[ONLINE_OPEN_OBRA]", { event:"pre_backup_quota_warning_online_open", obraId:id, reason:backup.reason });
+      }
+      window.__PLANNUS_PREFER_ONLINE_REALIZATION = true;
+      state = ensurePlanningStateContract(state);
+      state = migrateLegacyPlanningLocalStorageIntoState(state, id);
+      const rehydrateDiag = rehydratePlanningAssemblyIfMissing(state, id);
+      const consolidateDiag = consolidateRehydratedPlanningPhase(state);
+      const planningVersionDiag = ensureAppliedPlanningVersionContract(state, { source:"openObra" });
+      writePlanningStateScopedCache(state, id);
+      console.log("[PLANNING_STATE_CONTRACT]", {
+        event:"open_obra_contract_ready",
+        obraId:id,
+        eapDraft: !!state?.eap?.draft,
+        planningPhases: Array.isArray(state?.planningAssembly?.phases) ? state.planningAssembly.phases.length : 0,
+        rehydratedPlanningAssembly: !!rehydrateDiag?.applied,
+        rehydrateSource: String(rehydrateDiag?.source || ""),
+        consolidatedRehydratedPhase: !!consolidateDiag?.applied,
+        consolidateSource: String(consolidateDiag?.source || ""),
+        activePlanningVersionId: String(planningVersionDiag?.activePlanningVersionId || ""),
+        planningVersionsCount: Array.isArray(state?.planningVersions) ? state.planningVersions.length : 0
+      });
+      const appWrite = safeSetLocalStorage(APP_KEY, JSON.stringify(state), { allowCompactFallback:false });
+      if(!appWrite.ok){
+        console.warn("[LOCAL_STORAGE_QUOTA]", { event:"open_online_app_state_write_failed", obraId:id, quotaExceeded:appWrite.quotaExceeded });
+      }
+      try{
+        if(window.state && typeof window.state === "object"){
+          const runtimeState = window.state;
+          Object.keys(runtimeState).forEach((k)=>{ delete runtimeState[k]; });
+          Object.assign(runtimeState, deepClone(state));
+          if(typeof _ensureStateContracts === "function") _ensureStateContracts();
+          try{
+            if(typeof syncCalendarRangeToBlocks === "function"){
+              syncCalendarRangeToBlocks(
+                (typeof _getActivePlanBlocks === "function") ? _getActivePlanBlocks() : [],
+                { applyToVisible:true }
+              );
+            }
+          }catch(_){}
+          if(typeof buildCalendarDays === "function") buildCalendarDays();
+          try{ ensureServiceBaseCatalogAfterOpen(state); }catch(_){}
+          if(typeof loadOperational === "function") loadOperational({ obraId:id, strictObraId:true });
+          if(typeof renderAll === "function") renderAll();
+          if(typeof renderProjectHeader === "function") renderProjectHeader();
+          console.log("[ONLINE_STATE_HYDRATION]", { event:"runtime_state_applied", obraId:id });
+        }
+      }catch(e){
+        console.warn("[ONLINE_STATE_HYDRATION]", { event:"runtime_state_apply_failed", obraId:id, error:String(e && e.message || e) });
+      }
       cacheLocalObra({ id, nome:nm, codigo:obraCodigo(obra), revision:Number(data?.revision ?? data?.obra?.revision ?? 0) || 0, updated_at:data?.updated_at ?? data?.obra?.updated_at ?? now(), permissao:obraPerm(obra) }, state);
       writeMeta({
         obraId: id,
@@ -37174,10 +39489,24 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
         revision: Number(data?.revision ?? data?.obra?.revision ?? 0) || 0,
         updatedAt: data?.updated_at ?? data?.obra?.updated_at ?? null,
         lastSyncAt: now(),
+        source: "online",
         pendingOnlineSave: false,
         conflict: false
       });
-      setStatus(`Obra ${id} aberta.`, "ok", SYNC_STATES.ONLINE_SYNCED);
+      setStatus(`Obra ${id} aberta (fonte: online).`, "ok", SYNC_STATES.ONLINE_SYNCED);
+      if(typeof appWrite !== "undefined" && !appWrite.ok && appWrite.quotaExceeded){
+        setStatus("Obra aberta online. Cache local completo nao foi salvo por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+      }
+      if(backup.quotaExceeded){
+        setStatus("Obra carregada online. Backup local anterior nao foi criado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+      }
+      console.log("[ONLINE_STATE_HYDRATION]", { event:"open_online_source", obraId:id, source:"online", revision:Number(data?.revision ?? data?.obra?.revision ?? 0) || 0 });
+      showObraLoadSummaryPopup({
+        obraId: id,
+        source: "online",
+        revision: Number(data?.revision ?? data?.obra?.revision ?? 0) || 0,
+        state
+      });
       localStorage.setItem(SELECTED_KEY, id);
       const gate = q("#plannusObrasGate");
       if(gate) gate.remove();
@@ -37199,6 +39528,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       }
       const obras = mergeObras(asList(data));
       __plnObrasCache = obras.slice();
+      const canDeleteGlobal = !!(__plnMe?.can_delete_obras || String(__plnMe?.role || "").toLowerCase() === "planejador");
       setStatus(`Online conectado. ${obras.length} obra(s).`, "ok", SYNC_STATES.ONLINE_SYNCED);
       if(!tb) return;
       if(!obras.length){
@@ -37212,7 +39542,10 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
           <td>${Number(o?.revision||0)}</td>
           <td>${fmt(o?.updated_at||o?.updatedAt)}</td>
           <td>${obraPerm(o)}${o?.localOnly ? " (local)" : ""}</td>
-          <td><button data-open="${obraId(o)}" data-local="${o?.localOnly ? "1" : "0"}" class="pln-btn primary">${o?.localOnly ? "Abrir Local" : "Abrir Obra"}</button></td>
+          <td>
+            <button data-open="${obraId(o)}" data-local="${o?.localOnly ? "1" : "0"}" class="pln-btn primary">${o?.localOnly ? "Abrir Local" : "Abrir Obra"}</button>
+            ${(canDeleteGlobal || String(obraPerm(o) || "").toLowerCase() === "owner") ? `<button data-delete="${obraId(o)}" class="pln-btn" style="margin-left:8px">Excluir</button>` : ""}
+          </td>
         </tr>
       `).join("");
       tb.querySelectorAll("button[data-open]").forEach((b)=>{
@@ -37223,6 +39556,33 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
           }
           const obra = obras.find((x)=>obraId(x)===id) || { id };
           await window.PlannusOnlineActions?.openObra?.(obra);
+        });
+      });
+      tb.querySelectorAll("button[data-delete]").forEach((b)=>{
+        b.addEventListener("click", async ()=>{
+          const id = b.getAttribute("data-delete");
+          if(!id) return;
+          const obra = obras.find((x)=>obraId(x)===id) || { id };
+          const nome = obraNome(obra) || id;
+          if(!confirm(`Excluir a obra "${nome}"? Ela sera desativada no banco.`)) return;
+          b.disabled = true;
+          try{
+            const { res, data } = await PlannusOnlineRepository.deleteObra(id);
+            if(!res.ok || data?.ok===false){
+              alert(`Falha ao excluir obra: ${data?.erro || res.status}`);
+              return;
+            }
+            removeCachedObra(id);
+            if(String(readMeta()?.obraId || "").trim() === id){
+              writeMeta({});
+            }
+            await refreshList();
+            setStatus(`Obra ${id} excluida com sucesso.`, "ok", SYNC_STATES.ONLINE_SYNCED);
+          }catch(e){
+            alert(`Erro de rede ao excluir obra: ${String(e && e.message || e)}`);
+          }finally{
+            b.disabled = false;
+          }
         });
       });
       const obraSel = q("#plnPermObraSelect");
@@ -37246,7 +39606,10 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       const el = q("#plannusMeInfo");
       if(el){
         const u = __plnMe || {};
-        el.textContent = `${u.email || "-"} | role=${u.role || "usuario"}`;
+        el.textContent = `${u.email || "-"} | role=${u.role || "usuario"} | delete=${String(!!u.can_delete_obras)}`;
+      }
+      if(q("#plannusObrasRows")){
+        refreshList();
       }
       const canManage = !!(__plnMe?.can_grant_permissions || __plnMe?.can_manage_users || String(__plnMe?.role||"").toLowerCase()==="planejador");
       const btn = q("#plnManagePerm");
@@ -37335,7 +39698,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       }
       const items = Array.isArray(data?.usuarios) ? data.usuarios : (Array.isArray(data) ? data : []);
       if(!items.length){
-        body.innerHTML = "<tr><td colspan='9'>Sem usuarios.</td></tr>";
+        body.innerHTML = "<tr><td colspan='10'>Sem usuarios.</td></tr>";
         if(st) st.textContent = "Sem usuarios.";
         return;
       }
@@ -37349,12 +39712,13 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
           <td>${Number(u.can_grant_permissions||0)}</td>
           <td>${Number(u.can_manage_users||0)}</td>
           <td>${Number(u.can_create_obras||0)}</td>
+          <td>${Number(u.can_delete_obras||0)}</td>
           <td>${String(!!u.ativo)}</td>
         </tr>
       `).join("");
       if(st) st.textContent = `Usuarios carregados (${items.length}).`;
     }catch(e){
-      body.innerHTML = `<tr><td colspan='9'>Erro: ${String(e&&e.message||e)}</td></tr>`;
+      body.innerHTML = `<tr><td colspan='10'>Erro: ${String(e&&e.message||e)}</td></tr>`;
       if(st) st.textContent = "Erro de rede ao carregar usuarios.";
     }
   }
@@ -37527,8 +39891,8 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
             </div>
             <div class="pln-table-wrap">
               <table>
-                <thead><tr><th>Email</th><th>Nome</th><th>Perfil global</th><th>Role</th><th>All Obras</th><th>Grant</th><th>Manage</th><th>Create</th><th>Ativo</th></tr></thead>
-                <tbody id="plnUsersRows"><tr><td colspan="9">Sem dados.</td></tr></tbody>
+                <thead><tr><th>Email</th><th>Nome</th><th>Perfil global</th><th>Role</th><th>All Obras</th><th>Grant</th><th>Manage</th><th>Create</th><th>Delete</th><th>Ativo</th></tr></thead>
+                <tbody id="plnUsersRows"><tr><td colspan="10">Sem dados.</td></tr></tbody>
               </table>
             </div>
         </div>
@@ -37613,6 +39977,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
     window.PlannusOnlineActions.listObras = ()=>refreshList();
     window.PlannusOnlineActions.openObra = (obra)=>openObra(obra);
     window.PlannusOnlineActions.createObra = (nome, codigo)=>createOnlineObra(nome, codigo);
+    window.PlannusOnlineActions.deleteObra = (obraId)=>PlannusOnlineRepository.deleteObra(obraId);
     window.PlannusOnlineActions.saveCurrentObra = ()=>PlannusOnlineSaveAdapter.saveCurrentObra();
     window.__plannusSaveOnlineNow = ()=>window.PlannusOnlineActions.saveCurrentObra();
     const navSaveTxt = q("#btnExportHTML .txt");

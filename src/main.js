@@ -63,6 +63,36 @@ function renderBootScreen() {
     onOpenObra: async (obra) => {
       await openOnlineObra(obra);
     },
+    onDeleteObra: async (obra) => {
+      const obraId = obra?.id;
+      const obraNome = obra?.nome || obraId || "";
+      if (!obraId) return;
+      if (!window.confirm(`Excluir a obra "${obraNome}"? Esta ação desativa a obra no banco.`)) return;
+      bootState = { ...bootState, loading: true, status: `Excluindo obra ${obraId}...` };
+      renderBootScreen();
+      const result = await persistence.deleteOnlineObra(obraId);
+      if (!result.ok) {
+        bootState = { ...bootState, loading: false, status: `Falha ao excluir obra: ${result.erro}` };
+        renderBootScreen();
+        return;
+      }
+      persistence.removeLocalObraCache?.(obraId);
+      const meta = persistence.getSelectedObraMeta();
+      if (meta?.obraId === obraId) {
+        bootState = { ...bootState, status: `Obra ${obraId} excluida e selecao local removida.` };
+      } else {
+        bootState = { ...bootState, status: `Obra ${obraId} excluida com sucesso.` };
+      }
+      await refreshObrasList();
+      bootState = {
+        ...bootState,
+        loading: false,
+        status: meta?.obraId === obraId
+          ? `Obra ${obraId} excluida e selecao local removida.`
+          : `Obra ${obraId} excluida com sucesso.`,
+      };
+      renderBootScreen();
+    },
     onOpenLocal: () => {
       logObras("Abrindo ultimo estado local.");
       mountMainAppWithCurrentLocal();

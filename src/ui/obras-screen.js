@@ -30,6 +30,7 @@ export function renderObrasSelector(root, options) {
     onRefresh = async () => {},
     onCreateObra = async () => {},
     onOpenObra = async () => {},
+    onDeleteObra = async () => {},
     onOpenLocal = () => {},
     onContinueLast = async () => {},
     onOpenPermissions = async () => {},
@@ -37,6 +38,7 @@ export function renderObrasSelector(root, options) {
     onRevokePermission = async () => {},
   } = options;
   const canManagePermissions = Boolean(me?.can_grant_permissions) || String(me?.role || "").toLowerCase() === "planejador";
+  const canDeleteGlobally = Boolean(me?.can_delete_obras) || String(me?.role || "").toLowerCase() === "planejador";
 
   root.innerHTML = `
     <section class="panel" style="max-width:980px;margin:24px auto;padding:20px">
@@ -50,7 +52,7 @@ export function renderObrasSelector(root, options) {
       </div>
       <div class="sticky-note" style="margin-bottom:12px">
         <strong>Usuario:</strong> ${escapeHtml(me?.email || "-")}<br/>
-        <span class="muted">role=${escapeHtml(me?.role || "usuario")} | grant=${String(Boolean(me?.can_grant_permissions))} | manage_users=${String(Boolean(me?.can_manage_users))}</span>
+        <span class="muted">role=${escapeHtml(me?.role || "usuario")} | grant=${String(Boolean(me?.can_grant_permissions))} | manage_users=${String(Boolean(me?.can_manage_users))} | delete=${String(Boolean(me?.can_delete_obras))}</span>
       </div>
       <div class="toolbar" style="margin-bottom:12px">
         <button class="btn-secondary" data-action="refresh-obras" ${loading ? "disabled" : ""}>Atualizar lista de obras</button>
@@ -85,7 +87,10 @@ export function renderObrasSelector(root, options) {
                         <td>${Number(obra.revision || 0)}</td>
                         <td>${escapeHtml(formatDateTime(obra.updated_at || obra.updatedAt))}</td>
                         <td>${escapeHtml(pickPermissionLabel(obra))}</td>
-                        <td><button class="btn" data-action="open-obra" data-obra-id="${escapeHtml(pickObraId(obra))}" data-obra-nome="${escapeHtml(obra.nome || obra.obra_nome || "")}">Abrir Obra</button></td>
+                        <td>
+                          <button class="btn" data-action="open-obra" data-obra-id="${escapeHtml(pickObraId(obra))}" data-obra-nome="${escapeHtml(obra.nome || obra.obra_nome || "")}">Abrir Obra</button>
+                          ${canDeleteGlobally || String(pickPermissionLabel(obra) || "").toLowerCase() === "owner" ? `<button class="btn-secondary" style="margin-left:8px" data-action="delete-obra" data-obra-id="${escapeHtml(pickObraId(obra))}" data-obra-nome="${escapeHtml(obra.nome || obra.obra_nome || "")}">Excluir</button>` : ""}
+                        </td>
                       </tr>
                     `).join("")}
                   </tbody>
@@ -140,6 +145,10 @@ export function renderObrasSelector(root, options) {
   });
   root.querySelectorAll("[data-action='revoke-permission']").forEach((button) => button.addEventListener("click", async () => onRevokePermission(button.dataset.email)));
   root.querySelectorAll("[data-action='open-obra']").forEach((button) => button.addEventListener("click", async () => onOpenObra({
+    id: button.dataset.obraId,
+    nome: button.dataset.obraNome,
+  })));
+  root.querySelectorAll("[data-action='delete-obra']").forEach((button) => button.addEventListener("click", async () => onDeleteObra({
     id: button.dataset.obraId,
     nome: button.dataset.obraNome,
   })));

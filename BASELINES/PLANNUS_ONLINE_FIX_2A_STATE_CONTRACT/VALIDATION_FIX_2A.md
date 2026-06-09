@@ -1,0 +1,21 @@
+﻿# VALIDATION_FIX_2A
+
+- [ ] Plannus abre
+- [ ] obra online abre
+- [ ] ensurePlanningStateContract cria namespaces
+- [ ] state.eap existe
+- [ ] state.planningAssembly existe
+- [ ] state.planningVersions existe
+- [ ] state.operational existe
+- [ ] state.blockEdits existe
+- [ ] legado PLANNUS_* é migrado quando state está vazio
+- [ ] legado QP_* é migrado quando state está vazio
+- [ ] dados existentes no state não são sobrescritos
+- [ ] cache novo usa obraId
+- [ ] localStorage antigo não é apagado
+- [ ] baseline não é apagada
+- [ ] acompanhamento não é apagado
+- [ ] salvar online inclui contrato canônico
+- [ ] abrir online preserva contrato canônico
+- [ ] API/D1/Worker não foram alterados
+- [ ] PUBLIC_DEPLOY não foi editado manualmente
