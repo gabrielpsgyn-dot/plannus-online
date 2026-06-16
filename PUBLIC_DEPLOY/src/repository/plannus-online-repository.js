@@ -158,6 +158,23 @@ export async function upsertUser(payload) {
   }
 }
 
+export async function deleteUser(email) {
+  const url = buildUrl("/api/usuarios");
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) return { ok: false, status: response.status, erro: data?.erro || "Falha ao excluir usuario.", data };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao excluir usuario.", { email, error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao excluir usuario.", data: null };
+  }
+}
+
 export async function listObraPermissions(obraId) {
   const url = buildUrl(`/api/obras/${encodeURIComponent(obraId)}/permissoes`);
   try {

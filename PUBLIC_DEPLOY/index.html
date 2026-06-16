@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
@@ -4764,9 +4764,437 @@ thead th{
 .workflowStep .n{ background:var(--pln-black) !important; }
 .navLink, a, .link{ color:var(--pln-black) !important; }
 *:focus{ outline-color:rgba(213,0,50,.28) !important; }
-</style></head>
 
-<body class="withSideNav navCollapsed">
+/* ===== Shell contract v2 =====
+   Canonical visual shell for root and opened work screens.
+   This block wins over the older overlapping sidebar/header layers above. */
+:root{
+  --shell-side-w: 252px;
+  --shell-header-h: 72px;
+}
+body.withSideNav #sideNav,
+body.projectRootShell #sideNav,
+body.plannerActiveView #sideNav{
+  width:var(--shell-side-w) !important;
+  background:#101820 !important;
+  color:#fff !important;
+  border-right:1px solid rgba(255,255,255,.06) !important;
+  box-shadow:12px 0 28px rgba(16,24,32,.10) !important;
+}
+body.withSideNav #sideNav .navTop,
+body.projectRootShell #sideNav .navTop,
+body.plannerActiveView #sideNav .navTop{
+  background:#101820 !important;
+  border-bottom:1px solid rgba(255,255,255,.08) !important;
+}
+body.withSideNav #sideNav .brandTitle,
+body.projectRootShell #sideNav .brandTitle,
+body.plannerActiveView #sideNav .brandTitle{
+  color:#fff !important;
+  font-family:var(--pln-font-head) !important;
+  font-weight:900 !important;
+  letter-spacing:-.03em !important;
+}
+body.withSideNav #sideNav .navSectionTitle,
+body.projectRootShell #sideNav .navSectionTitle,
+body.plannerActiveView #sideNav .navSectionTitle{
+  color:rgba(255,255,255,.48) !important;
+  font-family:var(--pln-font-head) !important;
+  text-transform:uppercase !important;
+  letter-spacing:.14em !important;
+}
+body.withSideNav #sideNav .navItem,
+body.projectRootShell #sideNav .navItem,
+body.plannerActiveView #sideNav .navItem{
+  min-height:40px !important;
+  border-radius:12px !important;
+  background:transparent !important;
+  color:#fff !important;
+}
+body.withSideNav #sideNav .navItem:hover,
+body.projectRootShell #sideNav .navItem:hover,
+body.plannerActiveView #sideNav .navItem:hover{
+  background:rgba(255,255,255,.05) !important;
+}
+body.withSideNav #sideNav .navItem.active,
+body.withSideNav #sideNav .navItem.primary,
+body.withSideNav #sideNav .active,
+body.projectRootShell #sideNav .navItem.active,
+body.projectRootShell #sideNav .navItem.primary,
+body.projectRootShell #sideNav .active,
+body.plannerActiveView #sideNav .navItem.active,
+body.plannerActiveView #sideNav .navItem.primary,
+body.plannerActiveView #sideNav .active{
+  background:#1f1f1f !important;
+  color:#fff !important;
+  border-left:3px solid var(--pln-red) !important;
+}
+header,
+body.projectRootShell header,
+body.plannerActiveView header{
+  min-height:var(--shell-header-h) !important;
+  padding:10px 16px !important;
+  align-items:center !important;
+  overflow:visible !important;
+}
+body.plannerActiveView header .title{
+  padding-top:0 !important;
+}
+body.plannerActiveView header .controls{
+  align-items:center !important;
+}
+body.plannerActiveView header .plannerHeaderActions{
+  align-items:center !important;
+  overflow:visible !important;
+  flex-wrap:wrap !important;
+}
+body.plannerActiveView header .plannerActionGroup{
+  height:auto !important;
+}
+body.plannerActiveView main{
+  padding-top:8px !important;
+}
+
+
+/* =========================================================
+   PLANNUS VISUAL CONTRACT V1_14_SAFE
+   Objetivo: um único padrão visual para o sistema inteiro.
+   - Menu lateral fixo, abre/recolhe sem sobrepor conteúdo.
+   - Header limpo; dados do projeto em linha, não empilhados.
+   - Conteúdo com o mesmo padrão visual da tela Workspace / Minhas Obras.
+   - CSS final intencional: neutraliza estilos legados conflitantes sem mexer em cálculo/render.
+   ========================================================= */
+:root{
+  --pln-v14-bg:#f6f7f8;
+  --pln-v14-surface:#ffffff;
+  --pln-v14-sidebar:#08090a;
+  --pln-v14-text:#101114;
+  --pln-v14-muted:#667085;
+  --pln-v14-border:#dce2ea;
+  --pln-v14-soft:#f1f3f5;
+  --pln-v14-primary:#ef1735;
+  --pln-v14-primary-hover:#d9142f;
+  --pln-v14-radius:18px;
+  --pln-v14-sidebar-open:256px;
+  --pln-v14-sidebar-closed:76px;
+  --pln-v14-shadow:0 12px 34px rgba(15,23,42,.055);
+  --pln-v14-topbar:76px;
+}
+html,body{background:var(--pln-v14-bg)!important;color:var(--pln-v14-text)!important;}
+body.withSideNav{--pln-v14-nav-w:var(--pln-v14-sidebar-open);padding:0!important;overflow-x:hidden!important;}
+body.withSideNav.navCollapsed{--pln-v14-nav-w:var(--pln-v14-sidebar-closed);}
+body.withSideNav #sideNav{
+  position:fixed!important;
+  inset:0 auto 0 0!important;
+  z-index:1000!important;
+  width:var(--pln-v14-nav-w)!important;
+  min-width:var(--pln-v14-nav-w)!important;
+  height:100vh!important;
+  display:flex!important;
+  flex-direction:column!important;
+  background:var(--pln-v14-sidebar)!important;
+  color:#fff!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  transition:width .18s ease,min-width .18s ease!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header,
+body.withSideNav:not(.plannerGridFullscreen) > main{
+  margin-left:var(--pln-v14-nav-w)!important;
+  width:calc(100% - var(--pln-v14-nav-w))!important;
+  max-width:none!important;
+  transition:margin-left .18s ease,width .18s ease!important;
+}
+body.withSideNav #sideNav .navTop{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:78px!important;
+  height:78px!important;
+  padding:14px 16px!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+  background:var(--pln-v14-sidebar)!important;
+  flex:0 0 auto!important;
+}
+body.withSideNav #sideNav .brandMark,
+body.withSideNav #sideNav .brandDot{
+  width:32px!important;height:32px!important;min-width:32px!important;border-radius:10px!important;
+  object-fit:contain!important;display:grid!important;place-items:center!important;background:#10151d!important;color:var(--pln-v14-primary)!important;
+}
+body.withSideNav #sideNav .brandWrap{display:flex!important;flex-direction:column!important;gap:3px!important;min-width:0!important;flex:1 1 auto!important;overflow:hidden!important;padding:0!important;}
+body.withSideNav #sideNav .brandWordmarkSide{display:block!important;width:104px!important;max-width:100%!important;height:auto!important;object-fit:contain!important;}
+body.withSideNav #sideNav .brandSub{display:block!important;font-size:11px!important;color:#9aa3af!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+body.withSideNav #sideNav .navToggle{
+  appearance:none!important;width:38px!important;height:38px!important;min-width:38px!important;border:0!important;border-radius:12px!important;
+  background:#15191f!important;color:#fff!important;display:grid!important;place-items:center!important;font-size:18px!important;line-height:1!important;box-shadow:none!important;
+}
+body.withSideNav #sideNav .navScroll{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:16px 12px 14px!important;display:flex!important;flex-direction:column!important;gap:18px!important;scrollbar-width:thin!important;}
+body.withSideNav #sideNav .navSec{display:flex!important;flex-direction:column!important;gap:7px!important;margin:0!important;padding:0!important;}
+body.withSideNav #sideNav .navSecTitle{display:block!important;padding:0 10px 6px!important;font-size:10px!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:#77808c!important;font-weight:800!important;white-space:nowrap!important;}
+body.withSideNav #sideNav .navItem,
+body.withSideNav #sideNav button.navItem,
+body.withSideNav #sideNav a.navItem{
+  appearance:none!important;width:100%!important;min-height:42px!important;height:42px!important;border:0!important;border-radius:14px!important;
+  background:transparent!important;color:#d2d7df!important;display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;
+  padding:0 12px!important;margin:0!important;text-align:left!important;box-shadow:none!important;font-size:13px!important;font-weight:800!important;line-height:1!important;text-decoration:none!important;
+}
+body.withSideNav #sideNav .navItem:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;}
+body.withSideNav #sideNav .navItem.active,
+body.withSideNav #sideNav .navItem.primary,
+body.withSideNav #sideNav .navItem.is-active{background:rgba(239,23,53,.15)!important;color:#fff!important;box-shadow:inset 3px 0 0 var(--pln-v14-primary)!important;}
+body.withSideNav #sideNav .navItem .ic,
+body.withSideNav #sideNav .navItem .ico{
+  width:30px!important;height:30px!important;border-radius:10px!important;display:grid!important;place-items:center!important;background:rgba(255,255,255,.065)!important;color:currentColor!important;flex:0 0 auto!important;
+}
+body.withSideNav #sideNav .navItem .ic svg,
+body.withSideNav #sideNav .navItem .ico svg{width:17px!important;height:17px!important;display:block!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;}
+body.withSideNav #sideNav .navItem .txt,
+body.withSideNav #sideNav .navItem .lbl{display:block!important;min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:inherit!important;font-size:13px!important;font-weight:800!important;}
+body.withSideNav #sideNav .navItem .k{display:none!important;}
+body.withSideNav.navCollapsed #sideNav .brandWrap,
+body.withSideNav.navCollapsed #sideNav .navSecTitle,
+body.withSideNav.navCollapsed #sideNav .navItem .txt,
+body.withSideNav.navCollapsed #sideNav .navItem .lbl,
+body.withSideNav.navCollapsed #sideNav .navItem .k{display:none!important;}
+body.withSideNav.navCollapsed #sideNav .navTop{justify-content:center!important;padding:14px 0!important;gap:10px!important;flex-direction:column!important;height:auto!important;min-height:96px!important;}
+body.withSideNav.navCollapsed #sideNav .brandMark{width:30px!important;height:30px!important;min-width:30px!important;}
+body.withSideNav.navCollapsed #sideNav .navToggle{width:42px!important;height:42px!important;min-width:42px!important;border-radius:14px!important;}
+body.withSideNav.navCollapsed #sideNav .navScroll{align-items:center!important;padding:14px 10px!important;}
+body.withSideNav.navCollapsed #sideNav .navSec{align-items:center!important;width:100%!important;gap:8px!important;}
+body.withSideNav.navCollapsed #sideNav .navItem,
+body.withSideNav.navCollapsed #sideNav button.navItem,
+body.withSideNav.navCollapsed #sideNav a.navItem{width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;display:grid!important;grid-template-columns:1fr!important;place-items:center!important;border-radius:14px!important;}
+body.withSideNav.navCollapsed #sideNav .navItem .ic,
+body.withSideNav.navCollapsed #sideNav .navItem .ico{width:34px!important;height:34px!important;background:rgba(255,255,255,.075)!important;}
+
+body.withSideNav:not(.plannerGridFullscreen) > header{
+  position:sticky!important;top:0!important;z-index:900!important;min-height:var(--pln-v14-topbar)!important;height:var(--pln-v14-topbar)!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;padding:0 28px!important;
+  background:rgba(255,255,255,.96)!important;border:0!important;border-bottom:1px solid var(--pln-v14-border)!important;box-shadow:none!important;backdrop-filter:blur(12px)!important;overflow:hidden!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header > .title{display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important;flex:1 1 auto!important;overflow:hidden!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .brandWordmark{display:none!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .sub{display:none!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .projName{
+  display:inline-flex!important;align-items:center!important;gap:5px!important;min-height:30px!important;max-width:230px!important;padding:0 10px!important;border:1px solid transparent!important;border-radius:999px!important;
+  background:transparent!important;color:#53657a!important;font-size:12px!important;font-weight:700!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header .projName .v{color:#111827!important;font-weight:900!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .controls{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;min-width:0!important;flex:0 1 auto!important;overflow:hidden!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .kpiRow{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:nowrap!important;min-width:0!important;overflow:hidden!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .kpi{
+  min-width:98px!important;max-width:126px!important;height:40px!important;padding:7px 10px!important;border:1px solid var(--pln-v14-border)!important;border-radius:13px!important;background:#fff!important;box-shadow:none!important;
+  display:flex!important;flex-direction:column!important;justify-content:center!important;gap:2px!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header .kpi .k{font-size:9px!important;font-weight:850!important;letter-spacing:.04em!important;text-transform:uppercase!important;color:#53657a!important;line-height:1!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .kpi .v{font-size:13px!important;font-weight:900!important;color:#0f172a!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .actions.plannerHeaderActions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;max-width:min(46vw,620px)!important;min-width:0!important;white-space:nowrap!important;scrollbar-width:thin!important;padding-bottom:2px!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup{display:inline-flex!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important;min-height:36px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionLabel{font-size:12px!important;font-weight:700!important;color:#475467!important;white-space:nowrap!important;}
+body.withSideNav:not(.plannerGridFullscreen) > header .btn,
+body.withSideNav:not(.plannerGridFullscreen) > header button{
+  min-height:36px!important;height:36px!important;border:1px solid var(--pln-v14-border)!important;border-radius:13px!important;background:#fff!important;color:#111827!important;padding:0 12px!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important;white-space:nowrap!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > header .btn.primary{background:var(--pln-v14-primary)!important;border-color:var(--pln-v14-primary)!important;color:#fff!important;}
+body.withSideNav:not(.plannerGridFullscreen) > main{
+  min-height:calc(100vh - var(--pln-v14-topbar))!important;padding:28px 28px 44px!important;background:linear-gradient(135deg,#fff 0%,#f6f7f8 54%,#f2f4f7 100%)!important;overflow-x:hidden!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) > main > div:not([style*="display:none"]):not([style*="display: none"]){max-width:1288px!important;margin:0 auto!important;}
+body.withSideNav:not(.plannerGridFullscreen) .card,
+body.withSideNav:not(.plannerGridFullscreen) .projectSetupHero,
+body.withSideNav:not(.plannerGridFullscreen) .projectSetupStep,
+body.withSideNav:not(.plannerGridFullscreen) .modal .card{
+  border:1px solid var(--pln-v14-border)!important;border-radius:var(--pln-v14-radius)!important;background:#fff!important;box-shadow:0 10px 28px rgba(15,23,42,.04)!important;
+}
+body.withSideNav:not(.plannerGridFullscreen) .btn.primary,
+body.withSideNav:not(.plannerGridFullscreen) button.primary{background:var(--pln-v14-primary)!important;border-color:var(--pln-v14-primary)!important;color:#fff!important;}
+body.withSideNav:not(.plannerGridFullscreen) .btn.primary:hover,
+body.withSideNav:not(.plannerGridFullscreen) button.primary:hover{background:var(--pln-v14-primary-hover)!important;}
+body.withSideNav:not(.plannerGridFullscreen) input,
+body.withSideNav:not(.plannerGridFullscreen) select,
+body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln-v14-border)!important;border-radius:14px!important;background:#fff!important;color:#111827!important;}
+
+@media (max-width:1100px){
+  body.withSideNav:not(.plannerGridFullscreen) > header .actions.plannerHeaderActions{max-width:34vw!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > header .projName{max-width:160px!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > header .kpi:nth-child(n+3){display:none!important;}
+}
+@media (max-width:760px){
+  body.withSideNav{--pln-v14-nav-w:var(--pln-v14-sidebar-closed)!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > header,
+  body.withSideNav:not(.plannerGridFullscreen) > main{margin-left:var(--pln-v14-sidebar-closed)!important;width:calc(100% - var(--pln-v14-sidebar-closed))!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > header{padding:0 12px!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > header .projName:nth-child(n+3),
+  body.withSideNav:not(.plannerGridFullscreen) > header .kpiRow,
+  body.withSideNav:not(.plannerGridFullscreen) > header .actions.plannerHeaderActions{display:none!important;}
+  body.withSideNav:not(.plannerGridFullscreen) > main{padding:18px 14px 32px!important;}
+}
+</style>
+
+
+<style id="PLANNUS_VISUAL_CONTRACT_V36_RAILS_BRAND_AND_GAPS">
+/* V36: manter gaps reais entre raias e devolver visual Plannus ao fluxo. */
+#viewGuided .guidedFlowHeader,
+#viewGuidedApply .guidedFlowHeader,
+#viewGuidedPlan .guidedFlowHeader{
+  display:flex !important; align-items:flex-start !important; justify-content:space-between !important; gap:18px !important;
+  padding:16px 18px !important; border:1px solid #e3eaf3 !important; border-radius:22px !important;
+  background:linear-gradient(90deg, rgba(239,23,53,.10) 0 4px, transparent 4px), linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%) !important;
+  box-shadow:0 10px 28px rgba(16,24,40,.05) !important;
+}
+#viewGuided .guidedFlowHeader .ttl,
+#viewGuidedApply .guidedFlowHeader .ttl,
+#viewGuidedPlan .guidedFlowHeader .ttl{font-size:18px !important; font-weight:900 !important; letter-spacing:-.02em !important; color:#101828 !important;}
+#viewGuided .guidedFlowHeader .subttl,
+#viewGuidedApply .guidedFlowHeader .subttl,
+#viewGuidedPlan .guidedFlowHeader .subttl{margin-top:4px !important; font-size:12px !important; line-height:1.45 !important; color:#667085 !important;}
+#viewGuided .guidedSectionActions .btn, #viewGuidedApply .guidedSectionActions .btn, #viewGuidedPlan .guidedSectionActions .btn{min-height:40px !important; border-radius:14px !important; font-weight:800 !important;}
+#viewGuided .guidedFlowRailCount, #viewGuidedApply .guidedFlowRailCount, #viewGuidedPlan .guidedFlowRailCount{display:inline-flex !important; align-items:center !important; gap:8px !important; padding:0 12px !important; min-height:40px !important; border:1px solid #d8e2ee !important; border-radius:14px !important; background:#fff !important; font-weight:800 !important; color:#344054 !important;}
+#viewGuided .guidedFlowRailCount input, #viewGuidedApply .guidedFlowRailCount input, #viewGuidedPlan .guidedFlowRailCount input{width:52px !important; height:34px !important; border:0 !important; background:transparent !important; font-weight:800 !important;}
+#viewGuided .guidedFlowToolHeader,
+#viewGuidedApply .guidedFlowToolHeader,
+#viewGuidedPlan .guidedFlowToolHeader{margin-top:12px !important;}
+#viewGuided .guidedFlowSearchBox,
+#viewGuidedApply .guidedFlowSearchBox,
+#viewGuidedPlan .guidedFlowSearchBox{display:grid !important; grid-template-columns:minmax(300px,1fr) minmax(260px,340px) !important; gap:12px !important; align-items:start !important; padding:14px 16px !important; border:1px solid #dce5f0 !important; border-radius:20px !important; background:linear-gradient(90deg, rgba(239,23,53,.06) 0 4px, transparent 4px), #fff !important; box-shadow:0 10px 28px rgba(16,24,40,.04) !important;}
+#viewGuided .guidedFlowSearchBox label, #viewGuidedApply .guidedFlowSearchBox label, #viewGuidedPlan .guidedFlowSearchBox label{display:block !important; margin-bottom:6px !important; font-size:12px !important; font-weight:900 !important; text-transform:uppercase !important; letter-spacing:.06em !important; color:#475467 !important;}
+#viewGuided .guidedFlowSearchBox input, #viewGuidedApply .guidedFlowSearchBox input, #viewGuidedPlan .guidedFlowSearchBox input{height:44px !important; border-radius:14px !important; border:1px solid #d8e2ee !important; box-shadow:0 0 0 3px rgba(239,23,53,.06) !important;}
+#viewGuided .guidedFlowSearchServiceBox, #viewGuidedApply .guidedFlowSearchServiceBox, #viewGuidedPlan .guidedFlowSearchServiceBox{min-height:84px !important; border-radius:18px !important; border:1px solid #dce5f0 !important; background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%) !important; padding:12px 14px !important;}
+#viewGuided .guidedFlowSearchResults, #viewGuidedApply .guidedFlowSearchResults, #viewGuidedPlan .guidedFlowSearchResults{grid-column:1 / -1 !important; display:flex !important; flex-wrap:wrap !important; gap:8px !important;}
+#viewGuided .guidedFlowSearchOverlap, #viewGuidedApply .guidedFlowSearchOverlap, #viewGuidedPlan .guidedFlowSearchOverlap{grid-column:1 / -1 !important; margin-top:0 !important; font-size:12px !important; color:#667085 !important;}
+#viewGuided .guidedFlowRailWrap, #viewGuidedApply .guidedFlowRailWrap, #viewGuidedPlan .guidedFlowRailWrap{padding:18px !important; border:1px solid #dbe4f0 !important; border-radius:24px !important; background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important; box-shadow:0 14px 30px rgba(16,24,40,.06) !important;}
+#viewGuided .guidedFlowSimpleBoard, #viewGuidedApply .guidedFlowSimpleBoard, #viewGuidedPlan .guidedFlowSimpleBoard, #planningStageFlowBoard{border-radius:22px !important; background:linear-gradient(180deg, rgba(255,255,255,.8) 0%, rgba(248,250,252,.9) 100%), repeating-linear-gradient(90deg, rgba(15,23,42,.04) 0 1px, transparent 1px var(--guided-flow-grid-x,304px)) !important; background-position:0 0, var(--guided-flow-grid-pad-x,112px) 0 !important;}
+#viewGuided .guidedFlowRailLine::before, #viewGuidedApply .guidedFlowRailLine::before, #viewGuidedPlan .guidedFlowRailLine::before, #planningStageFlowBoard .guidedFlowRailLine::before{border-top:1px dashed rgba(71,84,103,.26) !important;}
+#viewGuided .guidedFlowRailLabel, #viewGuidedApply .guidedFlowRailLabel, #viewGuidedPlan .guidedFlowRailLabel, #planningStageFlowBoard .guidedFlowRailLabel{width:100px !important; height:30px !important; border-color:rgba(239,23,53,.22) !important; background:linear-gradient(180deg,#fff 0%,#fff8fa 100%) !important; color:#344054 !important; box-shadow:0 10px 24px rgba(16,24,40,.06) !important;}
+#viewGuided .guidedFlowBlock, #viewGuidedApply .guidedFlowBlock, #viewGuidedPlan .guidedFlowBlock, #planningStageFlowBoard .guidedFlowBlock{border:1px solid #d9e2ec !important; border-radius:22px !important; background:radial-gradient(circle at right 18px top 16px, rgba(239,23,53,.10), transparent 34px), linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%) !important; box-shadow:0 14px 30px rgba(16,24,40,.10), inset 0 1px 0 rgba(255,255,255,.95) !important;}
+#viewGuided .guidedFlowBlock::before, #viewGuidedApply .guidedFlowBlock::before, #viewGuidedPlan .guidedFlowBlock::before, #planningStageFlowBoard .guidedFlowBlock::before{width:6px !important; border-radius:22px 0 0 22px !important; background:linear-gradient(180deg,#ef1735 0%,#111827 100%) !important;}
+#viewGuided .guidedFlowBlock .name, #viewGuidedApply .guidedFlowBlock .name, #viewGuidedPlan .guidedFlowBlock .name, #planningStageFlowBoard .guidedFlowBlock .name{font-size:13px !important; line-height:1.25 !important; font-weight:900 !important; color:#101828 !important; letter-spacing:-.01em !important;}
+#viewGuided .guidedFlowBlock:hover, #viewGuidedApply .guidedFlowBlock:hover, #viewGuidedPlan .guidedFlowBlock:hover, #planningStageFlowBoard .guidedFlowBlock:hover{transform:translateY(-2px) !important; border-color:rgba(239,23,53,.28) !important; box-shadow:0 18px 34px rgba(16,24,40,.12), 0 0 0 4px rgba(239,23,53,.05) !important;}
+#viewGuided .guidedFlowLaneNudger .btn, #viewGuidedApply .guidedFlowLaneNudger .btn, #viewGuidedPlan .guidedFlowLaneNudger .btn, #planningStageFlowBoard .guidedFlowLaneNudger .btn{width:26px !important; height:26px !important; min-width:26px !important; min-height:26px !important; border-radius:10px !important; border:1px solid #d8e2ee !important; background:#f8fafc !important; color:#101828 !important; box-shadow:0 6px 14px rgba(16,24,40,.05) !important;}
+#viewGuided .guidedFlowClearBtn, #viewGuidedApply .guidedFlowClearBtn, #viewGuidedPlan .guidedFlowClearBtn, #planningStageFlowBoard .guidedFlowClearBtn{top:-14px !important; right:-14px !important; width:28px !important; height:28px !important; border:1px solid rgba(239,23,53,.22) !important; background:linear-gradient(180deg,#fff 0%,#fff5f7 100%) !important; color:#ef1735 !important; box-shadow:0 8px 18px rgba(239,23,53,.14) !important;}
+#viewGuided .guidedFlowEdge, #viewGuidedApply .guidedFlowEdge, #viewGuidedPlan .guidedFlowEdge, #planningStageFlowSvg .guidedFlowEdge{stroke:#98a2b3 !important; stroke-width:2.5 !important;}
+#viewGuided .guidedFlowEdge.active, #viewGuidedApply .guidedFlowEdge.active, #viewGuidedPlan .guidedFlowEdge.active, #planningStageFlowSvg .guidedFlowEdge.active{stroke:#ef1735 !important; stroke-width:3 !important;}
+@media (max-width:1024px){#viewGuided .guidedFlowSearchBox, #viewGuidedApply .guidedFlowSearchBox, #viewGuidedPlan .guidedFlowSearchBox{grid-template-columns:1fr !important;}}
+</style>
+
+<style id="PLANNUS_VISUAL_CONTRACT_V37_EAP_FILTER_TIGHT">
+/* V37: reduz espaço entre filtro/localizar serviço e o grid de raias.
+   Mantém correções V36 de gaps reais e visual Plannus. Sem alterar cálculo/API/banco. */
+
+#viewGuided .guidedFlowToolHeader,
+#viewGuidedApply .guidedFlowToolHeader,
+#viewGuidedPlan .guidedFlowToolHeader{
+  margin-top:8px !important;
+  margin-bottom:4px !important;
+}
+
+#viewGuided .guidedFlowSearchBox,
+#viewGuidedApply .guidedFlowSearchBox,
+#viewGuidedPlan .guidedFlowSearchBox{
+  grid-template-columns:minmax(280px,1fr) minmax(220px,300px) !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  border-radius:18px !important;
+  align-items:start !important;
+}
+
+#viewGuided .guidedFlowSearchBox label,
+#viewGuidedApply .guidedFlowSearchBox label,
+#viewGuidedPlan .guidedFlowSearchBox label{
+  margin-bottom:4px !important;
+  font-size:11px !important;
+}
+
+#viewGuided .guidedFlowSearchBox input,
+#viewGuidedApply .guidedFlowSearchBox input,
+#viewGuidedPlan .guidedFlowSearchBox input{
+  height:38px !important;
+  min-height:38px !important;
+  border-radius:13px !important;
+  font-size:13px !important;
+}
+
+#viewGuided .guidedFlowSearchServiceBox,
+#viewGuidedApply .guidedFlowSearchServiceBox,
+#viewGuidedPlan .guidedFlowSearchServiceBox{
+  min-height:58px !important;
+  height:auto !important;
+  padding:10px 12px !important;
+  border-radius:16px !important;
+}
+
+#viewGuided .guidedFlowSearchServiceBox .miniName,
+#viewGuidedApply .guidedFlowSearchServiceBox .miniName,
+#viewGuidedPlan .guidedFlowSearchServiceBox .miniName{
+  font-size:11px !important;
+  line-height:1.15 !important;
+}
+
+#viewGuided .guidedFlowSearchServiceBox .miniMeta,
+#viewGuidedApply .guidedFlowSearchServiceBox .miniMeta,
+#viewGuidedPlan .guidedFlowSearchServiceBox .miniMeta{
+  font-size:10px !important;
+  line-height:1.25 !important;
+}
+
+#viewGuided .guidedFlowSearchBox .guidedFlowConnHandle,
+#viewGuidedApply .guidedFlowSearchBox .guidedFlowConnHandle,
+#viewGuidedPlan .guidedFlowSearchBox .guidedFlowConnHandle{
+  width:8px !important;
+  height:8px !important;
+  min-width:8px !important;
+  min-height:8px !important;
+}
+
+#viewGuided .guidedFlowSearchResults,
+#viewGuidedApply .guidedFlowSearchResults,
+#viewGuidedPlan .guidedFlowSearchResults{
+  margin-top:0 !important;
+  padding-top:0 !important;
+  min-height:0 !important;
+  gap:6px !important;
+}
+
+#viewGuided .guidedFlowSearchResult,
+#viewGuidedApply .guidedFlowSearchResult,
+#viewGuidedPlan .guidedFlowSearchResult{
+  min-height:28px !important;
+  padding:0 10px !important;
+  font-size:11px !important;
+  border-radius:999px !important;
+}
+
+#viewGuided .guidedFlowSearchOverlap,
+#viewGuidedApply .guidedFlowSearchOverlap,
+#viewGuidedPlan .guidedFlowSearchOverlap{
+  margin-top:-2px !important;
+  padding-left:2px !important;
+  font-size:11px !important;
+  line-height:1.2 !important;
+}
+
+#viewGuided .guidedFlowRailWrap,
+#viewGuidedApply .guidedFlowRailWrap,
+#viewGuidedPlan .guidedFlowRailWrap{
+  margin-top:6px !important;
+  padding-top:14px !important;
+}
+
+@media (max-width:1024px){
+  #viewGuided .guidedFlowSearchBox,
+  #viewGuidedApply .guidedFlowSearchBox,
+  #viewGuidedPlan .guidedFlowSearchBox{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+
+</head>
+
+<body class="withSideNav">
 <script id="plannus-utils-stable">
 
 /* ============================
@@ -4915,7 +5343,7 @@ window.DEBUG = window.DEBUG || { RENDER_SKIP:false, ENGINE:false, MSP:false };
 (function(){
   function qs(s,root){return (root||document).querySelector(s);}
   function qsa(s,root){return Array.from((root||document).querySelectorAll(s));}
-  const LS_KEY = "PQP_SIDENAV_COLLAPSED_v1";
+  const LS_KEY = "plannus:v1:ui:sideNavCollapsed:v19";
 
   function applyCollapsed(collapsed){
     const b=document.body;
@@ -5506,38 +5934,7 @@ document.addEventListener("click", function(ev){
             </details>
           </div>
         </div>
-        <div class="guidedPreview">
-          <div id="guidedPlanSummary" class="gridCards"></div>
-          <div class="guidedMetaRow">
-            <div class="guidedTag" id="guidedSummaryTemplateTag">Modelo</div>
-            <div class="guidedTag" id="guidedSummaryServiceTag">Serviços</div>
-            <div class="guidedTag" id="guidedSummaryLocationTag">Pavimentos</div>
-          </div>
-          <div id="guidedReadinessPanel" class="projectSetupPreviewCard"></div>
-          <div class="guidedPreviewGrids">
-            <div>
-              <div class="label">Serviços cadastrados na EAP</div>
-              <div class="guidedTableWrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Ordem</th>
-                      <th>Cód.</th>
-                      <th>Nome do serviço</th>
-                      <th>Uso</th>
-                      <th>Equipes</th>
-                      <th>Duração</th>
-                      <th>Predecessora</th>
-                      <th>Vínculo</th>
-                      <th>Lag</th>
-                    </tr>
-                  </thead>
-                  <tbody id="guidedPlanServicesBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- V26: tabela de serviços removida da tela da EAP por contrato visual. -->
       </div>
         <div class="guidedSection guidedServiceSection">
           <div class="guidedSectionTitle">
@@ -11129,7 +11526,52 @@ const GUIDED_EAP_TEMPLATES = Object.freeze({
       commonAreas:"HALL\nLAZER",
       specialAreas:"SS1\nÁTICO"
     },
-    services:[]
+    services:[
+      {
+        key:"sup",
+        id:"sup",
+        order:1,
+        code:"SUP",
+        name:"SUPERESTRUTURA",
+        scopeKind:"todos",
+        teams:1,
+        durationDefault:5,
+        predecessorServiceId:"",
+        dependencyType:"FS",
+        lagDays:0,
+        sourceKind:"builtin"
+      },
+      {
+        key:"alv",
+        id:"alv",
+        order:2,
+        code:"ALV",
+        name:"ALVENARIA",
+        scopeKind:"todos",
+        teams:1,
+        durationDefault:5,
+        predecessorServiceId:"sup",
+        predecessors:[{ fromServiceId:"sup", type:"FS", lagDays:0, sourceKind:"builtin" }],
+        dependencyType:"FS",
+        lagDays:0,
+        sourceKind:"builtin"
+      },
+      {
+        key:"rbi",
+        id:"rbi",
+        order:3,
+        code:"RBI",
+        name:"REBOCO INTERNO",
+        scopeKind:"todos",
+        teams:1,
+        durationDefault:5,
+        predecessorServiceId:"alv",
+        predecessors:[{ fromServiceId:"alv", type:"FS", lagDays:0, sourceKind:"builtin" }],
+        dependencyType:"FS",
+        lagDays:0,
+        sourceKind:"builtin"
+      }
+    ]
   },
   condominio_horizontal_padrao:{
     key:"condominio_horizontal_padrao",
@@ -11146,7 +11588,11 @@ const GUIDED_EAP_TEMPLATES = Object.freeze({
       commonAreas:"PORTARIA\nÁREA COMUM",
       specialAreas:"RESERVAS"
     },
-    services:[]
+    services:[
+      { key:"fundacao", id:"fundacao", order:1, code:"FUN", name:"FUNDAÇÃO", scopeKind:"todos", teams:1, durationDefault:7, predecessorServiceId:"", dependencyType:"FS", lagDays:0, sourceKind:"builtin" },
+      { key:"estrutura", id:"estrutura", order:2, code:"EST", name:"ESTRUTURA", scopeKind:"todos", teams:1, durationDefault:8, predecessorServiceId:"fundacao", predecessors:[{ fromServiceId:"fundacao", type:"FS", lagDays:0, sourceKind:"builtin" }], dependencyType:"FS", lagDays:0, sourceKind:"builtin" },
+      { key:"acabamento", id:"acabamento", order:3, code:"ACA", name:"ACABAMENTO", scopeKind:"todos", teams:1, durationDefault:6, predecessorServiceId:"estrutura", predecessors:[{ fromServiceId:"estrutura", type:"FS", lagDays:0, sourceKind:"builtin" }], dependencyType:"FS", lagDays:0, sourceKind:"builtin" }
+    ]
   }
 });
 const GUIDED_MACRO_GROUPS = Object.freeze({
@@ -11567,13 +12013,27 @@ function _guidedBuiltinTemplateByKey(key){
   return GUIDED_EAP_TEMPLATES.residencial_vertical_padrao;
 }
 function _guidedTemplateOptions(){
+  const builtins = Object.values(GUIDED_EAP_TEMPLATES || {}).map(t=>({
+    key:String(t.key||"").trim(),
+    label:String(t.label||t.key||"").trim(),
+    sourceKind:String(t.sourceKind||"builtin").trim() || "builtin",
+    description:String(t.description||"Modelo padrão").trim()
+  })).filter(x=>x.key);
   const custom = Object.values(_readGuidedEapLibrary()).map(t=>({
     key:String(t.key||"").trim(),
     label:String(t.label||t.key||"").trim(),
     sourceKind:"custom",
     description:String(t.description||"Modelo salvo").trim()
-  }));
-  return custom.filter(x=>x.key).sort((a,b)=>String(a.label||"").localeCompare(String(b.label||"")));
+  })).filter(x=>x.key);
+  const byKey = new Map();
+  builtins.forEach(t=>byKey.set(t.key, t));
+  custom.forEach(t=>byKey.set(t.key, t));
+  return Array.from(byKey.values()).sort((a,b)=>{
+    const ak = String(a.sourceKind||"") === "builtin" ? 0 : 1;
+    const bk = String(b.sourceKind||"") === "builtin" ? 0 : 1;
+    if(ak !== bk) return ak - bk;
+    return String(a.label||"").localeCompare(String(b.label||""), "pt-BR");
+  });
 }
 function _guidedDefaultDraft(templateKey){
   const template = _guidedBuiltinTemplateByKey(templateKey || "residencial_vertical_padrao");
@@ -11590,7 +12050,7 @@ function _guidedDefaultDraft(templateKey){
     commonAreas: String(d.commonAreas || "HALL\nLAZER").trim(),
     specialAreas: String(d.specialAreas || "SS1\nÁTICO").trim(),
     flowRailCount: Math.max(3, Number(d.flowRailCount || 5) || 5),
-    services: [],
+    services: _guidedCloneServices(template?.services || []),
     ui: { guidedMode:"edit" }
   };
 }
@@ -11600,7 +12060,8 @@ function _normalizeGuidedDraft(draft, opts){
     ? _guidedBuiltinTemplateByKey(src.templateKey || "residencial_vertical_padrao")
     : _guidedTemplateByKey(src.templateKey || "residencial_vertical_padrao");
   const base = _guidedDefaultDraft(template?.key || "residencial_vertical_padrao");
-  const servicesSrc = Array.isArray(src.services) ? src.services : [];
+  const templateServices = Array.isArray(template?.services) ? template.services : [];
+  const servicesSrc = Array.isArray(src.services) && src.services.length ? src.services : templateServices;
   const services = servicesSrc.map((svc, idx)=>{
     return _normalizeGuidedService(svc, idx+1, "");
   });
@@ -11658,10 +12119,10 @@ function _guidedApplyDraftFromSelection(storedDraft, selectEl){
       services: _guidedCloneServices(template.services || [])
     }));
   }
-  return _normalizeGuidedDraft(Object.assign({}, stored, {
+  return _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(selectedTemplateKey), {
     templateKey: selectedTemplateKey,
-    templateLabel: String(stored.templateLabel || template?.label || "").trim(),
-    services: _guidedCloneServices(stored.services || [])
+    templateLabel: String(template?.label || stored.templateLabel || "").trim(),
+    services: _guidedCloneServices((Array.isArray(template?.services) && template.services.length) ? template.services : (stored.services || []))
   }));
 }
 function _guidedReadDraftFromUI(){
@@ -12259,7 +12720,9 @@ function _bindGuidedServiceFlowUI(){
         overlapInfo.textContent = "Sobreposição: —";
       }
     }
-    if(selected) scrollToFlowBlock(selected.block);
+    /* V31: filtrar não deve puxar a visualização do fluxo.
+       O destaque aparece apenas no bloco superior; o scroll só ocorre se o usuário clicar explicitamente em um resultado. */
+    if(false && selected) scrollToFlowBlock(selected.block);
   };
   const toggleFullscreen = (railId="guidedServiceFlowRail")=>{
     const rail = document.getElementById(railId);
@@ -12677,7 +13140,7 @@ function _renderGuidedServiceFlowRail(services){
   const xStep = 304;
   const laneH = Math.max(108, Number(__guidedFlowLaneStepPx || 108) || 108);
   const pad = 20;
-  const railLabelW = 0;
+  const railLabelW = 92;
   const blockW = 214;
   const blockH = 88;
   const defaultBoardPadY = Math.max(0, Number(__guidedFlowBoardPadYPx || 0) || 0);
@@ -12716,12 +13179,14 @@ function _renderGuidedServiceFlowRail(services){
     }
     occupiedFlowSlots.set(slotKey, used + 1);
   });
-  const laneOffset = rawItems.length ? Math.min(...rawItems.map(it=>Math.max(0, Number(it.laneId || 0)))) : 0;
-  const laneIds = Array.from(new Set(rawItems.map(it=>Math.max(0, Number(it.laneId || 0) - laneOffset)))).sort((a,b)=>a-b);
-  const laneRankById = new Map(laneIds.map((id, rank)=>[id, rank]));
+  const maxExplicitLane = rawItems.length ? Math.max(...rawItems.map(it=>Math.max(0, Number(it.laneId || 0)))) : 0;
+  const draftRailCount = Math.max(3, Number(_readGuidedPlanDraftSafe()?.flowRailCount || 0) || 0);
+  const usedRailCount = Math.max(1, maxExplicitLane + 1);
+  const railCount = Math.max(draftRailCount, usedRailCount);
+  const laneIds = Array.from({ length: railCount }, (_, idx)=>idx);
   const items = rawItems.map(it=>{
-    const laneId = Math.max(0, Number(it.laneId || 0) - laneOffset);
-    const laneRank = Math.max(0, Number(laneRankById.get(laneId) || 0));
+    const laneId = Math.max(0, Number(it.laneId || 0));
+    const laneRank = laneId;
     return Object.assign({}, it, {
       laneId,
       laneRank,
@@ -12730,9 +13195,7 @@ function _renderGuidedServiceFlowRail(services){
   });
   const flowMinWidth = Math.max(1200, 960 + (clean.length * 80));
   const width = Math.max(railLabelW + pad * 2 + (items.length ? Math.max(...items.map(it=>it.left + blockW)) : 0) + 260, flowMinWidth);
-  const draftRailCount = Math.max(3, Number(_readGuidedPlanDraftSafe()?.flowRailCount || 0) || 0);
-  const usedRailCount = Math.max(1, laneIds.length);
-  const height = Math.max(pad * 2 + usedRailCount * laneH + 96, items.length ? Math.max(...items.map(it=>it.top + blockH)) + 96 : 280);
+  const height = Math.max(pad * 2 + railCount * laneH + 96, items.length ? Math.max(...items.map(it=>it.top + blockH)) + 96 : 280);
   const linkSource = __guidedFlowLinkSourceKey ? byId.get(String(__guidedFlowLinkSourceKey).trim()) : null;
   const edgeSpecs = [];
   clean.forEach(svc=>{
@@ -14491,7 +14954,7 @@ function _buildPlanningStageFlowLayout(ctx){
   const xStep = 272;
   const laneH = Math.max(76, Number(__planningStageFlowLaneStepPx || 76) || 76);
   const padX = 20;
-  const railLabelW = 84;
+  const railLabelW = 92;
   const defaultBoardPadY = Math.max(0, Number(__planningStageFlowBoardPadYPx || 0) || 0);
   const laneCenterOffset = Math.max(0, Math.round((laneH - blockH) / 2));
   __planningStageFlowLaneStepPx = laneH;
@@ -14694,19 +15157,23 @@ function _buildPlanningStageFlowLayout(ctx){
       item.laneId = reserveLane(depth, preferred);
     });
   });
-  const maxLaneId = rawItems.length ? Math.max(...rawItems.map(n=>Math.max(0, Number(n.laneId || 0)))) : 0;
-  const laneIds = Array.from({ length: maxLaneId + 1 }, (_, idx)=>idx);
+  /* V34: compacta raias por uso real.
+     Antes o fluxo criava 0..maxLaneId, deixando raias vazias e numeração errada.
+     Agora só as raias ocupadas existem visualmente, numeradas de cima para baixo. */
+  const laneIds = Array.from(new Set(
+    rawItems.map(n=>Math.max(0, Math.round(Number(n.laneId || 0) || 0)))
+  )).sort((a,b)=>a-b);
+  if(!laneIds.length) laneIds.push(0);
   const laneIndexById = new Map(laneIds.map((id, idx)=>[id, idx]));
   const maxDepth = Math.max(0, ...rawItems.map(n=>Number(n.depth || 0)));
   const positioned = rawItems.map(n=>{
-    const rawLane = Math.max(0, Number(n.laneId || 0));
-    const laneIndex = Math.max(0, Number(rawLane));
-    const laneId = laneIndex;
+    const rawLane = Math.max(0, Math.round(Number(n.laneId || 0) || 0));
+    const laneIndex = Math.max(0, Number(laneIndexById.get(rawLane) ?? 0));
     return Object.assign({}, n, {
-      laneId,
+      laneId: rawLane,
       laneIndex,
       laneRank: laneIndex,
-      lane: laneId,
+      lane: rawLane,
       left: padX + railLabelW + (Number(n.depth || 0) * xStep),
       top: defaultBoardPadY + (laneIndex * laneH) + laneCenterOffset
     });
@@ -14715,8 +15182,7 @@ function _buildPlanningStageFlowLayout(ctx){
   const width = Math.max(railLabelW + padX * 2 + (positioned.length ? Math.max(...positioned.map(it=>it.left + blockW)) : 0) + 220, flowMinWidth);
   const laneCount = Math.max(1, laneIds.length || 0);
   const height = Math.max(padX + laneCount * laneH + 44, positioned.length ? Math.max(...positioned.map(it=>it.top + blockH)) + 44 : 180);
-  const laneLines = laneIds.map(laneIndex=>{
-    const laneId = laneIndex;
+  const laneLines = laneIds.map((laneId, laneIndex)=>{
     const top = defaultBoardPadY + laneIndex * laneH + laneCenterOffset;
     return `<div class="guidedFlowRailLine" data-guided-flow-lane="${escapeHtml(String(laneIndex))}" data-guided-flow-lane-rank="${escapeHtml(String(laneIndex))}" data-planning-flow-lane="${escapeHtml(String(laneId))}" data-planning-flow-lane-id="${escapeHtml(String(laneId))}" data-planning-flow-lane-index="${escapeHtml(String(laneIndex))}" data-planning-flow-lane-rank="${escapeHtml(String(laneIndex))}" style="top:${Math.round(top)}px;"></div><div class="guidedFlowRailLabel" style="top:${Math.round(top)}px;">RAIA ${laneIndex + 1}</div>`;
   }).join("");
@@ -15348,20 +15814,28 @@ function renderPlanningAssemblyView(model, locations){
   const syncPlanningLanePositions = ()=>{
     const board = document.getElementById("planningStageFlowBoard");
     if(!board) return { laneCount:0 };
-    const laneIds = Array.from(new Set(
-      Array.from(board.querySelectorAll(".planningStageFlowBlock")).map(block=>{
-        return Math.max(0, Math.round(Number(planningFlowLaneFromBlock(block)) || 0));
-      })
-    )).sort((a,b)=>a-b);
-    const laneCount = Math.max(1, (laneIds.length ? Math.max(...laneIds) : 0) + 1);
-    const fullLaneIds = Array.from({ length: laneCount }, (_, idx)=>idx);
+    const blocks = Array.from(board.querySelectorAll(".planningStageFlowBlock"));
+    const rawLaneIds = blocks.map(block=>Math.max(0, Math.round(Number(planningFlowLaneFromBlock(block)) || 0)));
+    const maxLaneId = rawLaneIds.length ? Math.max(...rawLaneIds) : 0;
+    const laneIds = Array.from({ length: Math.max(1, maxLaneId + 1) }, (_, idx)=>idx);
+    const laneIndexById = new Map(laneIds.map(id=>[id, id]));
     const sharedLaneH = Number(__planningStageFlowLaneStepPx || 76) || 76;
     board.__planningLayout = board.__planningLayout || {};
     board.__planningLayout.padY = Number(__planningStageFlowBoardPadYPx || 0) || 0;
     board.__planningLayout.laneH = sharedLaneH;
     board.__planningLayout.laneCenterOffset = Math.max(0, Math.round((sharedLaneH - Number(__planningStageFlowBlockHPx || 54)) / 2));
-    board.__planningLayout.laneIds = fullLaneIds;
-    board.__planningLayout.laneIndexById = new Map(fullLaneIds.map((id, idx)=>[id, idx]));
+    board.__planningLayout.laneIds = laneIds;
+    board.__planningLayout.laneIndexById = laneIndexById;
+    blocks.forEach(block=>{
+      const rawLane = Math.max(0, Math.round(Number(planningFlowLaneFromBlock(block)) || 0));
+      const laneIndex = Math.max(0, Number(laneIndexById.get(rawLane) ?? 0));
+      block.setAttribute("data-planning-lane-id", String(rawLane));
+      block.setAttribute("data-planning-lane-rank", String(laneIndex));
+      block.setAttribute("data-guided-lane-id", String(rawLane));
+      block.setAttribute("data-guided-lane-rank", String(laneIndex));
+      block.setAttribute("data-guided-lane", String(laneIndex + 1));
+      block.style.top = `${Math.max(0, board.__planningLayout.padY + (laneIndex * sharedLaneH) + board.__planningLayout.laneCenterOffset)}px`;
+    });
     board.querySelectorAll(".guidedFlowRailLine, .guidedFlowRailLabel").forEach(el=>{
       if(el && !el.closest(".planningStageFlowBlock")) el.remove();
     });
@@ -15373,44 +15847,46 @@ function renderPlanningAssemblyView(model, locations){
       Number(board.clientWidth || 0)
     );
     const frag = document.createDocumentFragment();
-    fullLaneIds.forEach(laneId=>{
-      const top = board.__planningLayout.padY + laneId * sharedLaneH + board.__planningLayout.laneCenterOffset;
+    laneIds.forEach((laneId, laneIndex)=>{
+      const top = board.__planningLayout.padY + laneIndex * sharedLaneH + board.__planningLayout.laneCenterOffset;
       const line = document.createElement("div");
       line.className = "guidedFlowRailLine";
-      line.setAttribute("data-guided-flow-lane", String(laneId));
-      line.setAttribute("data-guided-flow-lane-rank", String(laneId));
+      line.setAttribute("data-guided-flow-lane", String(laneIndex));
+      line.setAttribute("data-guided-flow-lane-rank", String(laneIndex));
       line.setAttribute("data-planning-flow-lane", String(laneId));
       line.setAttribute("data-planning-flow-lane-id", String(laneId));
-      line.setAttribute("data-planning-flow-lane-index", String(laneId));
-      line.setAttribute("data-planning-flow-lane-rank", String(laneId));
+      line.setAttribute("data-planning-flow-lane-index", String(laneIndex));
+      line.setAttribute("data-planning-flow-lane-rank", String(laneIndex));
       line.style.top = `${Math.round(top)}px`;
       const label = document.createElement("div");
       label.className = "guidedFlowRailLabel";
       label.style.top = `${Math.round(top)}px`;
-      label.textContent = `RAIA ${laneId + 1}`;
+      label.textContent = `RAIA ${laneIndex + 1}`;
       frag.appendChild(line);
       frag.appendChild(label);
     });
     const insertBeforeNode = svg || board.querySelector(".planningStageFlowBlock") || null;
     board.insertBefore(frag, insertBeforeNode);
-    const blockBottom = Array.from(board.querySelectorAll(".planningStageFlowBlock")).reduce((max, block)=>{
+    const blockBottom = blocks.reduce((max, block)=>{
       const bottom = Number(block.offsetTop || 0) + Number(block.offsetHeight || 0);
       return bottom > max ? bottom : max;
     }, 0);
     const nextHeight = Math.max(
-      board.__planningLayout.padY + laneCount * sharedLaneH + 44,
+      board.__planningLayout.padY + laneIds.length * sharedLaneH + 44,
       blockBottom + 44,
       180
     );
     if(svg){
-      svg.setAttribute("width", String(Math.max(width, board.scrollWidth || 0, board.clientWidth || 0, 760)));
+      const finalWidth = Math.max(width, board.scrollWidth || 0, board.clientWidth || 0, 760);
+      svg.setAttribute("width", String(finalWidth));
       svg.setAttribute("height", String(Math.round(nextHeight)));
-      svg.setAttribute("viewBox", `0 0 ${Math.max(width, board.scrollWidth || 0, board.clientWidth || 0, 760)} ${Math.round(nextHeight)}`);
+      svg.setAttribute("viewBox", `0 0 ${finalWidth} ${Math.round(nextHeight)}`);
     }
     board.style.height = `${Math.round(nextHeight)}px`;
     board.style.minHeight = `${Math.round(nextHeight)}px`;
-    return { laneCount };
+    return { laneCount: laneIds.length };
   };
+
   const updatePlanningBlockLane = (block, laneId)=>{
     if(!block) return;
     const board = document.getElementById("planningStageFlowBoard");
@@ -15419,7 +15895,8 @@ function renderPlanningAssemblyView(model, locations){
     const padY = Number(layout.padY || __planningStageFlowBoardPadYPx || 0) || 0;
     const laneCenterOffset = Number(layout.laneCenterOffset || Math.max(0, Math.round((laneH - Number(__planningStageFlowBlockHPx || 54)) / 2))) || 0;
     const lane = Math.max(0, Number(laneId || 0) || 0);
-    const laneIndex = lane;
+    const mappedLaneIndex = Number(layout?.laneIndexById?.get?.(lane));
+    const laneIndex = Number.isFinite(mappedLaneIndex) ? mappedLaneIndex : lane;
     block.setAttribute("data-planning-lane-id", String(lane));
     block.setAttribute("data-planning-lane-rank", String(laneIndex));
     block.setAttribute("data-guided-lane-id", String(lane));
@@ -28309,10 +28786,19 @@ function __APP_BOOT__(){
   normalizeBlockEditsKeysInStorage();
   buildCalendarDays();
   applyCssVars();
-  renderAll();
   log("App iniciado. Use o fluxo único: Pavimentos -> EAP -> Montar planejamento -> Acompanhamento.");
   log("Dica: clique no nome de um servico (cabecalho) para adicionar multiplas predecessoras.");
-  setView("project");
+  // FIX_IDENTIDADE_V1_12_BOOT_SAFE:
+  // Não renderizar a Linha de Balanço pesada no boot.
+  // O renderAll inicial travava o navegador quando havia estado legado/corrompido ou malha grande.
+  // A tela inicial leve é a Visão Geral; o render pesado só roda quando o usuário abrir Acompanhamento/Linha.
+  try{
+    setView("project");
+    console.info("[FIX_IDENTIDADE_V1_12_BOOT_SAFE]", { ok:true, skippedHeavyInitialRender:true, initialView:"project" });
+  }catch(e){
+    console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] setView project failed", e);
+    try{ renderProjectSetupView(); }catch(e2){ console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] renderProjectSetupView failed", e2); }
+  }
 }
 
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", __APP_BOOT__, {once:true});
@@ -39515,86 +40001,113 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
     }
   }
 
+  function renderObrasGrid(obras, canDeleteGlobal){
+    const tb = q("#plannusObrasRows");
+    const countEl = q("#plnObrasCount");
+    if(!tb) return;
+    const term = String(q("#plnFilterObras")?.value || "").trim().toLowerCase();
+    const canDelete = !!canDeleteGlobal || !!(__plnMe?.can_delete_obras || String(__plnMe?.role || "").toLowerCase() === "planejador");
+    const filtered = Array.isArray(obras) ? obras.filter((o)=>{
+      if(!term) return true;
+      return [obraNome(o), obraCodigo(o), obraId(o), obraPerm(o)].join(" ").toLowerCase().includes(term);
+    }) : [];
+    if(countEl) countEl.textContent = `${filtered.length} obra${filtered.length===1 ? "" : "s"}`;
+    if(!filtered.length){
+      tb.innerHTML = "<div class='pln-empty'>Nenhuma obra disponivel.</div>";
+      return;
+    }
+    tb.innerHTML = filtered.map((o)=>{
+      const canRemove = canDelete || String(obraPerm(o) || "").toLowerCase() === "owner";
+      return `
+        <article class="pln-obraCard">
+          <div class="pln-obraMeta">
+            <div class="pln-chipRow">
+              <span class="pln-chip ghost">${obraCodigo(o) || "-"}</span>
+              <span class="pln-chip">REV ${Number(o?.revision||0)}</span>
+            </div>
+            <button class="pln-ghostBtn" data-delete="${obraId(o)}" ${canRemove ? "" : "style='visibility:hidden'"}>...</button>
+          </div>
+          <h3 class="pln-obraTitle">${obraNome(o)}</h3>
+          <div class="pln-obraInfo">Atualizada ${fmt(o?.updated_at||o?.updatedAt)}</div>
+          <div class="pln-chipRow">
+            <span class="pln-chip">${String(obraPerm(o) || "-").toUpperCase()}</span>
+            ${o?.localOnly ? `<span class="pln-chip">LOCAL</span>` : ""}
+          </div>
+          <div class="pln-obraFooter">
+            <div class="pln-obraInfo">${o?.localOnly ? "Obra local" : "Obra online"}</div>
+            <div class="pln-obraActions">
+              <button data-open="${obraId(o)}" data-local="${o?.localOnly ? "1" : "0"}" class="pln-btn primary">${o?.localOnly ? "Abrir Local" : "Abrir Obra"}</button>
+              ${canRemove ? `<button data-delete="${obraId(o)}" class="pln-btn">Excluir</button>` : ""}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+    tb.querySelectorAll("button[data-open]").forEach((b)=>{
+      b.addEventListener("click", async ()=>{
+        const id=b.getAttribute("data-open");
+        if(b.getAttribute("data-local")==="1"){
+          if(openCachedObra(id)) return;
+        }
+        const obra = obras.find((x)=>obraId(x)===id) || { id };
+        await window.PlannusOnlineActions?.openObra?.(obra);
+      });
+    });
+    tb.querySelectorAll("button[data-delete]").forEach((b)=>{
+      b.addEventListener("click", async ()=>{
+        const id = b.getAttribute("data-delete");
+        if(!id) return;
+        const obra = obras.find((x)=>obraId(x)===id) || { id };
+        const nome = obraNome(obra) || id;
+        if(!confirm(`Excluir a obra \"${nome}\"? Ela sera desativada no banco.`)) return;
+        b.disabled = true;
+        try{
+          const { res, data } = await PlannusOnlineRepository.deleteObra(id);
+          if(!res.ok || data?.ok===false){
+            alert(`Falha ao excluir obra: ${data?.erro || res.status}`);
+            return;
+          }
+          removeCachedObra(id);
+          if(String(readMeta()?.obraId || "").trim() === id){
+            writeMeta({});
+          }
+          await refreshList();
+          setStatus(`Obra ${id} excluida com sucesso.`, "ok", SYNC_STATES.ONLINE_SYNCED);
+        }catch(e){
+          alert(`Erro de rede ao excluir obra: ${String(e && e.message || e)}`);
+        }finally{
+          b.disabled = false;
+        }
+      });
+    });
+    const obraSel = q("#plnPermObraSelect");
+    if (obraSel) {
+      const prev = obraSel.value;
+      const metaNow = readMeta();
+      obraSel.innerHTML = obras.map((o)=>`<option value="${obraId(o)}">${obraNome(o)} (${obraId(o)})</option>`).join("");
+      obraSel.value = prev || metaNow?.obraId || (obras[0] ? obraId(obras[0]) : "");
+    }
+  }
+
   async function refreshList(){
     const tb = q("#plannusObrasRows");
     setStatus("Carregando obras...", "warn", SYNC_STATES.SAVING);
-    if(tb) tb.innerHTML = "<tr><td colspan='6'>Carregando...</td></tr>";
+    if(tb) tb.innerHTML = "<div class='pln-empty'>Carregando...</div>";
     try{
       const {res,data} = await PlannusOnlineRepository.listObras();
       if(!res.ok || data?.ok===false){
         setStatus(`Falha ao conectar: ${data?.erro||res.status}`, "error", SYNC_STATES.OFFLINE);
-        if(tb) tb.innerHTML = "<tr><td colspan='6'>Falha ao carregar obras.</td></tr>";
+        if(tb) tb.innerHTML = "<div class='pln-empty'>Falha ao carregar obras.</div>";
         return;
       }
       const obras = mergeObras(asList(data));
       __plnObrasCache = obras.slice();
       const canDeleteGlobal = !!(__plnMe?.can_delete_obras || String(__plnMe?.role || "").toLowerCase() === "planejador");
       setStatus(`Online conectado. ${obras.length} obra(s).`, "ok", SYNC_STATES.ONLINE_SYNCED);
-      if(!tb) return;
-      if(!obras.length){
-        tb.innerHTML = "<tr><td colspan='6'>Nenhuma obra disponivel.</td></tr>";
-        return;
-      }
-      tb.innerHTML = obras.map((o)=>`
-        <tr>
-          <td>${obraNome(o)}</td>
-          <td>${obraCodigo(o)}</td>
-          <td>${Number(o?.revision||0)}</td>
-          <td>${fmt(o?.updated_at||o?.updatedAt)}</td>
-          <td>${obraPerm(o)}${o?.localOnly ? " (local)" : ""}</td>
-          <td>
-            <button data-open="${obraId(o)}" data-local="${o?.localOnly ? "1" : "0"}" class="pln-btn primary">${o?.localOnly ? "Abrir Local" : "Abrir Obra"}</button>
-            ${(canDeleteGlobal || String(obraPerm(o) || "").toLowerCase() === "owner") ? `<button data-delete="${obraId(o)}" class="pln-btn" style="margin-left:8px">Excluir</button>` : ""}
-          </td>
-        </tr>
-      `).join("");
-      tb.querySelectorAll("button[data-open]").forEach((b)=>{
-        b.addEventListener("click", async ()=>{
-          const id=b.getAttribute("data-open");
-          if(b.getAttribute("data-local")==="1"){
-            if(openCachedObra(id)) return;
-          }
-          const obra = obras.find((x)=>obraId(x)===id) || { id };
-          await window.PlannusOnlineActions?.openObra?.(obra);
-        });
-      });
-      tb.querySelectorAll("button[data-delete]").forEach((b)=>{
-        b.addEventListener("click", async ()=>{
-          const id = b.getAttribute("data-delete");
-          if(!id) return;
-          const obra = obras.find((x)=>obraId(x)===id) || { id };
-          const nome = obraNome(obra) || id;
-          if(!confirm(`Excluir a obra "${nome}"? Ela sera desativada no banco.`)) return;
-          b.disabled = true;
-          try{
-            const { res, data } = await PlannusOnlineRepository.deleteObra(id);
-            if(!res.ok || data?.ok===false){
-              alert(`Falha ao excluir obra: ${data?.erro || res.status}`);
-              return;
-            }
-            removeCachedObra(id);
-            if(String(readMeta()?.obraId || "").trim() === id){
-              writeMeta({});
-            }
-            await refreshList();
-            setStatus(`Obra ${id} excluida com sucesso.`, "ok", SYNC_STATES.ONLINE_SYNCED);
-          }catch(e){
-            alert(`Erro de rede ao excluir obra: ${String(e && e.message || e)}`);
-          }finally{
-            b.disabled = false;
-          }
-        });
-      });
-      const obraSel = q("#plnPermObraSelect");
-      if (obraSel) {
-        const prev = obraSel.value;
-        const metaNow = readMeta();
-        obraSel.innerHTML = obras.map((o)=>`<option value="${obraId(o)}">${obraNome(o)} (${obraId(o)})</option>`).join("");
-        obraSel.value = prev || metaNow?.obraId || (obras[0] ? obraId(obras[0]) : "");
-      }
+      renderObrasGrid(obras, canDeleteGlobal);
     }catch(e){
       setStatus(`Erro de rede: ${String(e&&e.message||e)}`, "error", SYNC_STATES.OFFLINE);
-      if(tb) tb.innerHTML = "<tr><td colspan='6'>Erro de rede.</td></tr>";
+      if(tb) tb.innerHTML = "<div class='pln-empty'>Erro de rede.</div>";
     }
   }
 
@@ -39741,12 +40254,13 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
     const hasLocal = !!localStorage.getItem(APP_KEY);
     const wrap = document.createElement("div");
     wrap.id = "plannusObrasGate";
-    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:radial-gradient(circle at top right, rgba(213,0,50,.18), transparent 30%),linear-gradient(145deg,#07111f 0%,#08182b 55%,#0a1d33 100%);display:flex;align-items:center;justify-content:center;padding:20px";
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#f5f6f6;display:block;overflow:auto;padding:0";
     wrap.innerHTML = `
       <style>
         #plannusObrasGate *{box-sizing:border-box}
-        #plannusObrasGate .pln-shell{width:100vw;min-height:100vh;overflow:auto;background:rgba(255,255,255,.96);border:none;border-radius:0;padding:24px 28px;box-shadow:none;font:13px Inter,Segoe UI,Arial,sans-serif}
-        #plannusObrasGate .pln-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}
+        #plannusObrasGate .pln-shell{width:min(1380px,100%);min-height:100vh;overflow:auto;background:#fff;border:none;border-radius:0;box-shadow:none;font:13px Inter,Segoe UI,Arial,sans-serif;display:flex;flex-direction:column;margin:0 auto}
+        #plannusObrasGate .pln-shellTop{padding:24px 28px 14px;border-bottom:1px solid #e5e7eb;background:#fff}
+        #plannusObrasGate .pln-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
         #plannusObrasGate .pln-brand{display:flex;align-items:center;gap:10px}
         #plannusObrasGate .pln-brand img{width:28px;height:28px;display:block;object-fit:contain;flex:0 0 auto}
         #plannusObrasGate .pln-title{margin:0;font-size:22px;line-height:1.1;color:#0f172a}
@@ -39771,13 +40285,34 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
         #plannusObrasGate .pln-btn[disabled]{opacity:.45;cursor:not-allowed}
         #plannusObrasGate .pln-btn.primary{background:linear-gradient(180deg,#d50032,#b3002a);border-color:#9e0025;color:#fff}
         #plannusObrasGate .pln-btn.warn{background:linear-gradient(180deg,#ff4d6d,#d50032);border-color:#b3002a;color:#fff}
-        #plannusObrasGate .pln-table-wrap{overflow:auto;border:1px solid #dbe3ee;border-radius:12px;background:#fff}
-        #plannusObrasGate table{width:100%;min-width:880px;border-collapse:collapse}
-        #plannusObrasGate thead th{position:sticky;top:0;background:#f8fafc;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
-        #plannusObrasGate th,#plannusObrasGate td{padding:10px;border-bottom:1px solid #eef2f7;text-align:left;white-space:nowrap}
-        #plannusObrasGate th:last-child,#plannusObrasGate td:last-child{min-width:128px}
-        #plannusObrasGate td:last-child .pln-btn{min-width:110px;display:inline-flex;justify-content:center}
-        #plannusObrasGate tbody tr:hover{background:#f8fbff}
+        #plannusObrasGate .pln-shellBody{padding:18px 28px 28px;display:flex;flex-direction:column;gap:16px;min-height:0;flex:1}
+        #plannusObrasGate .pln-heroBar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+        #plannusObrasGate .pln-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+        #plannusObrasGate .pln-kicker{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#64748b;font-weight:800;margin:0 0 4px}
+        #plannusObrasGate .pln-heroTitle{font-size:28px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin:0;color:#0f172a}
+        #plannusObrasGate .pln-heroText{margin:6px 0 0;color:#475569;font-size:14px;max-width:820px}
+        #plannusObrasGate .pln-quickCards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        #plannusObrasGate .pln-quickCard{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #dbe3ee;border-radius:16px;background:#fff;padding:16px 18px;box-shadow:0 6px 22px rgba(16,24,32,.05);cursor:pointer}
+        #plannusObrasGate .pln-quickCard strong{display:block;font-size:15px;color:#0f172a}
+        #plannusObrasGate .pln-quickCard span{display:block;margin-top:2px;color:#64748b;font-size:12px}
+        #plannusObrasGate .pln-quickIcon{width:40px;height:40px;border-radius:12px;background:#d50032;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px;font-weight:800}
+        #plannusObrasGate .pln-quickCard.secondary .pln-quickIcon{background:#f3f4f6;color:#d50032}
+        #plannusObrasGate .pln-metaRow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+        #plannusObrasGate .pln-filter{min-width:min(360px,100%);height:42px;border:1px solid #dbe3ee;border-radius:16px;padding:0 14px;background:#f8fafc;outline:none}
+        #plannusObrasGate .pln-filter:focus{border-color:#d50032;box-shadow:0 0 0 3px rgba(213,0,50,.10);background:#fff}
+        #plannusObrasGate .pln-sectionTitle{margin:0;font-size:18px;font-weight:800;color:#0f172a}
+        #plannusObrasGate .pln-obrasGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+        #plannusObrasGate .pln-obraCard{background:#fff;border:1px solid #dbe3ee;border-radius:18px;padding:16px;box-shadow:0 10px 32px rgba(16,24,32,.05);display:flex;flex-direction:column;gap:10px;min-height:184px}
+        #plannusObrasGate .pln-obraMeta{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+        #plannusObrasGate .pln-chipRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        #plannusObrasGate .pln-chip{display:inline-flex;align-items:center;justify-content:center;min-height:26px;padding:4px 10px;border:1px solid #dbe3ee;border-radius:999px;background:#f8fafc;color:#0f172a;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+        #plannusObrasGate .pln-chip.ghost{background:#fff}
+        #plannusObrasGate .pln-ghostBtn{border:1px solid #dbe3ee;background:#f8fafc;color:#64748b;border-radius:10px;min-width:40px;min-height:34px;cursor:pointer;font-weight:700}
+        #plannusObrasGate .pln-obraTitle{margin:0;font-size:18px;line-height:1.2;font-weight:800;color:#0f172a;letter-spacing:-.02em}
+        #plannusObrasGate .pln-obraInfo{font-size:12px;color:#64748b}
+        #plannusObrasGate .pln-obraFooter{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:auto}
+        #plannusObrasGate .pln-obraActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+        #plannusObrasGate .pln-empty{padding:18px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc;color:#64748b}
         #plannusObrasGate .pln-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(7,17,31,.45);z-index:2147483648}
         #plannusObrasGate .pln-modal-card{width:min(520px,92vw);background:#fff;border:1px solid #f0d3db;border-radius:14px;box-shadow:0 24px 56px rgba(0,0,0,.25);padding:16px}
         #plannusObrasGate .pln-modal-card.wide{width:min(920px,95vw)}
@@ -39791,38 +40326,439 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
         #plannusObrasGate .pln-perm-panel{display:none;margin-top:12px;border:1px solid #dbe3ee;border-radius:12px;background:#ffffff;padding:12px}
         #plannusObrasGate .pln-users-panel{display:none;margin-top:12px;border:1px solid #dbe3ee;border-radius:12px;background:#ffffff;padding:12px}
         @media (max-width: 860px){
-          #plannusObrasGate .pln-shell{padding:14px 12px}
+          #plannusObrasGate .pln-shell{width:100%;min-height:100vh;border-radius:0}
+          #plannusObrasGate .pln-shellTop,
+          #plannusObrasGate .pln-shellBody{padding:14px 12px}
           #plannusObrasGate .pln-head{flex-direction:column}
           #plannusObrasGate .pln-badge{width:100%;min-width:0}
-          #plannusObrasGate th,#plannusObrasGate td{padding:8px}
-          #plannusObrasGate table{min-width:760px}
+          #plannusObrasGate .pln-quickCards,
+          #plannusObrasGate .pln-obrasGrid{grid-template-columns:1fr}
         }
-      </style>
+
+        /* FIX_IDENTIDADE_V1_13_MINHAS_OBRAS_VISUAL_SAFE
+           Apenas visual: não altera boot, renderização, setView, cálculo ou persistência. */
+        #plannusObrasGate{
+          background:linear-gradient(135deg,#ffffff 0%,#f7f8fa 55%,#eef1f5 100%)!important;
+          padding:0!important;
+          color:#101114!important;
+          font-family:Inter,"Segoe UI",Arial,sans-serif!important;
+        }
+        #plannusObrasGate .pln-shell{
+          width:100%!important;
+          max-width:none!important;
+          min-height:100vh!important;
+          background:transparent!important;
+          border:0!important;
+          border-radius:0!important;
+          box-shadow:none!important;
+          margin:0!important;
+          overflow:auto!important;
+        }
+        #plannusObrasGate .pln-shellTop{
+          width:min(1180px,calc(100% - 64px))!important;
+          margin:0 auto!important;
+          padding:22px 0 6px!important;
+          border-bottom:0!important;
+          background:transparent!important;
+        }
+        #plannusObrasGate .pln-head{
+          align-items:center!important;
+          gap:18px!important;
+        }
+        #plannusObrasGate .pln-brand{
+          gap:12px!important;
+          align-items:center!important;
+        }
+        #plannusObrasGate .pln-brand img{
+          width:36px!important;
+          height:36px!important;
+          border-radius:12px!important;
+          background:#08090a!important;
+          padding:8px!important;
+          box-shadow:0 8px 18px rgba(15,23,42,.08)!important;
+        }
+        #plannusObrasGate .pln-brand .pln-title{
+          display:none!important;
+        }
+        #plannusObrasGate .pln-brand .pln-sub{
+          margin:0!important;
+          color:#475467!important;
+          font-size:12px!important;
+          line-height:1.3!important;
+        }
+        #plannusObrasGate .pln-head > div > p.pln-sub{
+          display:none!important;
+        }
+        #plannusObrasGate .pln-badge{
+          display:inline-flex!important;
+          align-items:center!important;
+          gap:8px!important;
+          min-width:0!important;
+          max-width:420px!important;
+          padding:9px 14px!important;
+          border-radius:999px!important;
+          border:1px solid #dfe4ea!important;
+          background:#ffffff!important;
+          color:#172033!important;
+          box-shadow:0 8px 22px rgba(15,23,42,.045)!important;
+          font-size:12px!important;
+          font-weight:700!important;
+          white-space:nowrap!important;
+        }
+        #plannusObrasGate .pln-badge:before{
+          content:""!important;
+          width:8px!important;
+          height:8px!important;
+          border-radius:999px!important;
+          background:#10b981!important;
+          display:inline-block!important;
+          flex:0 0 auto!important;
+        }
+        #plannusObrasGate .pln-badge.is-error:before{background:#ef4444!important;}
+        #plannusObrasGate .pln-badge.is-warn:before{background:#f59e0b!important;}
+        #plannusObrasGate .pln-badge.is-saving:before{background:#38bdf8!important;}
+        #plannusObrasGate .pln-badge b{
+          display:none!important;
+        }
+        #plannusObrasGate .pln-badge span{
+          color:#172033!important;
+          overflow:hidden!important;
+          text-overflow:ellipsis!important;
+        }
+        #plannusObrasGate .pln-shellBody{
+          width:min(1180px,calc(100% - 64px))!important;
+          margin:0 auto!important;
+          padding:24px 0 56px!important;
+          display:flex!important;
+          flex-direction:column!important;
+          gap:22px!important;
+          background:transparent!important;
+        }
+        #plannusObrasGate .pln-heroBar{
+          align-items:flex-end!important;
+          margin:0 0 6px!important;
+          padding:0!important;
+        }
+        #plannusObrasGate .pln-kicker{
+          font-size:12px!important;
+          letter-spacing:.26em!important;
+          text-transform:uppercase!important;
+          color:#394150!important;
+          font-weight:850!important;
+          margin:0 0 8px!important;
+          line-height:1.1!important;
+        }
+        #plannusObrasGate .pln-heroTitle{
+          font-size:32px!important;
+          line-height:1.02!important;
+          font-weight:900!important;
+          letter-spacing:-.04em!important;
+          margin:0!important;
+          color:#05070b!important;
+        }
+        #plannusObrasGate .pln-heroText{
+          margin:8px 0 0!important;
+          color:#475467!important;
+          font-size:14px!important;
+          line-height:1.45!important;
+          max-width:780px!important;
+        }
+        #plannusObrasGate .pln-actions{
+          align-items:center!important;
+          gap:10px!important;
+        }
+        #plannusObrasGate .pln-btn{
+          border:1px solid #d9dee7!important;
+          background:#fff!important;
+          background-image:none!important;
+          border-radius:14px!important;
+          padding:10px 14px!important;
+          min-height:40px!important;
+          font-size:13px!important;
+          font-weight:800!important;
+          color:#111827!important;
+          display:inline-flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          gap:8px!important;
+          white-space:nowrap!important;
+          box-shadow:0 1px 2px rgba(15,23,42,.03)!important;
+          transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease!important;
+        }
+        #plannusObrasGate .pln-btn:hover{
+          border-color:#c5ccd8!important;
+          box-shadow:0 8px 22px rgba(15,23,42,.07)!important;
+          transform:translateY(-1px)!important;
+        }
+        #plannusObrasGate .pln-btn.primary{
+          background:#ef1735!important;
+          border-color:#ef1735!important;
+          color:#fff!important;
+          box-shadow:0 12px 24px rgba(239,23,53,.18)!important;
+        }
+        #plannusObrasGate .pln-quickCards{
+          display:grid!important;
+          grid-template-columns:1fr 1fr!important;
+          gap:14px!important;
+          margin:0!important;
+        }
+        #plannusObrasGate .pln-quickCard{
+          min-height:74px!important;
+          border:1px solid #dce2ea!important;
+          border-radius:18px!important;
+          background:#fff!important;
+          padding:18px 20px!important;
+          box-shadow:0 10px 28px rgba(15,23,42,.045)!important;
+          color:#101114!important;
+          overflow:hidden!important;
+          transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease!important;
+        }
+        #plannusObrasGate .pln-quickCard:hover{
+          transform:translateY(-1px)!important;
+          border-color:#cfd6e0!important;
+          box-shadow:0 16px 34px rgba(15,23,42,.07)!important;
+        }
+        #plannusObrasGate .pln-quickCard strong{
+          font-size:15px!important;
+          font-weight:850!important;
+          color:#0b0f17!important;
+          line-height:1.2!important;
+        }
+        #plannusObrasGate .pln-quickCard span span,
+        #plannusObrasGate .pln-quickCard span[style] span{
+          color:#667085!important;
+          font-size:12px!important;
+        }
+        #plannusObrasGate .pln-quickIcon{
+          width:42px!important;
+          height:42px!important;
+          min-width:42px!important;
+          border-radius:14px!important;
+          background:#ef1735!important;
+          color:#fff!important;
+          display:inline-flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          line-height:1!important;
+          font-size:0!important;
+          position:relative!important;
+          box-shadow:none!important;
+        }
+        #plannusObrasGate #plnContinueLast .pln-quickIcon:before{
+          content:""!important;
+          width:16px!important;
+          height:16px!important;
+          border:2px solid currentColor!important;
+          border-radius:999px!important;
+          display:block!important;
+        }
+        #plannusObrasGate #plnContinueLast .pln-quickIcon:after{
+          content:""!important;
+          position:absolute!important;
+          width:5px!important;
+          height:5px!important;
+          border-right:2px solid currentColor!important;
+          border-bottom:2px solid currentColor!important;
+          transform:rotate(-45deg)!important;
+          top:12px!important;
+          right:13px!important;
+        }
+        #plannusObrasGate #plnOpenLastLocal .pln-quickIcon{
+          background:#f2f4f7!important;
+          color:#ef1735!important;
+        }
+        #plannusObrasGate #plnOpenLastLocal .pln-quickIcon:before{
+          content:""!important;
+          width:14px!important;
+          height:12px!important;
+          border:2px solid currentColor!important;
+          border-radius:3px!important;
+          display:block!important;
+        }
+        #plannusObrasGate .pln-toolbar{
+          margin:0!important;
+          display:flex!important;
+          align-items:center!important;
+          gap:10px!important;
+        }
+        #plannusObrasGate .pln-toolbar .pln-btn{
+          min-height:38px!important;
+          padding:9px 12px!important;
+        }
+        #plannusObrasGate #plnManagePerm,
+        #plannusObrasGate #plnManageUsers{
+          color:#ef1735!important;
+          border-color:transparent!important;
+          background:transparent!important;
+          box-shadow:none!important;
+          padding-inline:6px!important;
+        }
+        #plannusObrasGate .pln-filter{
+          height:42px!important;
+          min-width:min(360px,100%)!important;
+          border:0!important;
+          border-radius:16px!important;
+          padding:0 16px!important;
+          background:#f1f3f5!important;
+          outline:none!important;
+          color:#111827!important;
+          box-shadow:none!important;
+        }
+        #plannusObrasGate .pln-filter:focus{
+          background:#fff!important;
+          box-shadow:0 0 0 3px rgba(239,23,53,.12)!important;
+        }
+        #plannusObrasGate .pln-sectionTitle{
+          margin:0!important;
+          font-size:15px!important;
+          font-weight:850!important;
+          color:#05070b!important;
+        }
+        #plannusObrasGate .pln-obrasGrid{
+          display:grid!important;
+          grid-template-columns:repeat(3,minmax(0,1fr))!important;
+          gap:14px!important;
+        }
+        #plannusObrasGate .pln-obraCard{
+          background:#fff!important;
+          border:1px solid #dce2ea!important;
+          border-radius:18px!important;
+          padding:20px!important;
+          box-shadow:0 12px 34px rgba(15,23,42,.05)!important;
+          display:flex!important;
+          flex-direction:column!important;
+          gap:12px!important;
+          min-height:174px!important;
+        }
+        #plannusObrasGate .pln-chip{
+          min-height:24px!important;
+          padding:3px 8px!important;
+          border:1px solid #dce2ea!important;
+          border-radius:999px!important;
+          background:#f8fafc!important;
+          color:#182230!important;
+          font-size:10px!important;
+          font-weight:850!important;
+          letter-spacing:.06em!important;
+        }
+        #plannusObrasGate .pln-ghostBtn{
+          background:#f3f4f6!important;
+          border:0!important;
+          color:#111827!important;
+          border-radius:12px!important;
+          width:34px!important;
+          height:34px!important;
+          min-width:34px!important;
+          min-height:34px!important;
+          font-size:14px!important;
+          font-weight:900!important;
+          display:grid!important;
+          place-items:center!important;
+          padding:0!important;
+        }
+        #plannusObrasGate .pln-obraTitle{
+          margin:0!important;
+          font-size:16px!important;
+          line-height:1.25!important;
+          font-weight:850!important;
+          color:#05070b!important;
+          letter-spacing:-.02em!important;
+          min-height:40px!important;
+        }
+        #plannusObrasGate .pln-obraInfo{
+          font-size:12px!important;
+          color:#667085!important;
+        }
+        #plannusObrasGate .pln-obraInfo:before{
+          content:"◷"!important;
+          margin-right:7px!important;
+          color:#667085!important;
+        }
+        #plannusObrasGate .pln-empty{
+          padding:22px!important;
+          border:1px dashed #cbd5e1!important;
+          border-radius:16px!important;
+          background:rgba(255,255,255,.72)!important;
+          color:#667085!important;
+        }
+        #plannusObrasGate .pln-modal-card,
+        #plannusObrasGate .pln-perm-panel,
+        #plannusObrasGate .pln-users-panel{
+          border-color:#dce2ea!important;
+          border-radius:18px!important;
+          box-shadow:0 18px 48px rgba(15,23,42,.10)!important;
+        }
+        @media (max-width:980px){
+          #plannusObrasGate .pln-obrasGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+          #plannusObrasGate .pln-shellTop,#plannusObrasGate .pln-shellBody{width:calc(100% - 28px)!important;}
+        }
+        @media (max-width:760px){
+          #plannusObrasGate .pln-head{align-items:flex-start!important;flex-direction:column!important;}
+          #plannusObrasGate .pln-badge{width:100%!important;max-width:none!important;}
+          #plannusObrasGate .pln-quickCards,#plannusObrasGate .pln-obrasGrid{grid-template-columns:1fr!important;}
+          #plannusObrasGate .pln-heroTitle{font-size:28px!important;}
+          #plannusObrasGate .pln-actions{width:100%!important;justify-content:flex-start!important;}
+        }
+
+      
+
+        /* FIX_IDENTIDADE_V1_14_MINHAS_OBRAS_SEM_CABECALHO_DUPLICADO */
+        #plannusObrasGate .pln-shellTop{display:none!important;}
+        #plannusObrasGate .pln-shellBody{padding-top:42px!important;}
+        #plannusObrasGate .pln-heroBar{margin-top:0!important;}
+        #plannusObrasGate .pln-heroTitle{font-size:32px!important;font-weight:900!important;letter-spacing:-.04em!important;}
+        #plannusObrasGate .pln-actions .pln-btn.primary{background:#ef1735!important;border-color:#ef1735!important;color:#fff!important;}
+</style>
       <div class="pln-shell">
-        <div class="pln-head">
-          <div>
-            <div class="pln-brand">
-              <img src="brand-assets/plannus-icon-p.svg?v=20260528v4" alt="Plannus" />
-              <h2 class="pln-title">Minhas Obras</h2>
+        <div class="pln-shellTop">
+          <div class="pln-head">
+            <div>
+              <div class="pln-brand">
+                <img src="brand-assets/plannus-icon-p.svg?v=20260528v4" alt="Plannus" />
+                <div>
+                  <h2 class="pln-title">Minhas Obras</h2>
+                  <p id="plannusMeInfo" class="pln-sub">Carregando usuario...</p>
+                </div>
+              </div>
+              <p class="pln-sub">Selecione a obra para iniciar o Plannus online. O modo local continua disponivel.</p>
             </div>
-            <p class="pln-sub">Selecione a obra para iniciar o Plannus online. O modo local continua disponivel.</p>
-            <p id="plannusMeInfo" class="pln-sub">Carregando usuario...</p>
+            <div class="pln-badge"><b>Status de Conexao</b><span id="plannusObrasStatus">Inicializando...</span></div>
           </div>
-          <div class="pln-badge"><b>Status de Conexao</b><span id="plannusObrasStatus">Inicializando...</span></div>
         </div>
-        <div class="pln-toolbar">
-          <button id="plnRefreshObras" class="pln-btn">Atualizar lista de obras</button>
-          <button id="plnCreateObra" class="pln-btn warn">Criar obra</button>
-          <button id="plnOpenLastLocal" class="pln-btn" ${hasLocal?"":"disabled"}>Abrir ultima obra local</button>
-          <button id="plnContinueLast" class="pln-btn primary" ${meta?.obraId?"":"disabled"}>Continuar ultima obra (${meta?.obraId||"-"})</button>
-          <button id="plnManagePerm" class="pln-btn">Gerenciar permissoes</button>
-          <button id="plnManageUsers" class="pln-btn">Gerenciar usuarios</button>
-        </div>
-        <div class="pln-table-wrap">
-          <table>
-            <thead><tr><th>Nome</th><th>Codigo</th><th>Revision</th><th>Updated At</th><th>Permissao</th><th>Acoes</th></tr></thead>
-            <tbody id="plannusObrasRows"><tr><td colspan="6">Carregando...</td></tr></tbody>
-          </table>
+        <div class="pln-shellBody">
+          <div class="pln-heroBar">
+            <div>
+              <p class="pln-kicker">Workspace</p>
+              <h1 class="pln-heroTitle">Minhas Obras</h1>
+              <p class="pln-heroText">Selecione a obra para abrir o planejamento. O modo local continua disponivel como fallback.</p>
+            </div>
+            <div class="pln-actions">
+              <button id="plnRefreshObras" class="pln-btn">Atualizar lista de obras</button>
+              <button id="plnCreateObra" class="pln-btn primary">Nova obra</button>
+            </div>
+          </div>
+          <div class="pln-quickCards">
+            <button id="plnContinueLast" class="pln-quickCard" ${meta?.obraId?"":"disabled"}>
+              <span class="pln-quickIcon">&#8635;</span>
+              <span style="flex:1;text-align:left"><strong>Continuar ultima obra</strong><span>${meta?.obraNome || meta?.obraId || "Nenhuma obra recente"}</span></span>
+              <span style="font-size:24px;color:#64748b">&#8594;</span>
+            </button>
+            <button id="plnOpenLastLocal" class="pln-quickCard secondary" ${hasLocal?"":"disabled"}>
+              <span class="pln-quickIcon">&#9633;</span>
+              <span style="flex:1;text-align:left"><strong>Abrir ultima obra local</strong><span>Trabalho offline</span></span>
+              <span style="font-size:24px;color:#64748b">&#8594;</span>
+            </button>
+          </div>
+          <div class="pln-toolbar">
+            <button id="plnManagePerm" class="pln-btn">Gerenciar permissoes</button>
+            <button id="plnManageUsers" class="pln-btn">Gerenciar usuarios</button>
+            <span style="flex:1"></span>
+            <input id="plnFilterObras" class="pln-filter" placeholder="Filtrar por nome ou codigo..." />
+          </div>
+          <div class="pln-metaRow">
+            <h3 id="plnObrasCount" class="pln-sectionTitle">Carregando obras...</h3>
+          </div>
+          <div id="plannusObrasRows" class="pln-obrasGrid"><div class="pln-empty">Carregando...</div></div>
         </div>
         <div id="plnCreateObraModal" class="pln-modal">
           <div class="pln-modal-card">
@@ -39935,6 +40871,7 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
     q("#plnPermClose")?.addEventListener("click", closePermissionsModal);
     q("#plnUserClose")?.addEventListener("click", closeUsersPanel);
     q("#plnUserRefresh")?.addEventListener("click", refreshUsersList);
+    q("#plnFilterObras")?.addEventListener("input", ()=>refreshList());
     q("#plnUserSave")?.addEventListener("click", async ()=>{
       const email = String(q("#plnUserEmail")?.value || "").trim().toLowerCase();
       const nome = String(q("#plnUserNome")?.value || "").trim();
@@ -40034,19 +40971,2055 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
 })();
 </script>
 
+<style id="shell-contract-v2-final">
+/* Final shell contract: last CSS word in the document.
+   Single visual language: technical, clean, Plannus black/red/neutral. */
+:root{
+  --shell-side-w: 252px;
+  --shell-header-h: 72px;
+  --pln-black:#101820;
+  --pln-red:#D50032;
+  --pln-bg:#F5F6F6;
+  --pln-surface:#FFFFFF;
+  --pln-border:#E4E7E8;
+  --pln-text:#101820;
+  --pln-muted:#5F666A;
+  --pln-cement:#B1B3B3;
+  --pln-font:Inter,"Segoe UI",Arial,system-ui,sans-serif;
+  --pln-font-head:Inter,"Segoe UI",Arial,system-ui,sans-serif;
+  --ui-bg:var(--pln-bg);
+  --ui-card:var(--pln-surface);
+  --ui-text:var(--pln-text);
+  --ui-muted:var(--pln-muted);
+  --ui-line:var(--pln-border);
+  --ui-primary:var(--pln-black);
+  --ui-primary-600:#000000;
+  --ui-primary-100:#F4E9EB;
+  --ui-primary-800:var(--pln-black);
+  --ui-danger:var(--pln-red);
+  --ui-danger-600:#A00025;
+  --ds-bg:var(--pln-bg);
+  --ds-surface:var(--pln-surface);
+  --ds-text:var(--pln-text);
+  --ds-muted:var(--pln-muted);
+  --ds-line:var(--pln-border);
+  --ds-primary:var(--pln-black);
+  --ds-primary-600:#000000;
+  --ds-primary-100:#F4E9EB;
+  --ds-primary-800:var(--pln-black);
+  --ds-danger:var(--pln-red);
+}
+html, body{
+  background:var(--pln-bg) !important;
+  color:var(--pln-text) !important;
+  font-family:var(--pln-font) !important;
+}
+body, button, input, select, textarea{
+  font-family:var(--pln-font) !important;
+}
+h1,h2,h3,h4,h5,h6,strong,b{
+  color:var(--pln-text) !important;
+  font-family:var(--pln-font-head) !important;
+}
+small,.small,.hint,.help,.muted,label{
+  color:var(--pln-muted) !important;
+}
+button,.btn,input,select,textarea,.chip,.kpi,.card{
+  border-radius:14px !important;
+}
+button,.btn{
+  min-height:36px !important;
+}
+.card,
+.projectSetupHero,
+.projectSetupPanel,
+.projectSetupPreviewCard,
+.projectSetupList,
+.guidedSection,
+.guidedServiceRow,
+.workflowStep,
+.pln-shell,
+#plannusObrasGate .pln-modal-card,
+#plannusObrasGate .pln-perm-panel,
+#plannusObrasGate .pln-users-panel{
+  background:var(--pln-surface) !important;
+  border:1px solid var(--pln-border) !important;
+  box-shadow:none !important;
+  color:var(--pln-text) !important;
+}
+header,
+body.projectRootShell header,
+body.plannerActiveView header{
+  min-height:var(--shell-header-h) !important;
+  padding:10px 16px !important;
+  align-items:center !important;
+  background:var(--pln-surface) !important;
+  border-bottom:1px solid var(--pln-border) !important;
+}
+body.plannerActiveView header .title .sub,
+body.plannerActiveView header .title .projName{
+  color:var(--pln-muted) !important;
+}
+body.plannerActiveView header .title .projName .v{
+  color:var(--pln-text) !important;
+}
+body.plannerActiveView header .controls{
+  align-items:center !important;
+}
+body.withSideNav #sideNav,
+body.projectRootShell #sideNav,
+body.plannerActiveView #sideNav{
+  width:var(--shell-side-w) !important;
+  background:var(--pln-black) !important;
+  color:#fff !important;
+  border-right:1px solid rgba(255,255,255,.06) !important;
+  box-shadow:12px 0 28px rgba(16,24,32,.10) !important;
+}
+body.withSideNav #sideNav .navTop,
+body.projectRootShell #sideNav .navTop,
+body.plannerActiveView #sideNav .navTop{
+  background:var(--pln-black) !important;
+  border-bottom:1px solid rgba(255,255,255,.08) !important;
+}
+body.withSideNav #sideNav .brandTitle,
+body.projectRootShell #sideNav .brandTitle,
+body.plannerActiveView #sideNav .brandTitle{
+  color:#fff !important;
+  font-family:var(--pln-font-head) !important;
+  font-weight:900 !important;
+  letter-spacing:-.03em !important;
+}
+body.withSideNav #sideNav .navSectionTitle,
+body.projectRootShell #sideNav .navSectionTitle,
+body.plannerActiveView #sideNav .navSectionTitle{
+  color:rgba(255,255,255,.48) !important;
+  font-family:var(--pln-font-head) !important;
+  text-transform:uppercase !important;
+  letter-spacing:.14em !important;
+}
+body.withSideNav #sideNav .navItem .txt,
+body.projectRootShell #sideNav .navItem .txt,
+body.plannerActiveView #sideNav .navItem .txt{
+  color:#fff !important;
+  font-family:var(--pln-font) !important;
+  font-weight:700 !important;
+}
+body.withSideNav #sideNav .navItem,
+body.projectRootShell #sideNav .navItem,
+body.plannerActiveView #sideNav .navItem{
+  min-height:40px !important;
+  border-radius:12px !important;
+  background:transparent !important;
+  color:#fff !important;
+}
+body.withSideNav #sideNav .navItem:hover,
+body.projectRootShell #sideNav .navItem:hover,
+body.plannerActiveView #sideNav .navItem:hover{
+  background:rgba(255,255,255,.05) !important;
+}
+body.withSideNav #sideNav .navItem.active,
+body.withSideNav #sideNav .navItem.primary,
+body.withSideNav #sideNav .active,
+body.projectRootShell #sideNav .navItem.active,
+body.projectRootShell #sideNav .navItem.primary,
+body.projectRootShell #sideNav .active,
+body.plannerActiveView #sideNav .navItem.active,
+body.plannerActiveView #sideNav .navItem.primary,
+body.plannerActiveView #sideNav .active{
+  background:#1f1f1f !important;
+  color:#fff !important;
+  border-left:3px solid var(--pln-red) !important;
+}
+header,
+body.projectRootShell header,
+body.plannerActiveView header{
+  min-height:var(--shell-header-h) !important;
+  padding:10px 16px !important;
+  align-items:center !important;
+  overflow:visible !important;
+}
+body.plannerActiveView header .title{
+  padding-top:0 !important;
+}
+body.plannerActiveView header .controls{
+  align-items:center !important;
+}
+body.plannerActiveView header .plannerHeaderActions{
+  align-items:center !important;
+  overflow:visible !important;
+  flex-wrap:wrap !important;
+}
+body.plannerActiveView header .plannerActionGroup{
+  height:auto !important;
+}
+body.plannerActiveView main{
+  padding-top:8px !important;
+}
+#plannusObrasGate,
+#plannusObrasGate .pln-shell{
+  background:var(--pln-bg) !important;
+  color:var(--pln-text) !important;
+  font-family:var(--pln-font) !important;
+}
+#plannusObrasGate .pln-title,
+#plannusObrasGate .pln-head,
+#plannusObrasGate .pln-modal-title{
+  color:var(--pln-text) !important;
+  font-family:var(--pln-font-head) !important;
+}
+#plannusObrasGate .pln-sub,
+#plannusObrasGate .pln-modal-sub,
+#plannusObrasGate .pln-badge{
+  color:var(--pln-muted) !important;
+}
+#plannusObrasGate .pln-brand img{
+  filter:none !important;
+}
+#plannusObrasGate .pln-btn{
+  background:#fff !important;
+  border:1px solid var(--pln-border) !important;
+  color:var(--pln-text) !important;
+  box-shadow:none !important;
+}
+#plannusObrasGate .pln-btn.primary{
+  background:var(--pln-black) !important;
+  border-color:var(--pln-black) !important;
+  color:#fff !important;
+}
+#plannusObrasGate .pln-btn.warn{
+  background:var(--pln-red) !important;
+  border-color:var(--pln-red) !important;
+  color:#fff !important;
+}
+#plannusObrasGate .pln-badge{
+  background:#0f3b23 !important;
+  color:#dcfce7 !important;
+  border-color:#22c55e !important;
+}
+#plannusObrasGate .pln-table-wrap{
+  border-color:var(--pln-border) !important;
+  box-shadow:none !important;
+}
+#plannusObrasGate thead th{
+  background:#fff !important;
+  color:var(--pln-muted) !important;
+  font-family:var(--pln-font-head) !important;
+}
+#plannusObrasGate td,
+#plannusObrasGate th{
+  color:var(--pln-text) !important;
+  border-bottom:1px solid var(--pln-border) !important;
+}
+</style>
+
+<style id="PLANNUS_VISUAL_CONTRACT_V20_MENU_SCROLL_LOCK">
+/*
+ PLANNUS VISUAL CONTRACT V20 — MENU COLLAPSED SCROLL LOCK
+ Objetivo: manter o menu recolhido como coluna de ícones com rolagem nativa/por wheel funcional.
+ Não altera cálculo, renderização, acompanhamento, linha de balanço, API ou banco.
+*/
+:root{
+  --pln-v20-nav-open:252px;
+  --pln-v20-nav-closed:74px;
+  --pln-v20-nav-w:252px;
+  --pln-v20-red:#ef1735;
+  --pln-v20-black:#101820;
+  --pln-v20-bg:#f6f7f8;
+  --pln-v20-surface:#ffffff;
+  --pln-v20-border:#dfe5ee;
+  --pln-v20-text:#101820;
+  --pln-v20-muted:#53657a;
+  --pln-v20-header-h:52px;
+}
+html,body{background:var(--pln-v20-bg)!important;color:var(--pln-v20-text)!important;overflow-x:hidden!important;}
+body.withSideNav{padding-left:0!important;--pln-v20-nav-w:var(--pln-v20-nav-open)!important;}
+body.withSideNav.navCollapsed{--pln-v20-nav-w:var(--pln-v20-nav-closed)!important;}
+
+/* SIDEBAR: base fixa */
+html body.withSideNav #sideNav{
+  position:fixed!important;left:0!important;top:0!important;bottom:0!important;right:auto!important;z-index:1200!important;
+  width:var(--pln-v20-nav-w)!important;min-width:var(--pln-v20-nav-w)!important;max-width:var(--pln-v20-nav-w)!important;height:100vh!important;
+  display:flex!important;flex-direction:column!important;padding:14px 12px!important;margin:0!important;gap:0!important;
+  background:var(--pln-v20-black)!important;color:#fff!important;border:0!important;border-right:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:12px 0 30px rgba(16,24,32,.10)!important;overflow:hidden!important;transform:none!important;
+  transition:width .18s ease,min-width .18s ease,max-width .18s ease!important;
+}
+html body.withSideNav #sideNav .navTop{
+  flex:0 0 auto!important;width:100%!important;min-height:58px!important;display:grid!important;grid-template-columns:32px minmax(0,1fr) 42px!important;
+  align-items:center!important;gap:10px!important;padding:0 0 14px!important;margin:0 0 8px!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;background:var(--pln-v20-black)!important;overflow:hidden!important;
+}
+html body.withSideNav #sideNav .brandMark,
+html body.withSideNav #sideNav .brandDot{
+  display:grid!important;place-items:center!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;
+  margin:0!important;padding:0!important;border-radius:10px!important;background:#111a24!important;color:var(--pln-v20-red)!important;object-fit:contain!important;
+}
+html body.withSideNav #sideNav .brandWrap{display:flex!important;flex-direction:column!important;gap:2px!important;min-width:0!important;overflow:hidden!important;}
+html body.withSideNav #sideNav .brandWordmarkSide{display:block!important;width:96px!important;max-width:100%!important;height:auto!important;object-fit:contain!important;}
+html body.withSideNav #sideNav .brandSub{display:block!important;color:#9aa3af!important;font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+html body.withSideNav #sideNav .navToggle{
+  position:static!important;display:grid!important;place-items:center!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;
+  margin:0!important;padding:0!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:14px!important;background:#151b23!important;color:#fff!important;
+  box-shadow:none!important;font-size:18px!important;line-height:1!important;cursor:pointer!important;
+}
+
+/* NAVSCROLL: aberto */
+html body.withSideNav #sideNav .navScroll{
+  flex:1 1 auto!important;width:100%!important;min-height:0!important;height:auto!important;max-height:none!important;
+  display:block!important;overflow-y:auto!important;overflow-x:hidden!important;padding:8px 0 28px!important;margin:0!important;
+  scrollbar-width:thin!important;scrollbar-color:rgba(255,255,255,.42) transparent!important;overscroll-behavior:contain!important;touch-action:pan-y!important;
+}
+html body.withSideNav #sideNav .navScroll::-webkit-scrollbar{width:7px!important;}
+html body.withSideNav #sideNav .navScroll::-webkit-scrollbar-track{background:transparent!important;}
+html body.withSideNav #sideNav .navScroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.32)!important;border-radius:999px!important;}
+html body.withSideNav #sideNav .navSec{display:block!important;width:100%!important;margin:12px 0 0!important;padding:0!important;}
+html body.withSideNav #sideNav .navSecTitle{
+  display:block!important;padding:8px 12px 7px!important;margin:0!important;font-size:10px!important;line-height:1.2!important;font-weight:850!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:#77808c!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+html body.withSideNav #sideNav .navItem,
+html body.withSideNav #sideNav button.navItem,
+html body.withSideNav #sideNav a.navItem{
+  appearance:none!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:42px!important;height:42px!important;
+  display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;align-items:center!important;justify-items:start!important;gap:10px!important;
+  padding:0 12px!important;margin:0 0 7px!important;border:1px solid transparent!important;border-radius:14px!important;background:transparent!important;color:#d2d7df!important;
+  text-align:left!important;text-decoration:none!important;box-shadow:none!important;font-size:13px!important;font-weight:800!important;line-height:1!important;overflow:hidden!important;
+}
+html body.withSideNav #sideNav .navItem:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;}
+html body.withSideNav #sideNav .navItem.active,
+html body.withSideNav #sideNav .navItem.primary,
+html body.withSideNav #sideNav .navItem.is-active,
+html body.withSideNav #sideNav .active{
+  position:relative!important;background:rgba(239,23,53,.15)!important;color:#fff!important;border-color:rgba(239,23,53,.34)!important;box-shadow:inset 3px 0 0 var(--pln-v20-red)!important;
+}
+html body.withSideNav #sideNav .navItem .ic,
+html body.withSideNav #sideNav .navItem .ico,
+html body.withSideNav #sideNav .navItem .icon{
+  display:grid!important;place-items:center!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;margin:0!important;padding:0!important;
+  border-radius:10px!important;background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.10)!important;color:currentColor!important;box-shadow:none!important;opacity:1!important;visibility:visible!important;
+}
+html body.withSideNav #sideNav .navItem .ic svg,
+html body.withSideNav #sideNav .navItem .ico svg,
+html body.withSideNav #sideNav .navItem .icon svg,
+html body.withSideNav #sideNav .navItem svg{
+  display:block!important;width:17px!important;height:17px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;opacity:1!important;visibility:visible!important;
+}
+html body.withSideNav #sideNav .navItem .txt,
+html body.withSideNav #sideNav .navItem .lbl{display:block!important;min-width:0!important;max-width:100%!important;color:inherit!important;font-size:13px!important;font-weight:800!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+html body.withSideNav #sideNav .navItem .k{display:none!important;}
+
+/* RECOLHIDO: top fixo + área de ícones com altura definida e rolagem REAL */
+html body.withSideNav.navCollapsed #sideNav{
+  width:var(--pln-v20-nav-closed)!important;min-width:var(--pln-v20-nav-closed)!important;max-width:var(--pln-v20-nav-closed)!important;
+  padding:12px 9px!important;background:var(--pln-v20-black)!important;overflow:hidden!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navTop{
+  flex:0 0 94px!important;width:100%!important;height:94px!important;min-height:94px!important;max-height:94px!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;
+  padding:0 0 12px!important;margin:0 0 8px!important;overflow:hidden!important;border-bottom:1px solid rgba(255,255,255,.08)!important;background:var(--pln-v20-black)!important;
+}
+html body.withSideNav.navCollapsed #sideNav .brandWrap,
+html body.withSideNav.navCollapsed #sideNav .brandWordmarkSide,
+html body.withSideNav.navCollapsed #sideNav .brandSub,
+html body.withSideNav.navCollapsed #sideNav .navSecTitle,
+html body.withSideNav.navCollapsed #sideNav .navItem .txt,
+html body.withSideNav.navCollapsed #sideNav .navItem .lbl,
+html body.withSideNav.navCollapsed #sideNav .navItem .k{display:none!important;}
+html body.withSideNav.navCollapsed #sideNav .brandMark,
+html body.withSideNav.navCollapsed #sideNav .brandDot{display:grid!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;}
+html body.withSideNav.navCollapsed #sideNav .navToggle{display:grid!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;border-radius:14px!important;background:#151b23!important;color:#fff!important;}
+html body.withSideNav.navCollapsed #sideNav .navScroll{
+  flex:0 0 auto!important;
+  display:block!important;
+  width:100%!important;
+  height:calc(100vh - 126px)!important;
+  max-height:calc(100vh - 126px)!important;
+  min-height:0!important;
+  overflow-y:scroll!important;
+  overflow-x:hidden!important;
+  padding:8px 0 96px!important;
+  margin:0!important;
+  scrollbar-gutter:stable!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(255,255,255,.46) transparent!important;
+  overscroll-behavior:contain!important;
+  touch-action:pan-y!important;
+  pointer-events:auto!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navScroll::-webkit-scrollbar{width:7px!important;}
+html body.withSideNav.navCollapsed #sideNav .navScroll::-webkit-scrollbar-track{background:transparent!important;}
+html body.withSideNav.navCollapsed #sideNav .navScroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.42)!important;border-radius:999px!important;}
+html body.withSideNav.navCollapsed #sideNav .navSec{display:block!important;width:100%!important;margin:8px 0 0!important;padding:0!important;}
+html body.withSideNav.navCollapsed #sideNav .navItem,
+html body.withSideNav.navCollapsed #sideNav button.navItem,
+html body.withSideNav.navCollapsed #sideNav a.navItem{
+  display:grid!important;grid-template-columns:1fr!important;place-items:center!important;width:100%!important;height:42px!important;min-height:42px!important;max-height:42px!important;
+  padding:0!important;margin:0 0 9px!important;border-radius:14px!important;overflow:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem .icon{display:grid!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;background:rgba(255,255,255,.075)!important;opacity:1!important;visibility:visible!important;}
+
+/* HEADER LIMPO E COMPACTO */
+html body.withSideNav:not(.plannerGridFullscreen) > header{
+  position:sticky!important;top:0!important;z-index:900!important;margin-left:var(--pln-v20-nav-w)!important;width:calc(100% - var(--pln-v20-nav-w))!important;max-width:calc(100% - var(--pln-v20-nav-w))!important;
+  min-height:var(--pln-v20-header-h)!important;height:var(--pln-v20-header-h)!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;
+  padding:0 22px!important;background:rgba(255,255,255,.97)!important;border:0!important;border-bottom:1px solid var(--pln-v20-border)!important;box-shadow:none!important;backdrop-filter:blur(12px)!important;overflow:hidden!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header > .title,
+html body.withSideNav:not(.plannerGridFullscreen) > header > .controls,
+html body.withSideNav:not(.plannerGridFullscreen) > header .brandWordmark,
+html body.withSideNav:not(.plannerGridFullscreen) > header .sub,
+html body.withSideNav:not(.plannerGridFullscreen) > header .projName,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpiRow,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpi,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpi .k,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpi .v{
+  display:none!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header > .actions,
+html body.withSideNav:not(.plannerGridFullscreen) > header > .actions.plannerHeaderActions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;min-width:0!important;width:auto!important;max-width:100%!important;overflow:hidden!important;white-space:nowrap!important;padding:0!important;margin:0!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionLabel,
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionDivider{display:none!important;}
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup{display:flex!important;align-items:center!important;gap:6px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;}
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup:not(.plannerActionGroupPrimary):not(.plannerActionGroupExport){display:none!important;}
+html body.withSideNav:not(.plannerGridFullscreen) > header button:not(#btnPlannerAutoUpdate),
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerVisualMode,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnToggleBaselineCols,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobZoomOut,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobZoomIn,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobRowDown,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobRowUp,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWDown,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWUp,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportHTMLTop,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportPlannerPDFTop{display:none!important;}
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerAutoUpdate{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;height:34px!important;min-height:34px!important;border:1px solid var(--pln-v20-border)!important;border-radius:13px!important;background:#fff!important;color:#111827!important;padding:0 13px!important;font-size:12px!important;font-weight:850!important;box-shadow:none!important;white-space:nowrap!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header #plannusSyncIndicator,
+html body.withSideNav:not(.plannerGridFullscreen) > header .pln-sync-indicator{
+  display:inline-flex!important;align-items:center!important;gap:7px!important;height:30px!important;max-width:260px!important;border:1px solid var(--pln-v20-border)!important;border-radius:999px!important;background:#fff!important;color:#334155!important;padding:0 11px!important;font-size:11px!important;font-weight:700!important;overflow:hidden!important;white-space:nowrap!important;
+}
+
+/* CONTEÚDO RESPEITA MENU */
+html body.withSideNav:not(.plannerGridFullscreen) > main{
+  margin-left:var(--pln-v20-nav-w)!important;width:calc(100% - var(--pln-v20-nav-w))!important;max-width:calc(100% - var(--pln-v20-nav-w))!important;min-height:calc(100vh - var(--pln-v20-header-h))!important;
+  padding:28px 28px 44px!important;background:linear-gradient(135deg,#fff 0%,#f6f7f8 54%,#f2f4f7 100%)!important;overflow-x:hidden!important;transition:margin-left .18s ease,width .18s ease!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > main > div:not([style*="display:none"]):not([style*="display: none"]){max-width:1288px!important;margin:0 auto!important;}
+html body.withSideNav:not(.plannerGridFullscreen) .card,
+html body.withSideNav:not(.plannerGridFullscreen) .projectSetupHero,
+html body.withSideNav:not(.plannerGridFullscreen) .projectSetupStep,
+html body.withSideNav:not(.plannerGridFullscreen) .projectSetupPanel{border:1px solid var(--pln-v20-border)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 28px rgba(15,23,42,.04)!important;}
+html body.withSideNav:not(.plannerGridFullscreen) .btn.primary,
+html body.withSideNav:not(.plannerGridFullscreen) button.primary{background:var(--pln-v20-red)!important;border-color:var(--pln-v20-red)!important;color:#fff!important;}
+
+@media (max-width:820px){
+  body.withSideNav{--pln-v20-nav-w:var(--pln-v20-nav-closed)!important;}
+  html body.withSideNav #sideNav{width:var(--pln-v20-nav-closed)!important;min-width:var(--pln-v20-nav-closed)!important;max-width:var(--pln-v20-nav-closed)!important;padding:12px 9px!important;}
+  html body.withSideNav #sideNav .brandWrap,html body.withSideNav #sideNav .navSecTitle,html body.withSideNav #sideNav .navItem .txt,html body.withSideNav #sideNav .navItem .lbl{display:none!important;}
+  html body.withSideNav #sideNav .navScroll{height:calc(100vh - 126px)!important;max-height:calc(100vh - 126px)!important;overflow-y:scroll!important;}
+  html body.withSideNav:not(.plannerGridFullscreen) > header{height:52px!important;min-height:52px!important;padding:0 12px!important;}
+  html body.withSideNav:not(.plannerGridFullscreen) > main{padding:20px 14px 34px!important;}
+}
+</style>
+<script id="PLANNUS_MENU_SCROLL_FIX_V20">
+(function(){
+  "use strict";
+  var KEY = "plannus:v1:ui:sideNavCollapsed:v20";
+  var LEGACY_KEYS = ["plannus:v1:ui:sideNavCollapsed:v19", "plannus:v1:ui:sideNavCollapsed:v18", "plannus:v1:ui:sideNavCollapsed:v17", "plannus:v1:ui:sideNavCollapsed:v15", "PQP_SIDENAV_COLLAPSED_v1"];
+  function qs(sel){ return document.querySelector(sel); }
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+  function getScroller(){
+    var side = qs("#sideNav");
+    return side ? (side.querySelector(".navScroll") || side) : null;
+  }
+  function normalizeScroller(){
+    var side = qs("#sideNav");
+    var scroller = getScroller();
+    if(!side || !scroller) return;
+    document.body.classList.add("withSideNav");
+    if(document.body.classList.contains("navCollapsed")){
+      scroller.style.display = "block";
+      scroller.style.overflowY = "scroll";
+      scroller.style.overflowX = "hidden";
+      scroller.style.height = "calc(100vh - 126px)";
+      scroller.style.maxHeight = "calc(100vh - 126px)";
+      scroller.style.minHeight = "0";
+      scroller.style.pointerEvents = "auto";
+      scroller.scrollTop = clamp(scroller.scrollTop || 0, 0, Math.max(0, scroller.scrollHeight - scroller.clientHeight));
+    }else{
+      scroller.style.height = "";
+      scroller.style.maxHeight = "";
+      scroller.style.overflowY = "auto";
+    }
+  }
+  function apply(collapsed){
+    if(!document.body) return;
+    document.body.classList.add("withSideNav");
+    document.body.classList.toggle("navCollapsed", !!collapsed);
+    try{ localStorage.setItem(KEY, collapsed ? "1" : "0"); }catch(_){ }
+    setTimeout(normalizeScroller, 0);
+    setTimeout(normalizeScroller, 80);
+  }
+  function read(){
+    try{
+      var v = localStorage.getItem(KEY);
+      if(v === "1" || v === "0") return v === "1";
+      for(var i=0;i<LEGACY_KEYS.length;i++){
+        var old = localStorage.getItem(LEGACY_KEYS[i]);
+        if(old === "1" || old === "0") return old === "1";
+      }
+    }catch(_){ }
+    return document.body && document.body.classList.contains("navCollapsed");
+  }
+  function scrollCollapsed(delta){
+    if(!document.body || !document.body.classList.contains("navCollapsed")) return false;
+    var scroller = getScroller();
+    if(!scroller) return false;
+    normalizeScroller();
+    var max = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    if(max <= 0) return false;
+    scroller.scrollTop = clamp((scroller.scrollTop || 0) + delta, 0, max);
+    return true;
+  }
+  function bind(){
+    var side = qs("#sideNav");
+    if(side && !side.__plannusV20ScrollBound){
+      side.__plannusV20ScrollBound = true;
+      side.addEventListener("wheel", function(ev){
+        if(scrollCollapsed(ev.deltaY || 0)){
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
+      }, { passive:false, capture:true });
+      side.addEventListener("mouseenter", normalizeScroller, true);
+      side.addEventListener("scroll", normalizeScroller, true);
+    }
+    var btn = qs("#btnNavToggle");
+    if(btn && !btn.__plannusV20Bound){
+      btn.__plannusV20Bound = true;
+      btn.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+        apply(!document.body.classList.contains("navCollapsed"));
+      }, true);
+    }
+    window.addEventListener("resize", normalizeScroller, { passive:true });
+  }
+  function boot(){ apply(read()); bind(); normalizeScroller(); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+</script>
+
+
+
+
+<style id="PLANNUS_VISUAL_CONTRACT_V21_PROTOTYPE_HEADER_MENU">
+/*
+ PLANNUS VISUAL CONTRACT V21 — PROTOTYPE HEADER + SIDEBAR
+ Base: V20 funcional.
+ Objetivo: aplicar o padrão do protótipo sem mexer em boot, renderAll, cálculo, API ou banco.
+ - Cabeçalho com nome/logo Plannus à esquerda.
+ - Cabeçalho sem textos técnicos aleatórios.
+ - Menu recolhido com ícones e rolagem nativa no próprio #sideNav.
+*/
+:root{
+  --pln-v21-nav-open:252px;
+  --pln-v21-nav-closed:74px;
+  --pln-v21-nav-w:252px;
+  --pln-v21-black:#0f171f;
+  --pln-v21-red:#ef1735;
+  --pln-v21-bg:#f6f7f8;
+  --pln-v21-surface:#ffffff;
+  --pln-v21-border:#dfe5ee;
+  --pln-v21-text:#101820;
+  --pln-v21-muted:#53657a;
+  --pln-v21-header-h:64px;
+}
+body.withSideNav{--pln-v21-nav-w:var(--pln-v21-nav-open)!important;}
+body.withSideNav.navCollapsed{--pln-v21-nav-w:var(--pln-v21-nav-closed)!important;}
+
+/* SIDEBAR: padrão protótipo */
+html body.withSideNav #sideNav{
+  width:var(--pln-v21-nav-w)!important;
+  min-width:var(--pln-v21-nav-w)!important;
+  max-width:var(--pln-v21-nav-w)!important;
+  background:var(--pln-v21-black)!important;
+  color:#fff!important;
+  border-right:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:12px 0 28px rgba(16,24,32,.08)!important;
+}
+html body.withSideNav.navCollapsed #sideNav{
+  width:var(--pln-v21-nav-closed)!important;
+  min-width:var(--pln-v21-nav-closed)!important;
+  max-width:var(--pln-v21-nav-closed)!important;
+  padding:12px 9px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(255,255,255,.42) transparent!important;
+}
+html body.withSideNav.navCollapsed #sideNav::-webkit-scrollbar{width:7px!important;}
+html body.withSideNav.navCollapsed #sideNav::-webkit-scrollbar-track{background:transparent!important;}
+html body.withSideNav.navCollapsed #sideNav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.42)!important;border-radius:999px!important;}
+html body.withSideNav.navCollapsed #sideNav .navTop{
+  position:sticky!important;
+  top:0!important;
+  z-index:5!important;
+  flex:0 0 auto!important;
+  height:auto!important;
+  min-height:86px!important;
+  max-height:none!important;
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  padding:0 0 12px!important;
+  margin:0 0 8px!important;
+  background:var(--pln-v21-black)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navScroll{
+  height:auto!important;
+  max-height:none!important;
+  min-height:auto!important;
+  overflow:visible!important;
+  padding:8px 0 96px!important;
+  margin:0!important;
+}
+html body.withSideNav.navCollapsed #sideNav .brandMark{
+  display:grid!important;
+  place-items:center!important;
+  width:32px!important;
+  height:32px!important;
+  min-width:32px!important;
+  min-height:32px!important;
+  border-radius:10px!important;
+  object-fit:contain!important;
+  background:#111a24!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navToggle{
+  display:grid!important;
+  place-items:center!important;
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  min-height:42px!important;
+  border-radius:14px!important;
+  background:#151b23!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.14)!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navSec{
+  width:100%!important;
+  margin:8px 0 0!important;
+  padding:0!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem,
+html body.withSideNav.navCollapsed #sideNav button.navItem,
+html body.withSideNav.navCollapsed #sideNav a.navItem{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  place-items:center!important;
+  width:100%!important;
+  height:42px!important;
+  min-height:42px!important;
+  max-height:42px!important;
+  margin:0 0 9px!important;
+  padding:0!important;
+  border-radius:14px!important;
+  background:transparent!important;
+  overflow:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem .icon{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.075)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:currentColor!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem svg{
+  display:block!important;
+  width:17px!important;
+  height:17px!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .brandWrap,
+html body.withSideNav.navCollapsed #sideNav .brandWordmarkSide,
+html body.withSideNav.navCollapsed #sideNav .brandSub,
+html body.withSideNav.navCollapsed #sideNav .navSecTitle,
+html body.withSideNav.navCollapsed #sideNav .navItem .txt,
+html body.withSideNav.navCollapsed #sideNav .navItem .lbl,
+html body.withSideNav.navCollapsed #sideNav .navItem .k{
+  display:none!important;
+}
+
+/* HEADER: padrão protótipo com nome do sistema */
+html body.withSideNav:not(.plannerGridFullscreen) > header{
+  position:sticky!important;
+  top:0!important;
+  z-index:900!important;
+  margin-left:var(--pln-v21-nav-w)!important;
+  width:calc(100% - var(--pln-v21-nav-w))!important;
+  max-width:calc(100% - var(--pln-v21-nav-w))!important;
+  height:var(--pln-v21-header-h)!important;
+  min-height:var(--pln-v21-header-h)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  padding:0 22px!important;
+  background:rgba(255,255,255,.97)!important;
+  border:0!important;
+  border-bottom:1px solid var(--pln-v21-border)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(12px)!important;
+  overflow:hidden!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header > .title{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:170px!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  visibility:visible!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .brandWordmark{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+  visibility:visible!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .brandWordmark img{
+  display:block!important;
+  height:22px!important;
+  width:auto!important;
+  max-width:142px!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .brandWordmark::after{
+  content:"Plannus";
+  display:inline-block!important;
+  margin-left:0!important;
+  color:var(--pln-v21-text)!important;
+  font-size:0!important;
+}
+/* esconder textos técnicos do cabeçalho */
+html body.withSideNav:not(.plannerGridFullscreen) > header .sub,
+html body.withSideNav:not(.plannerGridFullscreen) > header .projName,
+html body.withSideNav:not(.plannerGridFullscreen) > header > .controls,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpiRow,
+html body.withSideNav:not(.plannerGridFullscreen) > header .kpi{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  visibility:hidden!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header > .actions{
+  flex:1 1 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  min-width:0!important;
+  width:auto!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup:not(.plannerActionGroupPrimary):not(.plannerActionGroupExport),
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionLabel,
+html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionDivider,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerVisualMode,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnToggleBaselineCols,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobZoomOut,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobZoomIn,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobRowDown,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobRowUp,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWDown,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWUp,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportHTMLTop,
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportPlannerPDFTop{
+  display:none!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerAutoUpdate{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  height:34px!important;
+  min-height:34px!important;
+  border:1px solid var(--pln-v21-border)!important;
+  border-radius:13px!important;
+  background:#fff!important;
+  color:#111827!important;
+  padding:0 13px!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  box-shadow:none!important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) > header #plannusSyncIndicator,
+html body.withSideNav:not(.plannerGridFullscreen) > header .pln-sync-indicator{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  height:30px!important;
+  max-width:260px!important;
+  border:1px solid var(--pln-v21-border)!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#334155!important;
+  padding:0 11px!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+
+/* conteúdo acompanha a largura real do menu */
+html body.withSideNav:not(.plannerGridFullscreen) > main{
+  margin-left:var(--pln-v21-nav-w)!important;
+  width:calc(100% - var(--pln-v21-nav-w))!important;
+  max-width:calc(100% - var(--pln-v21-nav-w))!important;
+  min-height:calc(100vh - var(--pln-v21-header-h))!important;
+  padding:28px 28px 44px!important;
+}
+@media (max-width:820px){
+  body.withSideNav{--pln-v21-nav-w:var(--pln-v21-nav-closed)!important;}
+  html body.withSideNav #sideNav{width:var(--pln-v21-nav-closed)!important;min-width:var(--pln-v21-nav-closed)!important;max-width:var(--pln-v21-nav-closed)!important;}
+  html body.withSideNav:not(.plannerGridFullscreen) > header{height:58px!important;min-height:58px!important;padding:0 12px!important;}
+  html body.withSideNav:not(.plannerGridFullscreen) > header > .title{min-width:120px!important;}
+  html body.withSideNav:not(.plannerGridFullscreen) > main{padding:20px 14px 34px!important;}
+}
+</style>
+
+
+<style id="PLANNUS_VISUAL_CONTRACT_V22_PROTOTYPE_ICON_HOVER">
+/*
+ PLANNUS VISUAL CONTRACT V22 — PROTOTYPE ICON HOVER
+ Escopo: somente cabeçalho/menu. Não altera boot, renderAll, cálculo, acompanhamento, API ou banco.
+ Objetivo: sidebar recolhida igual ao protótipo: coluna preta estreita, ícones limpos, hover escuro sem branco estourado e rolagem funcional.
+*/
+:root{
+  --pln-v22-nav-open:252px;
+  --pln-v22-nav-closed:56px;
+  --pln-v22-black:#050709;
+  --pln-v22-black-2:#0b1016;
+  --pln-v22-red:#ef1735;
+  --pln-v22-icon:#aab3bf;
+  --pln-v22-icon-hover:#ffffff;
+  --pln-v22-border:rgba(255,255,255,.12);
+  --pln-v22-header-h:64px;
+}
+html body.withSideNav{--pln-v21-nav-w:var(--pln-v22-nav-open)!important;--pln-v20-nav-w:var(--pln-v22-nav-open)!important;}
+html body.withSideNav.navCollapsed{--pln-v21-nav-w:var(--pln-v22-nav-closed)!important;--pln-v20-nav-w:var(--pln-v22-nav-closed)!important;}
+
+/* sidebar collapsed: padrão do protótipo */
+html body.withSideNav.navCollapsed #sideNav{
+  width:var(--pln-v22-nav-closed)!important;
+  min-width:var(--pln-v22-nav-closed)!important;
+  max-width:var(--pln-v22-nav-closed)!important;
+  height:100vh!important;
+  max-height:100vh!important;
+  padding:10px 8px 14px!important;
+  background:var(--pln-v22-black)!important;
+  border-right:1px solid rgba(255,255,255,.07)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  overscroll-behavior:contain!important;
+}
+html body.withSideNav.navCollapsed #sideNav::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
+
+html body.withSideNav.navCollapsed #sideNav .navTop{
+  position:sticky!important;
+  top:0!important;
+  z-index:9!important;
+  width:100%!important;
+  min-height:92px!important;
+  height:92px!important;
+  max-height:92px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  margin:0 0 10px!important;
+  padding:0 0 10px!important;
+  background:linear-gradient(180deg,var(--pln-v22-black) 0%,var(--pln-v22-black) 78%,rgba(5,7,9,0) 100%)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+html body.withSideNav.navCollapsed #sideNav .brandMark{
+  display:grid!important;
+  place-items:center!important;
+  width:28px!important;
+  height:28px!important;
+  min-width:28px!important;
+  min-height:28px!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navToggle{
+  appearance:none!important;
+  display:grid!important;
+  place-items:center!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  border-radius:13px!important;
+  background:#101820!important;
+  color:#ffffff!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:0 12px 24px rgba(0,0,0,.20)!important;
+  font-size:20px!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navScroll{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:calc(100vh + 1px)!important;
+  max-height:none!important;
+  overflow:visible!important;
+  padding:8px 0 96px!important;
+  margin:0!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navSec{
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navSecTitle,
+html body.withSideNav.navCollapsed #sideNav .brandWrap,
+html body.withSideNav.navCollapsed #sideNav .brandWordmarkSide,
+html body.withSideNav.navCollapsed #sideNav .brandSub,
+html body.withSideNav.navCollapsed #sideNav .navItem .txt,
+html body.withSideNav.navCollapsed #sideNav .navItem .lbl,
+html body.withSideNav.navCollapsed #sideNav .navItem .k{
+  display:none!important;
+}
+
+/* item recolhido: sem caixa cinza permanente, igual protótipo */
+html body.withSideNav.navCollapsed #sideNav .navItem,
+html body.withSideNav.navCollapsed #sideNav button.navItem,
+html body.withSideNav.navCollapsed #sideNav a.navItem{
+  appearance:none!important;
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  grid-template-columns:1fr!important;
+  width:40px!important;
+  height:40px!important;
+  min-width:40px!important;
+  min-height:40px!important;
+  max-width:40px!important;
+  max-height:40px!important;
+  margin:0 0 8px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:13px!important;
+  background:transparent!important;
+  color:var(--pln-v22-icon)!important;
+  box-shadow:none!important;
+  outline:none!important;
+  overflow:visible!important;
+}
+
+/* ícone recolhido */
+html body.withSideNav.navCollapsed #sideNav .navItem .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem .icon{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:11px!important;
+  background:transparent!important;
+  border:1px solid transparent!important;
+  color:currentColor!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem svg,
+html body.withSideNav.navCollapsed #sideNav .navItem .ic svg,
+html body.withSideNav.navCollapsed #sideNav .navItem .ico svg{
+  width:18px!important;
+  height:18px!important;
+  display:block!important;
+  color:currentColor!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  opacity:1!important;
+  filter:none!important;
+}
+
+/* hover/focus: nunca branco estourado */
+html body.withSideNav.navCollapsed #sideNav .navItem:hover,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible{
+  background:rgba(255,255,255,.055)!important;
+  color:var(--pln-v22-icon-hover)!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem:hover .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem:hover .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible .ico{
+  background:rgba(255,255,255,.075)!important;
+  border-color:rgba(255,255,255,.12)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+
+/* ativo recolhido: marcador vermelho do protótipo */
+html body.withSideNav.navCollapsed #sideNav .navItem.active,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active,
+html body.withSideNav.navCollapsed #sideNav .active{
+  background:transparent!important;
+  color:#ffffff!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem.active::before,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary::before,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active::before,
+html body.withSideNav.navCollapsed #sideNav .active::before{
+  content:""!important;
+  position:absolute!important;
+  left:-7px!important;
+  top:6px!important;
+  bottom:6px!important;
+  width:3px!important;
+  border-radius:999px!important;
+  background:var(--pln-v22-red)!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem.active .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active .ic,
+html body.withSideNav.navCollapsed #sideNav .active .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.active .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active .ico,
+html body.withSideNav.navCollapsed #sideNav .active .ico{
+  background:rgba(239,23,53,.12)!important;
+  border-color:var(--pln-v22-red)!important;
+  color:#ffffff!important;
+  box-shadow:0 0 0 1px rgba(239,23,53,.12)!important;
+}
+
+/* aberto: mantém texto + ícone sem hover branco */
+html body.withSideNav:not(.navCollapsed) #sideNav .navItem:hover{
+  background:rgba(255,255,255,.075)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+html body.withSideNav:not(.navCollapsed) #sideNav .navItem:hover .ic,
+html body.withSideNav:not(.navCollapsed) #sideNav .navItem:hover .ico{
+  background:rgba(255,255,255,.09)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+
+/* conteúdo e cabeçalho respeitam a coluna menor */
+html body.withSideNav.navCollapsed:not(.plannerGridFullscreen) > header{
+  margin-left:var(--pln-v22-nav-closed)!important;
+  width:calc(100% - var(--pln-v22-nav-closed))!important;
+  max-width:calc(100% - var(--pln-v22-nav-closed))!important;
+}
+html body.withSideNav.navCollapsed:not(.plannerGridFullscreen) > main{
+  margin-left:var(--pln-v22-nav-closed)!important;
+  width:calc(100% - var(--pln-v22-nav-closed))!important;
+  max-width:calc(100% - var(--pln-v22-nav-closed))!important;
+}
+</style>
+<script id="PLANNUS_VISUAL_CONTRACT_V22_MENU_WHEEL">
+(function(){
+  const KEY = "plannus:v1:ui:sideNavCollapsed:v22";
+  function nav(){ return document.getElementById("sideNav"); }
+  function isCollapsed(){ return document.body && document.body.classList.contains("navCollapsed"); }
+  function bind(){
+    const side = nav();
+    if(!side || side.__plannusV22WheelBound) return;
+    side.__plannusV22WheelBound = true;
+    side.addEventListener("wheel", function(ev){
+      if(!isCollapsed()) return;
+      const max = side.scrollHeight - side.clientHeight;
+      if(max <= 0) return;
+      side.scrollTop = Math.max(0, Math.min(max, side.scrollTop + ev.deltaY));
+      ev.preventDefault();
+      ev.stopPropagation();
+    }, { passive:false, capture:true });
+    const toggle = document.getElementById("btnNavToggle");
+    if(toggle && !toggle.__plannusV22Bound){
+      toggle.__plannusV22Bound = true;
+      toggle.addEventListener("click", function(){
+        setTimeout(function(){
+          try{ localStorage.setItem(KEY, document.body.classList.contains("navCollapsed") ? "1" : "0"); }catch(_){}
+        }, 30);
+      }, true);
+    }
+  }
+  function boot(){ bind(); setTimeout(bind, 250); setTimeout(bind, 1000); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+</script>
+
+
+<script id="PLANNUS_MENU_SCROLL_FIX_V21">
+(function(){
+  "use strict";
+  var KEY = "plannus:v1:ui:sideNavCollapsed:v21";
+  function qs(sel){ return document.querySelector(sel); }
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+  function apply(collapsed){
+    if(!document.body) return;
+    document.body.classList.add("withSideNav");
+    document.body.classList.toggle("navCollapsed", !!collapsed);
+    try{ localStorage.setItem(KEY, collapsed ? "1" : "0"); }catch(_){}
+    setTimeout(normalize, 0);
+    setTimeout(normalize, 120);
+  }
+  function read(){
+    try{
+      var v = localStorage.getItem(KEY);
+      if(v === "1" || v === "0") return v === "1";
+    }catch(_){}
+    return true;
+  }
+  function normalize(){
+    var side = qs("#sideNav");
+    if(!side || !document.body) return;
+    document.body.classList.add("withSideNav");
+    if(document.body.classList.contains("navCollapsed")){
+      side.style.overflowY = "auto";
+      side.style.overflowX = "hidden";
+      var max = Math.max(0, side.scrollHeight - side.clientHeight);
+      side.scrollTop = clamp(side.scrollTop || 0, 0, max);
+      var ns = side.querySelector(".navScroll");
+      if(ns){
+        ns.style.height = "auto";
+        ns.style.maxHeight = "none";
+        ns.style.overflow = "visible";
+      }
+    }else{
+      side.style.overflow = "hidden";
+      var scroll = side.querySelector(".navScroll");
+      if(scroll){
+        scroll.style.overflowY = "auto";
+        scroll.style.overflowX = "hidden";
+      }
+    }
+  }
+  function bind(){
+    var side = qs("#sideNav");
+    if(side && !side.__plannusV21ScrollBound){
+      side.__plannusV21ScrollBound = true;
+      side.addEventListener("wheel", function(ev){
+        if(!document.body || !document.body.classList.contains("navCollapsed")) return;
+        var max = Math.max(0, side.scrollHeight - side.clientHeight);
+        if(max <= 0) return;
+        side.scrollTop = clamp((side.scrollTop || 0) + (ev.deltaY || 0), 0, max);
+        ev.preventDefault();
+        ev.stopPropagation();
+      }, {passive:false, capture:true});
+    }
+    var btn = qs("#btnNavToggle");
+    if(btn && !btn.__plannusV21Bound){
+      btn.__plannusV21Bound = true;
+      btn.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+        apply(!document.body.classList.contains("navCollapsed"));
+      }, true);
+    }
+    window.addEventListener("resize", normalize, {passive:true});
+  }
+  function boot(){ apply(read()); bind(); normalize(); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+</script>
+
+<style id="PLANNUS_VISUAL_CONTRACT_V23_PAV_EAP">
+
+/*
+ PLANNUS VISUAL CONTRACT V23 — PAVIMENTOS + EAP SAFE POLISH
+ Escopo: apenas telas #viewPav, #viewGuidedPlan, #viewGuidedApply e #viewEAP.
+ Não altera boot, renderAll, cálculo, acompanhamento, API ou storage.
+*/
+:root{
+  --pln-v23-bg:#f6f7f9;
+  --pln-v23-surface:#ffffff;
+  --pln-v23-soft:#f3f5f7;
+  --pln-v23-border:#dfe5ee;
+  --pln-v23-border-2:#e8edf3;
+  --pln-v23-text:#101823;
+  --pln-v23-muted:#617086;
+  --pln-v23-primary:#ef1735;
+  --pln-v23-dark:#0d1722;
+  --pln-v23-radius:18px;
+  --pln-v23-radius-sm:14px;
+  --pln-v23-shadow:0 14px 34px rgba(15,23,42,.045);
+}
+
+/* base das telas */
+main:has(#viewPav[style*="block"]),
+main:has(#viewGuidedPlan[style*="block"]),
+main:has(#viewGuidedApply[style*="block"]),
+main:has(#viewEAP[style*="block"]){
+  background:linear-gradient(135deg,#ffffff 0%,#f7f8fa 52%,#f2f4f7 100%) !important;
+}
+
+#viewPav,
+#viewGuidedPlan,
+#viewGuidedApply,
+#viewEAP{
+  max-width:1220px !important;
+  margin:0 auto !important;
+  padding:18px 18px 42px !important;
+  color:var(--pln-v23-text) !important;
+}
+
+#viewPav > section.card,
+#viewGuidedPlan > section.card,
+#viewGuidedApply > section.card,
+#viewEAP > section.card{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+
+/* cabeçalhos de página no padrão Minhas Obras */
+#viewPav > section.card > h2,
+#viewGuidedPlan > section.card > .cardHead,
+#viewGuidedApply > section.card > .planningApplyToolbar{
+  position:relative !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  margin:0 0 18px !important;
+  padding:22px 26px !important;
+  background:rgba(255,255,255,.88) !important;
+  border:1px solid var(--pln-v23-border) !important;
+  border-radius:var(--pln-v23-radius) !important;
+  box-shadow:var(--pln-v23-shadow) !important;
+}
+
+#viewPav > section.card > h2{
+  min-height:124px !important;
+  flex-wrap:wrap !important;
+  align-content:flex-end !important;
+}
+#viewPav > section.card > h2::before,
+#viewGuidedPlan > section.card > .cardHead::before,
+#viewGuidedApply > section.card > .planningApplyToolbar::before{
+  content:"WORKSPACE";
+  position:absolute;
+  top:22px;
+  left:26px;
+  font-size:12px;
+  line-height:1;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  font-weight:900;
+  color:#344052;
+}
+#viewPav > section.card > h2 > span:first-child,
+#viewGuidedPlan .cardHead .title{
+  display:block !important;
+  margin-top:22px !important;
+  font-size:30px !important;
+  line-height:1.02 !important;
+  font-weight:900 !important;
+  letter-spacing:-.04em !important;
+  color:#07111d !important;
+}
+#viewPav > section.card > h2 > .hint,
+#viewGuidedPlan .cardHead .sub{
+  display:block !important;
+  margin-top:8px !important;
+  font-size:14px !important;
+  line-height:1.45 !important;
+  color:#475569 !important;
+  max-width:760px !important;
+}
+#viewGuidedPlan > section.card > .cardHead > div:first-child,
+#viewGuidedApply > section.card > .planningApplyToolbar::after{
+  min-width:0 !important;
+}
+#viewGuidedApply > section.card > .planningApplyToolbar{
+  align-items:center !important;
+  min-height:104px !important;
+  padding-top:42px !important;
+}
+#viewGuidedApply > section.card > .planningApplyToolbar::after{
+  content:"Aplicação da EAP ao planejamento";
+  position:absolute;
+  left:26px;
+  bottom:22px;
+  font-size:26px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.035em;
+  color:#07111d;
+  pointer-events:none;
+}
+#viewGuidedApply .planningApplyToolbar .actions{
+  margin-left:auto !important;
+  max-width:720px !important;
+  justify-content:flex-end !important;
+}
+
+/* cartões e painéis */
+#viewPav .body,
+#viewGuidedPlan #guidedEditPane,
+#viewGuidedApply .guidedApplyShell,
+#viewEAP #eapPageMount{
+  padding:0 !important;
+}
+#viewPav .body > .card,
+#viewPav details.card,
+#viewPav .body > div[style*="overflow:auto"],
+#viewGuidedPlan .guidedSection,
+#viewGuidedPlan .guidedPreview > .gridCards,
+#viewGuidedPlan .guidedPreview .projectSetupPreviewCard,
+#viewGuidedPlan .guidedPreviewGrids > div,
+#viewGuidedApply .guidedSection,
+#viewGuidedApply .planningPhaseSection{
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid var(--pln-v23-border) !important;
+  border-radius:var(--pln-v23-radius) !important;
+  box-shadow:var(--pln-v23-shadow) !important;
+}
+#viewPav .body > .card,
+#viewPav details.card,
+#viewGuidedPlan .guidedSection,
+#viewGuidedApply .guidedSection{
+  padding:18px !important;
+}
+#viewPav .body > .card > div,
+#viewPav details.card > div,
+#viewPav .body > .card .formGrid{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+#viewPav .body > div:first-child{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  margin:0 0 16px !important;
+  padding:16px 18px !important;
+  background:rgba(255,255,255,.92) !important;
+  border:1px solid var(--pln-v23-border) !important;
+  border-radius:var(--pln-v23-radius) !important;
+  box-shadow:var(--pln-v23-shadow) !important;
+}
+#viewPav .body > div:first-child > div:first-child{
+  max-width:760px !important;
+  font-size:13px !important;
+  color:#526178 !important;
+}
+
+/* grid dos formulários: menos apertado e mais legível */
+#viewPav .formGrid,
+#viewGuidedPlan .formGrid,
+#viewGuidedApply .guidedApplyGrid,
+#viewGuidedApply .planningPhaseEditor{
+  display:grid !important;
+  gap:12px !important;
+}
+#viewPav .body > .card .formGrid{
+  grid-template-columns:repeat(4,minmax(160px,1fr)) !important;
+}
+#viewPav details.card .formGrid{
+  grid-template-columns:repeat(3,minmax(190px,1fr)) !important;
+}
+#viewGuidedApply .guidedApplyGrid{
+  grid-template-columns:repeat(4,minmax(190px,1fr)) !important;
+}
+#viewGuidedApply .planningPhaseEditor{
+  grid-template-columns:minmax(220px,1fr) minmax(260px,2fr) auto auto auto !important;
+  align-items:end !important;
+}
+
+#viewPav .field,
+#viewGuidedPlan .field,
+#viewGuidedApply .field{
+  margin:0 !important;
+  min-width:0 !important;
+}
+#viewPav label,
+#viewGuidedPlan label,
+#viewGuidedApply label,
+#viewPav .label,
+#viewGuidedPlan .label,
+#viewGuidedApply .label{
+  font-size:12px !important;
+  font-weight:800 !important;
+  color:#516078 !important;
+  letter-spacing:.01em !important;
+}
+#viewPav input,
+#viewPav select,
+#viewGuidedPlan input,
+#viewGuidedPlan select,
+#viewGuidedApply input,
+#viewGuidedApply select{
+  width:100% !important;
+  min-height:42px !important;
+  border:1px solid var(--pln-v23-border) !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  color:#101823 !important;
+  box-shadow:none !important;
+}
+#viewPav input:focus,
+#viewPav select:focus,
+#viewGuidedPlan input:focus,
+#viewGuidedPlan select:focus,
+#viewGuidedApply input:focus,
+#viewGuidedApply select:focus{
+  outline:0 !important;
+  border-color:rgba(239,23,53,.42) !important;
+  box-shadow:0 0 0 3px rgba(239,23,53,.10) !important;
+}
+
+/* botões no padrão Plannus */
+#viewPav .btn,
+#viewGuidedPlan .btn,
+#viewGuidedApply .btn{
+  min-height:40px !important;
+  padding:10px 14px !important;
+  border-radius:14px !important;
+  border:1px solid var(--pln-v23-border) !important;
+  background:#fff !important;
+  color:#101823 !important;
+  font-weight:850 !important;
+  box-shadow:0 1px 2px rgba(15,23,42,.03) !important;
+}
+#viewPav .btn:hover,
+#viewGuidedPlan .btn:hover,
+#viewGuidedApply .btn:hover{
+  border-color:#cbd5e1 !important;
+  background:#f8fafc !important;
+}
+#viewPav .btn.primary,
+#viewGuidedPlan .btn.primary,
+#viewGuidedApply .btn.primary{
+  background:var(--pln-v23-primary) !important;
+  border-color:var(--pln-v23-primary) !important;
+  color:#fff !important;
+  box-shadow:0 12px 24px rgba(239,23,53,.16) !important;
+}
+#viewPav .btn.danger,
+#viewGuidedPlan .btn.danger,
+#viewGuidedApply .btn.danger{
+  color:#d9142f !important;
+  border-color:#ffd0d8 !important;
+  background:#fff5f7 !important;
+}
+
+/* EAP: layout mais claro */
+#viewGuidedPlan .guidedSplit{
+  display:grid !important;
+  grid-template-columns:minmax(330px, .85fr) minmax(520px, 1.35fr) !important;
+  gap:16px !important;
+  align-items:start !important;
+  padding:0 !important;
+}
+#viewGuidedPlan .guidedSectionTitle,
+#viewGuidedApply .guidedSectionTitle{
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  margin:0 0 14px !important;
+}
+#viewGuidedPlan .guidedSectionTitle .ttl,
+#viewGuidedApply .guidedSectionTitle .ttl{
+  font-size:15px !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+  color:#101823 !important;
+}
+#viewGuidedPlan .guidedSectionTitle .subttl,
+#viewGuidedApply .guidedSectionTitle .subttl,
+#viewGuidedPlan .hint,
+#viewGuidedApply .hint{
+  color:#64748b !important;
+  font-size:12px !important;
+  line-height:1.45 !important;
+}
+#viewGuidedPlan .guidedSectionActions,
+#viewGuidedPlan .guidedActions,
+#viewGuidedApply .guidedActions,
+#viewGuidedApply .guidedSectionActions{
+  display:flex !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-end !important;
+}
+#viewGuidedPlan .guidedPreview{
+  display:grid !important;
+  gap:12px !important;
+}
+#viewGuidedPlan .guidedMetaRow,
+#viewGuidedApply .guidedMetaRow{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+}
+#viewGuidedPlan .guidedTag,
+#viewGuidedApply .guidedTag,
+#viewGuidedApply .guidedPill{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:28px !important;
+  padding:5px 10px !important;
+  border-radius:999px !important;
+  background:#f8fafc !important;
+  border:1px solid var(--pln-v23-border-2) !important;
+  color:#334155 !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+}
+#viewGuidedPlan .guidedLibraryGrid,
+#viewGuidedPlan #guidedPlanSummary,
+#viewGuidedPlan #guidedReadinessPanel,
+#viewGuidedPlan .gridCards,
+#viewGuidedApply .gridCards{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+#viewGuidedPlan .guidedServiceSection{
+  margin-top:16px !important;
+}
+#viewGuidedPlan .guidedServiceFlowRail{
+  border:1px dashed #cbd5e1 !important;
+  border-radius:16px !important;
+  background:linear-gradient(135deg,#fff,#f8fafc) !important;
+  padding:12px !important;
+  overflow:auto !important;
+}
+#viewGuidedPlan .guidedServiceEditor{
+  display:grid !important;
+  gap:10px !important;
+  margin-top:12px !important;
+}
+
+/* tabelas */
+#viewPav table,
+#viewGuidedPlan table,
+#viewGuidedApply table{
+  width:100% !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  font-size:12px !important;
+}
+#viewPav thead th,
+#viewGuidedPlan thead th,
+#viewGuidedApply thead th{
+  position:sticky !important;
+  top:0 !important;
+  z-index:1 !important;
+  background:#f8fafc !important;
+  color:#516078 !important;
+  font-size:11px !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid var(--pln-v23-border) !important;
+}
+#viewPav td,
+#viewPav th,
+#viewGuidedPlan td,
+#viewGuidedPlan th,
+#viewGuidedApply td,
+#viewGuidedApply th{
+  border-bottom:1px solid #edf1f6 !important;
+  padding:10px 12px !important;
+  vertical-align:middle !important;
+}
+#viewPav .body > div[style*="overflow:auto"],
+#viewGuidedPlan .guidedTableWrap{
+  max-height:520px !important;
+  overflow:auto !important;
+  padding:0 !important;
+}
+#viewPav .legend,
+#viewGuidedPlan .legend,
+#viewGuidedApply .legend{
+  border-radius:16px !important;
+  background:#fff !important;
+  border:1px solid var(--pln-v23-border) !important;
+  padding:12px !important;
+}
+
+/* responsivo */
+@media (max-width:1180px){
+  #viewPav .body > .card .formGrid,
+  #viewGuidedApply .guidedApplyGrid,
+  #viewGuidedPlan .guidedLibraryGrid,
+  #viewGuidedPlan #guidedPlanSummary,
+  #viewGuidedPlan #guidedReadinessPanel,
+  #viewGuidedPlan .gridCards,
+  #viewGuidedApply .gridCards{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #viewGuidedPlan .guidedSplit{
+    grid-template-columns:1fr !important;
+  }
+}
+@media (max-width:760px){
+  #viewPav,
+  #viewGuidedPlan,
+  #viewGuidedApply,
+  #viewEAP{
+    padding:12px 10px 32px !important;
+  }
+  #viewPav > section.card > h2,
+  #viewGuidedPlan > section.card > .cardHead,
+  #viewGuidedApply > section.card > .planningApplyToolbar{
+    padding:20px !important;
+    align-items:flex-start !important;
+  }
+  #viewPav .body > .card .formGrid,
+  #viewPav details.card .formGrid,
+  #viewGuidedApply .guidedApplyGrid,
+  #viewGuidedApply .planningPhaseEditor,
+  #viewGuidedPlan .guidedLibraryGrid,
+  #viewGuidedPlan #guidedPlanSummary,
+  #viewGuidedPlan #guidedReadinessPanel,
+  #viewGuidedPlan .gridCards,
+  #viewGuidedApply .gridCards{
+    grid-template-columns:1fr !important;
+  }
+}
+
+</style>
+
+<style id="PLANNUS_VISUAL_CONTRACT_V25_MENU_EAP_FINAL">
+/* PLANNUS_VISUAL_CONTRACT_V25_MENU_EAP_FINAL
+   Correções finais solicitadas:
+   1) marcador ativo do menu recolhido alinhado;
+   2) resumo superior da EAP removido de verdade;
+   3) modelos salvos sem empilhamento/overlay.
+   Sem alteração de boot, cálculo, acompanhamento, API ou banco. */
+
+/* Menu recolhido: item e marcador no padrão protótipo */
+html body.withSideNav.navCollapsed #sideNav .navItem,
+html body.withSideNav.navCollapsed #sideNav button.navItem,
+html body.withSideNav.navCollapsed #sideNav a.navItem{
+  position:relative!important;
+  width:44px!important;
+  height:42px!important;
+  min-width:44px!important;
+  min-height:42px!important;
+  max-width:44px!important;
+  max-height:42px!important;
+  margin:0 auto 8px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  outline:0!important;
+  overflow:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem::before,
+html body.withSideNav.navCollapsed #sideNav button.navItem::before,
+html body.withSideNav.navCollapsed #sideNav a.navItem::before{
+  content:""!important;
+  display:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem.active::before,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary::before,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active::before,
+html body.withSideNav.navCollapsed #sideNav button.navItem.active::before,
+html body.withSideNav.navCollapsed #sideNav button.navItem.primary::before,
+html body.withSideNav.navCollapsed #sideNav button.navItem.is-active::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:-2px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  width:4px!important;
+  height:26px!important;
+  border-radius:0 999px 999px 0!important;
+  background:#ef1735!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem .icon{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:12px!important;
+  background:transparent!important;
+  color:#aeb6c2!important;
+  border:1px solid transparent!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem:hover,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible{
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem:hover .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem:hover .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem:hover .icon,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem:focus-visible .icon{
+  background:rgba(255,255,255,.075)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem.active,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active{
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem.active .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active .ic,
+html body.withSideNav.navCollapsed #sideNav .navItem.active .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active .ico,
+html body.withSideNav.navCollapsed #sideNav .navItem.active .icon,
+html body.withSideNav.navCollapsed #sideNav .navItem.primary .icon,
+html body.withSideNav.navCollapsed #sideNav .navItem.is-active .icon{
+  color:#fff!important;
+  background:rgba(239,23,53,.12)!important;
+  border-color:rgba(239,23,53,.72)!important;
+  box-shadow:none!important;
+}
+html body.withSideNav.navCollapsed #sideNav .navItem svg{
+  width:18px!important;
+  height:18px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+}
+
+/* EAP: remove o resumo superior de verdade, mesmo após renderização JS */
+#viewGuidedPlan #guidedPlanSummary,
+#viewGuidedPlan #guidedReadinessPanel,
+#viewGuidedPlan #guidedSummaryTemplateTag,
+#viewGuidedPlan #guidedSummaryServiceTag,
+#viewGuidedPlan #guidedSummaryLocationTag,
+#viewGuidedPlan .guidedPreview > .guidedMetaRow{
+  display:none!important;
+  visibility:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+}
+#viewGuidedPlan .guidedPreview{
+  align-content:start!important;
+  gap:0!important;
+}
+#viewGuidedPlan .guidedPreviewGrids{
+  margin-top:0!important;
+}
+
+/* EAP: modelos salvos sem empilhar botões em cima do texto */
+#viewGuidedPlan .guidedLibraryGrid{
+  display:block!important;
+  grid-template-columns:1fr!important;
+  gap:10px!important;
+  width:100%!important;
+  margin-top:10px!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:12px!important;
+  width:100%!important;
+  min-height:unset!important;
+  padding:14px!important;
+  border:1px solid #dbe4f0!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  overflow:visible!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .body{
+  min-width:0!important;
+  display:grid!important;
+  gap:4px!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .title{
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  color:#111827!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .meta{
+  font-size:12px!important;
+  line-height:1.35!important;
+  color:#667085!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions{
+  position:static!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  min-width:170px!important;
+  max-width:260px!important;
+  flex-shrink:0!important;
+  margin:0!important;
+}
+#viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions .btn{
+  height:34px!important;
+  min-height:34px!important;
+  padding:0 12px!important;
+  border-radius:12px!important;
+  font-size:12px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+#viewGuidedPlan #guidedLibraryPanel > .hint{
+  display:block!important;
+  margin:8px 0 0!important;
+  padding:0!important;
+  font-size:12px!important;
+  color:#667085!important;
+  clear:both!important;
+}
+@media (max-width:760px){
+  #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
+    grid-template-columns:1fr!important;
+  }
+  #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions{
+    justify-content:flex-start!important;
+    min-width:0!important;
+    max-width:none!important;
+  }
+}
+</style>
+
+
+
+<style id="PLANNUS_VISUAL_CONTRACT_V35_RAILS_SOURCE_OF_TRUTH">
+/* V35: fonte única de verdade visual das raias.
+   Remove dependência de remendos anteriores e mantém a posição vinda do cálculo original.
+   Regra: JS calcula top/lane; CSS apenas desenha. */
+#viewGuided .guidedFlowRailWrap,
+#viewGuidedApply .guidedFlowRailWrap,
+#viewGuidedPlan .guidedFlowRailWrap,
+#planningStageFlowBoard{
+  --pln-rail-label-x:16px;
+  --pln-rail-line-x:92px;
+}
+#viewGuided .guidedFlowRailWrap,
+#viewGuidedApply .guidedFlowRailWrap,
+#viewGuidedPlan .guidedFlowRailWrap{
+  margin-top:10px !important;
+  padding:18px !important;
+  border:1px solid #dbe4f0 !important;
+  border-radius:24px !important;
+  background:#fff !important;
+  box-shadow:0 14px 30px rgba(16,24,40,.055) !important;
+}
+#viewGuided .guidedFlowSimpleBoard,
+#viewGuidedApply .guidedFlowSimpleBoard,
+#viewGuidedPlan .guidedFlowSimpleBoard,
+#planningStageFlowBoard{
+  overflow:visible !important;
+  border-radius:22px !important;
+  background:
+    linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%),
+    repeating-linear-gradient(90deg, rgba(15,23,42,.035) 0 1px, transparent 1px var(--guided-flow-grid-x,304px)) !important;
+  background-position:0 0, var(--guided-flow-grid-pad-x,112px) 0 !important;
+}
+#viewGuided .guidedFlowRailLine,
+#viewGuidedApply .guidedFlowRailLine,
+#viewGuidedPlan .guidedFlowRailLine,
+#planningStageFlowBoard .guidedFlowRailLine{
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  height:1px !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+}
+#viewGuided .guidedFlowRailLine::before,
+#viewGuidedApply .guidedFlowRailLine::before,
+#viewGuidedPlan .guidedFlowRailLine::before,
+#planningStageFlowBoard .guidedFlowRailLine::before{
+  content:"" !important;
+  position:absolute !important;
+  left:var(--pln-rail-line-x) !important;
+  right:0 !important;
+  top:0 !important;
+  border-top:1px dashed rgba(71,84,103,.22) !important;
+}
+#viewGuided .guidedFlowRailLine::after,
+#viewGuidedApply .guidedFlowRailLine::after,
+#viewGuidedPlan .guidedFlowRailLine::after,
+#planningStageFlowBoard .guidedFlowRailLine::after{
+  content:"" !important;
+  position:absolute !important;
+  left:var(--pln-rail-line-x) !important;
+  top:0 !important;
+  width:6px !important;
+  height:6px !important;
+  border-radius:999px !important;
+  background:#ef1735 !important;
+  transform:translate(-50%,-50%) !important;
+  box-shadow:0 0 0 4px rgba(239,23,53,.08) !important;
+}
+#viewGuided .guidedFlowRailLabel,
+#viewGuidedApply .guidedFlowRailLabel,
+#viewGuidedPlan .guidedFlowRailLabel,
+#planningStageFlowBoard .guidedFlowRailLabel{
+  position:absolute !important;
+  left:var(--pln-rail-label-x) !important;
+  /* não definir top aqui: o top inline gerado pelo render é a fonte de verdade */
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:96px !important;
+  height:28px !important;
+  padding:0 10px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(239,23,53,.20) !important;
+  background:linear-gradient(180deg,#fff 0%,#fff8fa 100%) !important;
+  color:#344054 !important;
+  box-shadow:0 8px 18px rgba(16,24,40,.055) !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  letter-spacing:.08em !important;
+  line-height:1 !important;
+  text-transform:uppercase !important;
+  transform:translateY(-50%) rotate(-90deg) !important;
+  transform-origin:center center !important;
+  z-index:4 !important;
+  pointer-events:none !important;
+}
+#viewGuided .guidedFlowRailLabel::before,
+#viewGuidedApply .guidedFlowRailLabel::before,
+#viewGuidedPlan .guidedFlowRailLabel::before,
+#planningStageFlowBoard .guidedFlowRailLabel::before{
+  content:"" !important;
+  display:inline-block !important;
+  width:6px !important;
+  height:6px !important;
+  border-radius:999px !important;
+  margin-right:8px !important;
+  background:#ef1735 !important;
+}
+#viewGuided .guidedFlowBlock,
+#viewGuidedApply .guidedFlowBlock,
+#viewGuidedPlan .guidedFlowBlock,
+#planningStageFlowBoard .guidedFlowBlock{
+  z-index:3 !important;
+}
+#viewGuided .guidedFlowSvg,
+#viewGuidedApply .guidedFlowSvg,
+#viewGuidedPlan .guidedFlowSvg,
+#planningStageFlowSvg{
+  z-index:2 !important;
+}
+#viewGuided .guidedFlowToolHeader,
+#viewGuidedApply .guidedFlowToolHeader,
+#viewGuidedPlan .guidedFlowToolHeader{ margin-top:10px !important; }
+#viewGuided .guidedFlowSearchBox,
+#viewGuidedApply .guidedFlowSearchBox,
+#viewGuidedPlan .guidedFlowSearchBox{
+  padding:14px 16px !important;
+  border-radius:18px !important;
+}
+</style>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
 
 
 

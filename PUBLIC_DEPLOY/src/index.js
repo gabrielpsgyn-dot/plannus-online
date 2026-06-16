@@ -218,6 +218,107 @@ export default {
         });
       }
 
+      if (path === "/api/usuarios" && method === "DELETE") {
+        const actorEmail = getUserEmail(request);
+
+        if (!(await canUserDeleteUser(env, actorEmail))) {
+          return json({
+            ok: false,
+            erro: "Usuário sem permissão para excluir usuários."
+          }, 403);
+        }
+
+        const body = await readJson(request);
+        const targetEmail = normalizeEmail(body.email || url.searchParams.get("email"));
+
+        if (!targetEmail) {
+          return json({
+            ok: false,
+            erro: "E-mail obrigatório."
+          }, 400);
+        }
+
+        if (targetEmail === actorEmail) {
+          return json({
+            ok: false,
+            erro: "Não é permitido excluir o próprio usuário."
+          }, 400);
+        }
+
+        const existing = await env.DB.prepare(`
+          SELECT email, nome, perfil_global, ativo
+          FROM usuarios
+          WHERE email = ?
+        `).bind(targetEmail).first();
+
+        if (!existing) {
+          return json({
+            ok: false,
+            erro: "Usuário não encontrado."
+          }, 404);
+        }
+
+        const now = new Date().toISOString();
+
+        await env.DB.batch([
+          env.DB.prepare(`
+            UPDATE usuarios
+            SET ativo = 0,
+                updated_at = ?
+            WHERE email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            UPDATE usuario_roles
+            SET ativo = 0,
+                updated_at = ?
+            WHERE usuario_email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            UPDATE usuario_obras
+            SET ativo = 0,
+                updated_at = ?
+            WHERE usuario_email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            INSERT INTO audit_log (
+              id,
+              usuario_email,
+              acao,
+              entidade,
+              entidade_id,
+              detalhes_json,
+              created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            crypto.randomUUID(),
+            actorEmail,
+            "DELETE_USUARIO",
+            "usuario",
+            targetEmail,
+            JSON.stringify({
+              targetEmail,
+              nome: existing.nome,
+              perfil_global: existing.perfil_global
+            }),
+            now
+          )
+        ]);
+
+        return json({
+          ok: true,
+          usuario: {
+            email: existing.email,
+            nome: existing.nome,
+            perfil_global: existing.perfil_global,
+            ativo: 0
+          }
+        });
+      }
+
       // ============================================================
       // OBRAS — LISTAR
       // ============================================================
@@ -1041,8 +1142,76 @@ function getUserEmail(request) {
   return normalizeEmail(request.headers.get("x-plannus-user-email")) || "gabrielpsgyn@gmail.com";
 }
 
+async function ensureDefaultPlannerUser(env, email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (normalizedEmail !== "gabrielpsgyn@gmail.com") {
+    return false;
+  }
+
+  const now = new Date().toISOString();
+  const roleFlags = buildRoleFlags("planejador");
+
+  await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO usuarios (
+        email,
+        nome,
+        perfil_global,
+        ativo,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET
+        nome = excluded.nome,
+        perfil_global = excluded.perfil_global,
+        ativo = excluded.ativo,
+        updated_at = excluded.updated_at
+    `).bind(
+      normalizedEmail,
+      "Gabriel",
+      "usuario",
+      1,
+      now
+    ),
+
+    env.DB.prepare(`
+      INSERT INTO usuario_roles (
+        usuario_email,
+        role,
+        can_view_all_obras,
+        can_grant_permissions,
+        can_manage_users,
+        can_create_obras,
+        ativo,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(usuario_email) DO UPDATE SET
+        role = excluded.role,
+        can_view_all_obras = excluded.can_view_all_obras,
+        can_grant_permissions = excluded.can_grant_permissions,
+        can_manage_users = excluded.can_manage_users,
+        can_create_obras = excluded.can_create_obras,
+        ativo = excluded.ativo,
+        updated_at = excluded.updated_at
+    `).bind(
+      normalizedEmail,
+      "planejador",
+      roleFlags.can_view_all_obras,
+      roleFlags.can_grant_permissions,
+      roleFlags.can_manage_users,
+      roleFlags.can_create_obras,
+      1,
+      now
+    )
+  ]);
+
+  return true;
+}
+
 async function getUserRole(env, email) {
   const normalizedEmail = normalizeEmail(email);
+  await ensureDefaultPlannerUser(env, normalizedEmail);
 
   const row = await env.DB.prepare(`
     SELECT
@@ -1146,6 +1315,11 @@ async function canUserManageUsers(env, email) {
   return toBool(role.ativo) && toBool(role.can_manage_users);
 }
 
+async function canUserDeleteUser(env, email) {
+  const role = await getUserRole(env, email);
+  return toBool(role.ativo) && (toBool(role.can_manage_users) || role.role === "planejador");
+}
+
 async function canUserDeleteObra(env, email, obraId) {
   const role = await getUserRole(env, email);
 
@@ -1193,7 +1367,149 @@ async function readJson(request) {
   }
 }
 
+function buildDefaultObraSeed(obraId) {
+  const nowIso = new Date().toISOString();
+  const serviceBaseCatalog = [
+    {
+      id: "srv_seed_escavacao",
+      obraId,
+      name: "ESCAVAÇÃO - ESCAVAÇÃO",
+      code: "ESC",
+      classification: "Terraplenagem",
+      scopeKind: "tipo",
+      teams: 1,
+      durationDefault: 5,
+      companyDefault: "",
+      templateKey: "residencial_vertical_padrao",
+      sourceKind: "builtin",
+      color: "#1f7a8c",
+      order: 1
+    },
+    {
+      id: "srv_seed_contencao_estaca_helice",
+      obraId,
+      name: "CONTENÇÃO - ESTACA HÉLICE",
+      code: "CON",
+      classification: "Fundação",
+      scopeKind: "tipo",
+      teams: 1,
+      durationDefault: 5,
+      companyDefault: "",
+      templateKey: "residencial_vertical_padrao",
+      sourceKind: "builtin",
+      color: "#0f4c5c",
+      order: 2
+    },
+    {
+      id: "srv_seed_fundacao_estaca_helice",
+      obraId,
+      name: "FUNDAÇÃO - ESTACA HÉLICE",
+      code: "FUN-EST",
+      classification: "Fundação",
+      scopeKind: "tipo",
+      teams: 1,
+      durationDefault: 5,
+      companyDefault: "",
+      templateKey: "residencial_vertical_padrao",
+      sourceKind: "builtin",
+      color: "#1d4ed8",
+      order: 3
+    },
+    {
+      id: "srv_seed_fundacao_blocos",
+      obraId,
+      name: "FUNDAÇÃO - BLOCOS",
+      code: "FUN-BLO",
+      classification: "Fundação",
+      scopeKind: "tipo",
+      teams: 1,
+      durationDefault: 5,
+      companyDefault: "",
+      templateKey: "residencial_vertical_padrao",
+      sourceKind: "builtin",
+      color: "#bfdbf7",
+      order: 4
+    }
+  ];
+  const guidedDraftServices = serviceBaseCatalog.map((svc, idx) => ({
+    ...JSON.parse(JSON.stringify(svc)),
+    predecessorServiceId: idx === 0 ? "" : serviceBaseCatalog[idx - 1].id,
+    dependencyType: "FS",
+    lagDays: 0,
+    locationOffsetAbove: 0,
+    matchMode: "same_location",
+    expansionMode: "per_location",
+    sourceKind: "builtin",
+    predecessors: idx === 0 ? [] : [{
+      fromServiceId: serviceBaseCatalog[idx - 1].id,
+      type: "FS",
+      lagDays: 0,
+      locationOffsetAbove: 0,
+      matchMode: "same_location",
+      expansionMode: "per_location",
+      sourceKind: "builtin"
+    }]
+  }));
+  const dependencies = serviceBaseCatalog.slice(1).map((svc, idx) => ({
+    id: `dep_seed_${idx + 1}`,
+    obraId,
+    predecessorServiceId: serviceBaseCatalog[idx].id,
+    successorServiceId: svc.id,
+    type: "FS",
+    lagDays: 0,
+    escopoAplicacao: "MESMO_LOCAL",
+    obrigatoria: true
+  }));
+  const cycles = serviceBaseCatalog.map((svc) => ({
+    serviceId: svc.id,
+    locationsInOrder: [],
+    durationDefault: Number(svc.durationDefault || 5) || 5,
+    teams: Number(svc.teams || 1) || 1,
+    mode: "serial",
+    lockLocations: true,
+    source: "seed",
+    importBasis: "seed",
+    importTeamBranches: [],
+    teamScopes: []
+  }));
+  const eapLibraryItem = {
+    key: "residencial_vertical_padrao",
+    label: "Residencial vertical padrão",
+    sourceKind: "builtin",
+    description: "Modelo inicial da obra com serviços comuns já cadastrados.",
+    draftDefaults: {
+      clusterName: "Torre Principal",
+      executionDirection: "baixo_alto",
+      floorStart: 800,
+      floorEnd: 3600,
+      floorStep: 100,
+      floorPrefix: "PAV",
+      commonAreas: "HALL\nLAZER",
+      specialAreas: "SS1\nÁTICO"
+    },
+    services: JSON.parse(JSON.stringify(guidedDraftServices))
+  };
+  return {
+    services: JSON.parse(JSON.stringify(serviceBaseCatalog)),
+    serviceBaseCatalog: JSON.parse(JSON.stringify(serviceBaseCatalog)),
+    eap: {
+      draft: {
+        templateKey: "residencial_vertical_padrao",
+        templateLabel: "Residencial vertical padrão",
+        services: guidedDraftServices
+      },
+      library: [eapLibraryItem],
+      activeTemplateId: "residencial_vertical_padrao",
+      lastSavedTemplate: null,
+      updatedAtISO: nowIso
+    },
+    dependencies,
+    cycles
+  };
+}
+
 function buildInitialObraState({ id, nome, codigo, descricao }) {
+  const seeded = buildDefaultObraSeed(id);
   return {
     version: "1.0",
     obra: {
@@ -1202,7 +1518,8 @@ function buildInitialObraState({ id, nome, codigo, descricao }) {
       codigo: codigo || null,
       descricao: descricao || ""
     },
-    services: [],
+    services: seeded.services,
+    serviceBaseCatalog: seeded.serviceBaseCatalog,
     locations: [],
     blocks: [],
     baseline: {
@@ -1211,8 +1528,9 @@ function buildInitialObraState({ id, nome, codigo, descricao }) {
     plan: {
       blocks: []
     },
-    deps: [],
-    cycles: [],
+    deps: seeded.dependencies,
+    cycles: seeded.cycles,
+    eap: seeded.eap,
     acompanhamento: {},
     config: {}
   };
@@ -1309,7 +1627,7 @@ function corsResponse(body, status = 200, headers = {}) {
     headers: {
       ...headers,
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, x-plannus-user-email"
     }
   });
