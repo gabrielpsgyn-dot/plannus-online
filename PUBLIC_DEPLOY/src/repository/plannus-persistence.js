@@ -7,11 +7,13 @@ import {
   createOnlineObra as createOnlineObraRequest,
   listObraPermissions,
   listOnlineObras,
+  listServices as listServicesRequest,
   listUsers,
   loadOnlineObra,
   PLANNUS_ONLINE_CONFIG,
   revokeObraPermission,
   saveOnlineObra,
+  saveServicesCatalog as saveServicesCatalogRequest,
   upsertUser,
 } from "./plannus-online-repository.js";
 
@@ -210,6 +212,16 @@ export function createPlannusPersistence() {
       const obras = extractObrasList(result.data);
       logObras("Lista recebida.", { total: obras.length });
       return { ...result, obras };
+    },
+    async listServicesCatalog() {
+      const result = await listServicesRequest();
+      if (result.ok) logSync("Catalogo de servicos carregado.");
+      return result;
+    },
+    async saveServicesCatalog(payload) {
+      const result = await saveServicesCatalogRequest(payload);
+      if (result.ok) logSync("Catalogo de servicos salvo.", { total: Array.isArray(payload) ? payload.length : 0 });
+      return result;
     },
     async createOnlineObra(payload) {
       const result = await createOnlineObraRequest(payload);

@@ -2,20 +2,25 @@ import { APP_KEY } from "../domain/contracts.js";
 import { loadState, saveState } from "./local-repository.js";
 import {
   getMe,
+  deleteOnlineObra as deleteOnlineObraRequest,
   grantObraPermission,
   createOnlineObra as createOnlineObraRequest,
   listObraPermissions,
   listOnlineObras,
+  listServices as listServicesRequest,
   listUsers,
   loadOnlineObra,
   PLANNUS_ONLINE_CONFIG,
   revokeObraPermission,
   saveOnlineObra,
+  saveServicesCatalog as saveServicesCatalogRequest,
   upsertUser,
 } from "./plannus-online-repository.js";
 
 const ONLINE_META_KEY = "plannus.online.meta";
 const ONLINE_STATUS_KEY = "plannus.online.status";
+const LOCAL_OBRAS_KEY = "plannus.local.obras";
+const LOCAL_OBRA_STATE_PREFIX = "plannus.local.obra.state.";
 
 function logRepo(message, payload) {
   if (payload === undefined) console.log(`[PLANNUS_REPOSITORY] ${message}`);
@@ -87,6 +92,41 @@ function resolveRemoteObraNome(payload) {
   return payload?.obra_nome ?? payload?.obra?.nome ?? null;
 }
 
+function stableStringifyForSave(value) {
+  const seen = new WeakSet();
+  const walk = (v) => {
+    if (v === null || typeof v !== "object") return v;
+    if (seen.has(v)) return "[Circular]";
+    seen.add(v);
+    if (Array.isArray(v)) return v.map(walk);
+    const out = {};
+    Object.keys(v).sort().forEach((k) => {
+      const child = v[k];
+      if (child === undefined) return;
+      out[k] = walk(child);
+    });
+    return out;
+  };
+  try {
+    return JSON.stringify(walk(value));
+  } catch (error) {
+    return JSON.stringify(String(error?.message || error));
+  }
+}
+
+function buildOnlineSaveFingerprint(state) {
+  if (!state || typeof state !== "object") return "";
+  const clone = structuredClone(state);
+  delete clone.ui;
+  delete clone.dashboard;
+  delete clone.__plannusAux;
+  delete clone.__plannusSaveFingerprint;
+  if (clone.planning && typeof clone.planning === "object") {
+    delete clone.planning.lastEngineResult;
+  }
+  return stableStringifyForSave(clone);
+}
+
 function backupCurrentLocalState() {
   const raw = localStorage.getItem(APP_KEY);
   if (!raw) return null;
@@ -100,6 +140,28 @@ function extractObrasList(payload) {
   if (Array.isArray(payload?.obras)) return payload.obras;
   if (Array.isArray(payload?.data)) return payload.data;
   return [];
+}
+
+function getLocalObraStateKey(obraId) {
+  const id = String(obraId || "").trim();
+  return `${LOCAL_OBRA_STATE_PREFIX}${id || "local"}`;
+}
+
+function readLocalObrasIndex() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_OBRAS_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function writeLocalObrasIndex(index) {
+  try {
+    localStorage.setItem(LOCAL_OBRAS_KEY, JSON.stringify(index || {}));
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 export function createPlannusPersistence() {
@@ -124,6 +186,11 @@ export function createPlannusPersistence() {
       if (source.planning && typeof source.planning === "object") {
         delete source.planning.lastEngineResult;
       }
+      Object.defineProperty(source, "__plannusSaveFingerprint", {
+        value: buildOnlineSaveFingerprint(source),
+        enumerable: false,
+        configurable: true,
+      });
       logSave("State consolidado capturado para persistencia online.", {
         keys: Object.keys(source),
         hasObra: Boolean(source.obra),
@@ -146,9 +213,24 @@ export function createPlannusPersistence() {
       logObras("Lista recebida.", { total: obras.length });
       return { ...result, obras };
     },
+    async listServicesCatalog() {
+      const result = await listServicesRequest();
+      if (result.ok) logSync("Catalogo de servicos carregado.");
+      return result;
+    },
+    async saveServicesCatalog(payload) {
+      const result = await saveServicesCatalogRequest(payload);
+      if (result.ok) logSync("Catalogo de servicos salvo.", { total: Array.isArray(payload) ? payload.length : 0 });
+      return result;
+    },
     async createOnlineObra(payload) {
       const result = await createOnlineObraRequest(payload);
       if (result.ok) logObras("Obra criada online.", result.data?.obra || payload);
+      return result;
+    },
+    async deleteOnlineObra(obraId) {
+      const result = await deleteOnlineObraRequest(obraId);
+      if (result.ok) logObras("Obra excluida online.", { obraId });
       return result;
     },
     async getMe() {
@@ -180,6 +262,26 @@ export function createPlannusPersistence() {
       const result = await revokeObraPermission(obraId, email);
       if (result.ok) logPermissions("Permissao revogada.", { obraId, email });
       return result;
+    },
+    removeLocalObraCache(obraId) {
+      const id = String(obraId || "").trim();
+      if (!id) return { ok: false, erro: "obraId obrigatorio." };
+      const meta = loadMeta();
+      const index = readLocalObrasIndex();
+      const existed = Boolean(index[id]);
+      delete index[id];
+      const indexOk = writeLocalObrasIndex(index);
+      try {
+        localStorage.removeItem(getLocalObraStateKey(id));
+      } catch (_) {}
+      try {
+        if (String(meta?.obraId || "") === id) {
+          localStorage.removeItem(ONLINE_META_KEY);
+          localStorage.removeItem(ONLINE_STATUS_KEY);
+          localStorage.removeItem("plannus.online.selected");
+        }
+      } catch (_) {}
+      return { ok: true, removed: existed, indexOk };
     },
     async connectOnline() {
       if (!PLANNUS_ONLINE_CONFIG.enabled) return { ok: false, erro: "Modo online desabilitado." };
@@ -214,6 +316,7 @@ export function createPlannusPersistence() {
         pendingOnlineSave: false,
         conflict: false,
         lastError: null,
+        lastSavedStateSignature: buildOnlineSaveFingerprint(remoteState),
       };
       saveMeta(meta);
       setStatus(`Obra ${obraId} carregada online com sucesso.`);
@@ -232,7 +335,25 @@ export function createPlannusPersistence() {
       saveState(state);
       const previousMeta = loadMeta();
       const revision = Number(previousMeta.revision || 0);
+      const stateFingerprint = String(state?.__plannusSaveFingerprint || buildOnlineSaveFingerprint(state)).trim();
+      const lastSavedFingerprint = String(previousMeta.lastSavedStateSignature || "").trim();
       const localSaveAt = nowIso();
+      if (stateFingerprint && lastSavedFingerprint && stateFingerprint === lastSavedFingerprint && !previousMeta.pendingOnlineSave && !previousMeta.conflict) {
+        const metaSkipped = {
+          ...previousMeta,
+          obraId: resolvedObraId,
+          lastSyncAt: nowIso(),
+          lastLocalSaveAt: localSaveAt,
+          pendingOnlineSave: false,
+          conflict: false,
+          lastError: null,
+          lastSavedStateSignature: stateFingerprint,
+        };
+        saveMeta(metaSkipped);
+        setStatus("Nada novo para salvar online.");
+        logSync("Save online ignorado porque o estado nao mudou.", { obraId: resolvedObraId, signature: stateFingerprint });
+        return { ok: true, localSaved: true, onlineSaved: false, skipped: true, meta: metaSkipped };
+      }
       if (!PLANNUS_ONLINE_CONFIG.enabled) {
         const metaDisabled = {
           ...previousMeta,
@@ -261,6 +382,7 @@ export function createPlannusPersistence() {
           pendingOnlineSave: false,
           conflict: false,
           lastError: null,
+          lastSavedStateSignature: stateFingerprint || buildOnlineSaveFingerprint(state),
         };
         saveMeta(meta);
         setStatus(`Online salvo com sucesso. Revision ${meta.revision}.`);

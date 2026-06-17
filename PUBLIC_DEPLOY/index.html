@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
@@ -9105,7 +9105,6 @@ function _setActivePlanBlocks(blocks){
 
 
 /** ===== Storage Keys (must be defined before boot) ===== */
-const SERVICES_KEY = "QP_SERVICES_V1";
 
 
 const DEPS_KEY = "QP_SERVICE_DEPS_V1";
@@ -16889,7 +16888,6 @@ function _clearGuidedOperationalPlanning(){
   state.activityGraph = { activities:[], dependencies:[] };
   state.depsOverrides = {};
   try{ _clearAllBlockEditsStorage(); }catch(_){}
-  try{ saveServicesToStorage(); }catch(_){}
   try{ saveDepsToStorage(); }catch(_){}
   try{ savePlannerPrefsToStorage(); }catch(_){}
   try{ renderGuidedApplyView(); }catch(_){}
@@ -17017,20 +17015,6 @@ function _applyGuidedPlanningModelCore(){
     modelServices:Array.isArray(model?.services) ? model.services.length : 0,
     modelLocations:Array.isArray(model?.locations) ? model.locations.length : 0
   });
-  // Não reduzir a base de serviços ao conjunto da fase/EAP ativa.
-  // Mescla serviços do modelo atual com o catálogo já existente.
-  const _baseExisting = _getServiceBaseCatalogForStorage().map(x=>Object.assign({}, x));
-  const _baseFromModel = _getServiceBaseCatalogForStorage(model.services).map(x=>Object.assign({}, x));
-  const _baseMergedMap = new Map();
-  _baseExisting.forEach(s=>{ const id = String(s?.id || "").trim(); if(id) _baseMergedMap.set(id, s); });
-  _baseFromModel.forEach(s=>{
-    const id = String(s?.id || "").trim();
-    if(!id) return;
-    if(!_baseMergedMap.has(id)) _baseMergedMap.set(id, s);
-  });
-  state.serviceBaseCatalog = Array.from(_baseMergedMap.values())
-    .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
-  try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
   const targetGroup = String(state?.ui?.guidedTargetGroup || "").trim();
   const applyMode = String(document.getElementById("guidedApplyMode")?.value || "replace").trim() === "append" ? "append" : "replace";
   const hasOperationalPlanning = Array.isArray(state.services) && state.services.some(_isOperationalPlanningServiceRecord);
@@ -17067,11 +17051,11 @@ function _applyGuidedPlanningModelCore(){
   }
   if(operational.cycleCheck && operational.cycleCheck.ok === false){
     const audit = _guidedFormatCycleAudit(operational.cycleCheck, operational.services);
-    alert(`A fase não foi aplicada porque existe ciclo nas predecessoras.\n\nNada foi alterado no planejamento.\n\n${audit || "Revise os v�nculos antes de aplicar."}`);
+    alert(`A fase não foi aplicada porque existe ciclo nas predecessoras.\n\nNada foi alterado no planejamento.\n\n${audit || "Revise os vínculos antes de aplicar."}`);
     return false;
   }
   const stageCount = operational.services.filter(s=>s && s.isPlanningStage).length;
-  if(!confirm(`Vai aplicar a fase ativa ao planejamento.\n\nModo: ${isReplaceMode ? "substituir planejamento atual" : "adicionar � montagem atual"}\nGrupo de pavimentos de destino: ${targetLabel || "Base inteira"}\nServi�os da fase: ${model.services.length}\nAtividades operacionais geradas: ${operational.services.length}${stageCount ? `\nEtapas detalhadas: ${stageCount}` : ""}\nPavimentos/locais no grupo: ${isFilteredApply ? filteredLocations.length : model.locations.length}\nDepend�ncias geradas: ${operational.dependencies.length}\n\nConfirmar?`)) return false;
+  if(!confirm(`Vai aplicar a fase ativa ao planejamento.\n\nModo: ${isReplaceMode ? "substituir planejamento atual" : "adicionar à montagem atual"}\nGrupo de pavimentos de destino: ${targetLabel || "Base inteira"}\nServiços da fase: ${model.services.length}\nAtividades operacionais geradas: ${operational.services.length}${stageCount ? `\nEtapas detalhadas: ${stageCount}` : ""}\nPavimentos/locais no grupo: ${isFilteredApply ? filteredLocations.length : model.locations.length}\nDependências geradas: ${operational.dependencies.length}\n\nConfirmar?`)) return false;
   const previousPlanningState = {
     services: JSON.parse(JSON.stringify(Array.isArray(state.services) ? state.services : [])),
     cycles: JSON.parse(JSON.stringify(Array.isArray(state.cycles) ? state.cycles : [])),
@@ -17097,7 +17081,6 @@ function _applyGuidedPlanningModelCore(){
     state.depsOverrides = previousPlanningState.depsOverrides;
     state.importPathStore = previousPlanningState.importPathStore;
     state.importMeta = previousPlanningState.importMeta;
-    try{ saveServicesToStorage(); }catch(_){}
     try{ saveDepsToStorage(); }catch(_){}
     try{ savePlannerPrefsToStorage(); }catch(_){}
     try{ saveLocs(); }catch(_){}
@@ -17146,7 +17129,6 @@ function _applyGuidedPlanningModelCore(){
   state.ui.plannerServiceQueries = [];
   state.ui.plannerLocationQuery = "";
   try{ savePlannerPrefsToStorage(); }catch(_){}
-  try{ saveServicesToStorage(); }catch(_){}
   try{ saveLocs(); }catch(_){}
   try{ saveDepsToStorage(); }catch(_){}
   try{ ensureCyclesForServices(); }catch(_){}
@@ -23680,7 +23662,6 @@ function __collectLSForSnapshot(){
   // whitelist the keys this app uses (plus any compat keys already present)
   const known = [
     "PLANNUS_PROJECT_META_V1",
-    "QP_SERVICES_V1",
     "QP_COMPANIES_V1",
     "QP_SERVICE_COMPANIES_V1",
     "QP_PAV_COMPANIES_V1",
@@ -24277,64 +24258,88 @@ function saveProjectDatesToStorage(){
 }
 
 /** ===== EAP (Serviços) – Storage ===== */
-// SERVICES_KEY defined above (boot requirement)
-function loadServicesFromStorage(){
+let __serviceCatalogLoadPromise = null;
+let __serviceCatalogSaveTimer = null;
+function _normalizeServiceCatalogItem(svc, idx){
+  return _ensureServiceColorRecord({
+    id: String(svc?.id || svc?.key || "").trim(),
+    name: String(svc?.name || "").trim(),
+    order: Number(svc?.order || idx + 1) || idx + 1,
+    code: String(svc?.code || "").trim(),
+    classification: String(svc?.classification || "").trim(),
+    scopeKind: _guidedScopeKey(String(svc?.scopeKind || "todos")),
+    teams: Math.max(1, Number(svc?.teams || 1) || 1),
+    durationDefault: Math.max(1, Number(svc?.durationDefault || 5) || 5),
+    companyDefault: String(svc?.companyDefault || "").trim(),
+    templateKey: String(svc?.templateKey || "").trim(),
+    sourceKind: String(svc?.sourceKind || "").trim(),
+    color: String(svc?.color || svc?.serviceColor || "").trim()
+  }, idx + 1);
+}
+function _serviceRepoApi(){
+  return (typeof window !== "undefined" && window.PlannusOnlineRepository) ? window.PlannusOnlineRepository : null;
+}
+// Catálogo oficial mantido em estado; a persistência real acontece via API.
+async function loadServicesFromStorage(){
   try{
-    const raw = localStorage.getItem(SERVICES_KEY);
-    if(!raw) return;
-    const arr = JSON.parse(raw);
-    if(!Array.isArray(arr)) return;
-    // valida mínimo
-    const catalogSource = arr.filter(x=>!_isOperationalPlanningServiceRecord(x));
-    const recoveredParents = catalogSource.length ? [] : Array.from(new Map(arr
-      .filter(_isOperationalPlanningServiceRecord)
-      .map((x, idx)=>{
-        const id = String(x?.parentServiceId || "").trim();
-        if(!id) return null;
-        return [id, {
-          id,
-          name: String(x?.parentServiceName || x?.name || id).replace(/\s+-\s+.+$/, "").trim(),
-          order: Number(x?.order || idx + 1) || idx + 1,
-          code: String(x?.code || "").replace(/\.\d+$/, "").trim(),
-          classification: String(x?.classification || "").trim(),
-          scopeKind: _guidedScopeKey(String(x?.scopeKind || "todos")),
-          teams: Math.max(1, Number(x?.teams || 1) || 1),
-          durationDefault: Math.max(1, Number(x?.durationDefault || 5) || 5),
-          companyDefault: String(x?.companyDefault || "").trim(),
-          templateKey: String(x?.templateKey || "").trim(),
-          sourceKind: "custom",
-          color: String(x?.color || x?.serviceColor || "").trim()
-        }];
-      })
-      .filter(Boolean)).values());
-    const cleaned = (catalogSource.length ? catalogSource : recoveredParents)
-      .map(x=>({
-        id: String(x?.id||"").trim(),
-        name: String(x?.name||"").trim(),
-        order: Number(x?.order||0)||0,
-        code: String(x?.code||"").trim(),
-        classification: String(x?.classification||"").trim(),
-        scopeKind: _guidedScopeKey(String(x?.scopeKind||"todos")),
-        teams: Math.max(1, Number(x?.teams||1) || 1),
-        durationDefault: Math.max(1, Number(x?.durationDefault||5) || 5),
-        companyDefault: String(x?.companyDefault||"").trim(),
-        templateKey: String(x?.templateKey||"").trim(),
-        sourceKind: String(x?.sourceKind||"").trim(),
-        color: String(x?.color||x?.serviceColor||"").trim()
-      }))
-      .map((svc, idx)=>_ensureServiceColorRecord(svc, idx + 1))
-      .filter(x=>x.id && x.name);
-    if(cleaned.length){
-      const sorted = cleaned.slice().sort((a,b)=>(a.order||0)-(b.order||0) || a.name.localeCompare(b.name));
-      state.services = sorted.slice();
-      state.serviceBaseCatalog = sorted.slice();
-      log(`[EAP] serviços carregados do storage: ${state.services.length}`);
-    }
+    if(__serviceCatalogLoadPromise) return __serviceCatalogLoadPromise;
+    __serviceCatalogLoadPromise = (async ()=>{
+      try{
+        const repo = _serviceRepoApi();
+        if(!repo || typeof repo.listServices !== "function"){
+          const fallbackCatalog = _dedupeServiceBaseCatalog((Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
+            .map((svc, idx)=>_normalizeServiceCatalogItem(svc, idx))
+            .filter(x=>x.id && x.name));
+          if(fallbackCatalog.length){
+            const sorted = fallbackCatalog.slice().sort((a,b)=>(a.order||0)-(b.order||0) || String(a.name||"").localeCompare(String(b.name||"")));
+            state.services = sorted.slice();
+            state.serviceBaseCatalog = sorted.slice();
+            _syncServiceBaseCatalogToStateServicesWhenSafe();
+            try{ ensureCyclesForServices(); }catch(_){}
+            return sorted.slice();
+          }
+          return [];
+        }
+        const { res, data } = await repo.listServices();
+        if(res.ok && data?.ok !== false && Array.isArray(data?.services)){
+          const currentCatalog = _dedupeServiceBaseCatalog(data.services.map((svc, idx)=>_normalizeServiceCatalogItem(svc, idx)).filter(x=>x.id && x.name));
+          if(currentCatalog.length){
+            const sorted = currentCatalog.slice().sort((a,b)=>(a.order||0)-(b.order||0) || String(a.name||"").localeCompare(String(b.name||"")));
+            state.services = sorted.slice();
+            state.serviceBaseCatalog = sorted.slice();
+            _syncServiceBaseCatalogToStateServicesWhenSafe();
+            try{ ensureCyclesForServices(); }catch(_){}
+            log(`[EAP] serviços carregados da API: ${state.services.length}`);
+            if(document.getElementById("serviceCatalogEditor")){
+              try{ renderServiceCatalogView(); }catch(_){}
+            }
+            return sorted.slice();
+          }
+        }
+        const fallbackCatalog = _dedupeServiceBaseCatalog((Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
+          .map((svc, idx)=>_normalizeServiceCatalogItem(svc, idx))
+          .filter(x=>x.id && x.name));
+        if(fallbackCatalog.length){
+          const sorted = fallbackCatalog.slice().sort((a,b)=>(a.order||0)-(b.order||0) || String(a.name||"").localeCompare(String(b.name||"")));
+          state.services = sorted.slice();
+          state.serviceBaseCatalog = sorted.slice();
+          _syncServiceBaseCatalogToStateServicesWhenSafe();
+          try{ ensureCyclesForServices(); }catch(_){}
+          log(`[EAP] serviços mantidos do estado: ${state.services.length}`);
+          return sorted.slice();
+        }
+        return [];
+      }catch(e){
+        console.warn("[EAP] loadServicesFromStorage error", e);
+        return [];
+      }
+    })().finally(()=>{ __serviceCatalogLoadPromise = null; });
+    return __serviceCatalogLoadPromise;
   }catch(e){
     console.warn("[EAP] loadServicesFromStorage error", e);
+    return [];
   }
 }
-
 function _isOperationalPlanningServiceRecord(svc){
   return !!(svc && (
     svc.isPlanningStage ||
@@ -24359,21 +24364,40 @@ function _stripServiceBaseRecord(svc, idx){
   };
   return _ensureServiceColorRecord(clean, idx + 1);
 }
+function _serviceBaseCatalogFingerprint(svc){
+  const norm = (v)=>String(v ?? "").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ");
+  const code = norm(svc?.code || "");
+  const name = norm(svc?.name || "");
+  return code || name || "";
+}
+function _dedupeServiceBaseCatalog(list){
+  const out = [];
+  const seen = new Map();
+  (Array.isArray(list) ? list : []).forEach((svc, idx)=>{
+    const clean = _stripServiceBaseRecord(svc, idx);
+    if(!clean?.id || !clean?.name) return;
+    const key = _serviceBaseCatalogFingerprint(clean) || clean.id;
+    if(!seen.has(key)){
+      seen.set(key, out.length);
+      out.push(clean);
+      return;
+    }
+    const prevIdx = seen.get(key);
+    const prev = out[prevIdx] || {};
+    out[prevIdx] = Object.assign({}, prev, clean);
+  });
+  return out;
+}
 function _getServiceBaseCatalogForStorage(sourceList){
   const explicit = Array.isArray(sourceList) ? sourceList : null;
   const baseFromExplicit = explicit
-    ? explicit.filter(s=>!_isOperationalPlanningServiceRecord(s)).map(_stripServiceBaseRecord).filter(s=>s.id && s.name)
+    ? _dedupeServiceBaseCatalog(explicit.filter(s=>!_isOperationalPlanningServiceRecord(s)).map(_stripServiceBaseRecord).filter(s=>s.id && s.name))
     : [];
   if(baseFromExplicit.length) return baseFromExplicit;
-  const baseFromCatalog = (Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
+  const baseFromCatalog = _dedupeServiceBaseCatalog((Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
     .map(_stripServiceBaseRecord)
-    .filter(s=>s.id && s.name);
+    .filter(s=>s.id && s.name));
   if(baseFromCatalog.length) return baseFromCatalog;
-  const baseFromState = (Array.isArray(state?.services) ? state.services : [])
-    .filter(s=>!_isOperationalPlanningServiceRecord(s))
-    .map(_stripServiceBaseRecord)
-    .filter(s=>s.id && s.name);
-  if(baseFromState.length) return baseFromState;
   return [];
 }
 function _buildServiceBaseFromGuidedDraftForUi(draftObj){
@@ -24398,59 +24422,6 @@ function _ensureServiceBaseCatalogVisible(){
   try{
     const current = Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [];
     if(current.length) return current.length;
-    const fromStorage = _readServiceBaseCatalogFromStorageRaw();
-    if(fromStorage.length){
-      state.serviceBaseCatalog = fromStorage.map(x=>Object.assign({}, x));
-      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
-      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_storage", count:state.serviceBaseCatalog.length });
-      return state.serviceBaseCatalog.length;
-    }
-    let fromDraft = [];
-    try{
-      const raw = localStorage.getItem("PLANNUS_GUIDED_EAP_DRAFT_V1");
-      if(raw) fromDraft = _buildServiceBaseFromGuidedDraftForUi(JSON.parse(raw));
-    }catch(_){}
-    if(!fromDraft.length){
-      try{
-        fromDraft = _buildServiceBaseFromGuidedDraftForUi(state?.__plannusAux?.guidedEap?.draft || null);
-      }catch(_){}
-    }
-    if(fromDraft.length){
-      state.serviceBaseCatalog = fromDraft
-        .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
-      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
-      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_guided_draft", count:state.serviceBaseCatalog.length });
-      return state.serviceBaseCatalog.length;
-    }
-    const operational = Array.isArray(state?.services) ? state.services : [];
-    const recovered = Array.from(new Map(operational
-      .map((x, idx)=>{
-        const id = String(x?.parentServiceId || "").trim();
-        if(!id) return null;
-        return [id, _stripServiceBaseRecord({
-          id,
-          name: String(x?.parentServiceName || x?.name || id).replace(/\s+-\s+.+$/, "").trim(),
-          order: Number(x?.order || idx + 1) || idx + 1,
-          code: String(x?.code || "").replace(/\.\d+$/, "").trim(),
-          classification: String(x?.classification || "").trim(),
-          scopeKind: _guidedScopeKey(String(x?.scopeKind || "todos")),
-          teams: Math.max(1, Number(x?.teams || 1) || 1),
-          durationDefault: Math.max(1, Number(x?.durationDefault || 5) || 5),
-          companyDefault: String(x?.companyDefault || "").trim(),
-          templateKey: String(x?.templateKey || "").trim(),
-          sourceKind: "custom",
-          color: String(x?.color || x?.serviceColor || "").trim()
-        })];
-      })
-      .filter(Boolean)).values())
-      .filter(s=>s.id && s.name);
-    if(recovered.length){
-      state.serviceBaseCatalog = recovered
-        .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
-      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
-      console.log("[PLANNUS_EAP]", { event:"service_base_visible_from_operational", count:state.serviceBaseCatalog.length });
-      return state.serviceBaseCatalog.length;
-    }
     return 0;
   }catch(e){
     console.warn("[PLANNUS_EAP]", { event:"service_base_visible_failed", error:String(e && e.message || e) });
@@ -24458,36 +24429,11 @@ function _ensureServiceBaseCatalogVisible(){
   }
 }
 function _readServiceBaseCatalogFromStorageRaw(){
-  try{
-    const raw = localStorage.getItem(SERVICES_KEY);
-    if(!raw) return [];
-    const arr = JSON.parse(raw);
-    if(!Array.isArray(arr)) return [];
-    return arr
-      .filter(s=>!_isOperationalPlanningServiceRecord(s))
-      .map(_stripServiceBaseRecord)
-      .filter(s=>s.id && s.name);
-  }catch(_){
-    return [];
-  }
+  return [];
 }
 function _getMergedServiceBaseCatalogSnapshot(){
-  const map = new Map();
-  const addAll = (list)=>{
-    (Array.isArray(list) ? list : []).forEach((svc, idx)=>{
-      const clean = _stripServiceBaseRecord(svc, idx);
-      const id = String(clean?.id || "").trim();
-      if(!id || !clean?.name) return;
-      if(!map.has(id)) map.set(id, clean);
-      else{
-        const prev = map.get(id) || {};
-        map.set(id, Object.assign({}, prev, clean));
-      }
-    });
-  };
-  addAll(_readServiceBaseCatalogFromStorageRaw());
-  addAll(Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : []);
-  return Array.from(map.values())
+  return _getServiceBaseCatalogForStorage()
+    .slice()
     .sort((a,b)=>(Number(a?.order||0)-Number(b?.order||0)) || String(a?.name||"").localeCompare(String(b?.name||"")));
 }
 function _syncServiceBaseCatalogToStateServicesWhenSafe(){
@@ -24498,26 +24444,45 @@ function _syncServiceBaseCatalogToStateServicesWhenSafe(){
       .map(x=>Object.assign({}, x));
   }
 }
-function saveServicesToStorage(sourceList){
+async function saveServicesToStorage(sourceList, forceImmediate = false){
   try{
-    const arr = _getServiceBaseCatalogForStorage(sourceList).map(s=>({
-      id:s.id,
-      name:s.name,
-      order:Number(s.order||0)||0,
-      code:String(s.code||""),
-      classification:String(s.classification||"").trim(),
-      scopeKind:_guidedScopeKey(String(s.scopeKind||"todos")),
-      teams: Math.max(1, Number(s.teams||1) || 1),
-      durationDefault: Math.max(1, Number(s.durationDefault||5) || 5),
-      companyDefault:String(s.companyDefault||""),
-      templateKey:String(s.templateKey||""),
-      sourceKind:String(s.sourceKind||""),
-      color:String(s.color||s.serviceColor||"").trim()
-    }));
-    localStorage.setItem(SERVICES_KEY, JSON.stringify(arr));
+    const arr = _getServiceBaseCatalogForStorage(sourceList).map((s, idx)=>_normalizeServiceCatalogItem(s, idx));
     state.serviceBaseCatalog = arr.map(x=>Object.assign({}, x));
-    log(`[EAP] serviços salvos: ${arr.length}`);
+    _syncServiceBaseCatalogToStateServicesWhenSafe();
     try{ ensureCyclesForServices(); }catch(e){}
+    log(`[EAP] serviços atualizados em memória: ${arr.length}`);
+    if(__serviceCatalogSaveTimer){
+      clearTimeout(__serviceCatalogSaveTimer);
+      __serviceCatalogSaveTimer = null;
+    }
+    const persist = async ()=>{
+      try{
+        const repo = _serviceRepoApi();
+        if(!repo || typeof repo.saveServicesCatalog !== "function"){
+          console.warn("[EAP] saveServicesToStorage skipped; API repo unavailable");
+          return { ok:false, skipped:true };
+        }
+        const { res, data } = await repo.saveServicesCatalog(arr);
+        if(res.ok && data?.ok !== false){
+          log(`[EAP] serviços salvos na API: ${arr.length}`);
+          if(document.getElementById("serviceCatalogEditor")){
+            try{ renderServiceCatalogView(); }catch(_){}
+          }
+          return { ok:true, data };
+        }
+        console.warn("[EAP] saveServicesToStorage api error", { status: res.status, erro: data?.erro || null });
+        return { ok:false, status:res.status, data };
+      }catch(e){
+        console.warn("[EAP] saveServicesToStorage error", e);
+        return { ok:false, error:e };
+      }
+    };
+    if(forceImmediate){
+      return await persist();
+    }
+    __serviceCatalogSaveTimer = setTimeout(async ()=>{
+      await persist();
+    }, 350);
   }catch(e){
     console.warn("[EAP] saveServicesToStorage error", e);
   }
@@ -25926,7 +25891,7 @@ function renderServiceCatalogView(){
       items[idx] = next;
       state.serviceBaseCatalog = items.sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
       _syncServiceBaseCatalogToStateServicesWhenSafe();
-      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+      try{ saveServicesToStorage(state.serviceBaseCatalog, false); }catch(_){}
       state.ui.selectedServiceId = key;
     });
     root.addEventListener("click", ev=>{
@@ -25967,7 +25932,7 @@ function renderServiceCatalogView(){
       items.forEach((svc, i)=>{ svc.order = i + 1; });
       state.serviceBaseCatalog = items;
       _syncServiceBaseCatalogToStateServicesWhenSafe();
-      try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+      try{ saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
       renderServiceCatalogView();
     });
   }
@@ -26003,7 +25968,7 @@ function renderServiceCatalogView(){
     state.serviceBaseCatalog = items;
     _syncServiceBaseCatalogToStateServicesWhenSafe();
     state.ui.selectedServiceId = id;
-    try{ saveServicesToStorage(state.serviceBaseCatalog); }catch(_){}
+    try{ saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
     nameEl.value = "";
     codeEl.value = "";
     renderServiceCatalogView();
@@ -29051,20 +29016,15 @@ try{
   if(durVal!=="" && svcIdN && locIdN){
     const svcArr = (state && state.services) ? state.services : [];
     const svc = svcArr.find(s=>String(s.id)===String(svcIdN));
-    if(svc){
-      if(!svc.cycle || typeof svc.cycle!=="object") svc.cycle = {};
-      if(!svc.cycle.durationByLocation || typeof svc.cycle.durationByLocation!=="object") svc.cycle.durationByLocation = {};
-      svc.cycle.durationByLocation[String(locIdN)] = Number(durVal);
-      if(svc.cycle.durationDefault==null) svc.cycle.durationDefault = 5;
-      if(typeof saveServicesToStorage==="function") saveServicesToStorage();
-      else{
-        try{
-          if(typeof SERVICES_KEY!=="undefined") localStorage.setItem(SERVICES_KEY, JSON.stringify(state.services||[]));
-        }catch(e){}
+      if(svc){
+        if(!svc.cycle || typeof svc.cycle!=="object") svc.cycle = {};
+        if(!svc.cycle.durationByLocation || typeof svc.cycle.durationByLocation!=="object") svc.cycle.durationByLocation = {};
+        svc.cycle.durationByLocation[String(locIdN)] = Number(durVal);
+        if(svc.cycle.durationDefault==null) svc.cycle.durationDefault = 5;
+        if(typeof saveServicesToStorage==="function") saveServicesToStorage();
       }
     }
-  }
-}catch(e){ console.warn(e); }
+  }catch(e){ console.warn(e); }
       saveEdits(edits);
       // Replanejar: empurra todo o planejamento para frente conforme deps/equipes, usando RI/RF como ancora
       try{
@@ -38677,6 +38637,16 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
     async request(url, opts){
       return j(url, opts);
     },
+    async listServices(){
+      return this.request(`${API_BASE}/api/servicos`);
+    },
+    async saveServicesCatalog(payload){
+      return this.request(`${API_BASE}/api/servicos`, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ services: Array.isArray(payload) ? payload : [] })
+      });
+    },
     async ping(){
       return this.request(`${API_BASE}/api/ping`);
     },
@@ -38887,6 +38857,16 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
       }catch(_){}
     }
     if(!localState) return false;
+    const previousRuntimeCommon = {
+      locations: Array.isArray(window.state?.locations) ? deepClone(window.state.locations) : [],
+      cycles: Array.isArray(window.state?.cycles) ? deepClone(window.state.cycles) : [],
+      importPathStore: (window.state?.importPathStore && typeof window.state.importPathStore === "object") ? deepClone(window.state.importPathStore) : { byService:{} },
+      serviceBaseCatalog: Array.isArray(window.state?.serviceBaseCatalog) ? deepClone(window.state.serviceBaseCatalog) : []
+    };
+    const localCommonRestore = _restoreCommonPlanningCollectionsAfterOpen(localState, previousRuntimeCommon);
+    if(localCommonRestore.restored){
+      console.log("[ONLINE_STATE_HYDRATION]", { event:"common_collections_restored_from_cached_state", obraId:id, ...localCommonRestore });
+    }
     const current = readJsonLocalStorage(APP_KEY);
     const backup = safeCreatePreOnlineLoadBackup(current, { maxCount:3 });
     if(backup.quotaExceeded){
@@ -38931,12 +38911,67 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
   function obraCodigo(o){ return o?.codigo || o?.obra_codigo || "-"; }
   function obraPerm(o){ return o?.permissao || o?.permission || o?.role || "-"; }
   function fmt(v){ if(!v) return "-"; const d=new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString("pt-BR"); }
-  function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
-  function readJsonLocalStorage(key){
-    try{
-      const raw = localStorage.getItem(key);
-      if(!raw) return null;
-      return JSON.parse(raw);
+function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+function _restoreCommonPlanningCollectionsAfterOpen(targetState, fallbackState){
+  try{
+    const tgt = (targetState && typeof targetState === "object") ? targetState : null;
+    if(!tgt) return { restored:false, locations:false, cycles:false, importPathStore:false, serviceBaseCatalog:false, source:"none" };
+    const fb = (fallbackState && typeof fallbackState === "object") ? fallbackState : {};
+    const hasItems = (arr)=>Array.isArray(arr) && arr.length > 0;
+    const clone = (v)=>deepClone(v);
+    const out = { restored:false, locations:false, cycles:false, importPathStore:false, serviceBaseCatalog:false, source:"none" };
+
+    if(!hasItems(tgt.locations)){
+      if(hasItems(fb.locations)){
+        tgt.locations = clone(fb.locations);
+        out.restored = true;
+        out.locations = true;
+        out.source = "runtime";
+      }else{
+        try{
+          const raw = localStorage.getItem("PCP_MVP_LOCATIONS_V1");
+          if(raw){
+            const parsed = JSON.parse(raw);
+            if(parsed && Array.isArray(parsed.locations) && parsed.locations.length){
+              tgt.locations = clone(parsed.locations);
+              if(!hasItems(tgt.cycles) && Array.isArray(parsed.cycles) && parsed.cycles.length){
+                tgt.cycles = clone(parsed.cycles);
+                out.cycles = true;
+              }
+              if((!tgt.importPathStore || typeof tgt.importPathStore !== "object") && parsed.importPathStore && typeof parsed.importPathStore === "object"){
+                tgt.importPathStore = clone(parsed.importPathStore);
+                out.importPathStore = true;
+              }
+              out.restored = true;
+              out.locations = true;
+              out.source = "localStorage";
+            }
+          }
+        }catch(_){}
+      }
+    }
+    if(!hasItems(tgt.cycles) && hasItems(fb.cycles)){
+      tgt.cycles = clone(fb.cycles);
+      out.restored = true;
+      out.cycles = true;
+      if(out.source === "none") out.source = "runtime";
+    }
+    if((!tgt.importPathStore || typeof tgt.importPathStore !== "object") && fb.importPathStore && typeof fb.importPathStore === "object"){
+      tgt.importPathStore = clone(fb.importPathStore);
+      out.restored = true;
+      out.importPathStore = true;
+      if(out.source === "none") out.source = "runtime";
+    }
+    return out;
+  }catch(e){
+    return { restored:false, locations:false, cycles:false, importPathStore:false, serviceBaseCatalog:false, source:"error", error:String(e && e.message || e) };
+  }
+}
+function readJsonLocalStorage(key){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    return JSON.parse(raw);
     }catch(e){
       console.warn("[ONLINE_STATE_CONSOLIDATION]", { event:"invalid_local_storage_json", key, error:String(e && e.message || e) });
       return null;
@@ -39944,21 +39979,31 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
       if(!appWrite.ok){
         console.warn("[LOCAL_STORAGE_QUOTA]", { event:"open_online_app_state_write_failed", obraId:id, quotaExceeded:appWrite.quotaExceeded });
       }
-      try{
-        if(window.state && typeof window.state === "object"){
-          const runtimeState = window.state;
-          Object.keys(runtimeState).forEach((k)=>{ delete runtimeState[k]; });
-          Object.assign(runtimeState, deepClone(state));
-          if(typeof _ensureStateContracts === "function") _ensureStateContracts();
-          try{
-            if(typeof syncCalendarRangeToBlocks === "function"){
-              syncCalendarRangeToBlocks(
+    try{
+      if(window.state && typeof window.state === "object"){
+        const runtimeState = window.state;
+        const previousRuntimeCommon = {
+          locations: Array.isArray(runtimeState.locations) ? deepClone(runtimeState.locations) : [],
+          cycles: Array.isArray(runtimeState.cycles) ? deepClone(runtimeState.cycles) : [],
+          importPathStore: (runtimeState.importPathStore && typeof runtimeState.importPathStore === "object") ? deepClone(runtimeState.importPathStore) : { byService:{} }
+        };
+        Object.keys(runtimeState).forEach((k)=>{ delete runtimeState[k]; });
+        Object.assign(runtimeState, deepClone(state));
+        const commonRestore = _restoreCommonPlanningCollectionsAfterOpen(runtimeState, previousRuntimeCommon);
+        if(commonRestore.restored){
+          console.log("[ONLINE_STATE_HYDRATION]", { event:"common_collections_restored_after_open", obraId:id, ...commonRestore });
+        }
+        if(typeof _ensureStateContracts === "function") _ensureStateContracts();
+        try{
+          if(typeof syncCalendarRangeToBlocks === "function"){
+            syncCalendarRangeToBlocks(
                 (typeof _getActivePlanBlocks === "function") ? _getActivePlanBlocks() : [],
                 { applyToVisible:true }
               );
             }
           }catch(_){}
           if(typeof buildCalendarDays === "function") buildCalendarDays();
+          await loadServicesFromStorage();
           try{ ensureServiceBaseCatalogAfterOpen(state); }catch(_){}
           if(typeof loadOperational === "function") loadOperational({ obraId:id, strictObraId:true });
           if(typeof renderAll === "function") renderAll();
@@ -40912,6 +40957,8 @@ Calendário: ${s.calendarStart} até ${s.calendarEnd}`;
     q("#plnContinueLast")?.addEventListener("click", async ()=>{ await window.PlannusOnlineActions?.openObra?.({ id: meta.obraId, nome: meta.obraNome || meta.obraId }); });
     window.PlannusOnlineActions = window.PlannusOnlineActions || {};
     window.PlannusOnlineActions.listObras = ()=>refreshList();
+    window.PlannusOnlineRepository = PlannusOnlineRepository;
+    try{ loadServicesFromStorage(); }catch(_){}
     window.PlannusOnlineActions.openObra = (obra)=>openObra(obra);
     window.PlannusOnlineActions.createObra = (nome, codigo)=>createOnlineObra(nome, codigo);
     window.PlannusOnlineActions.deleteObra = (obraId)=>PlannusOnlineRepository.deleteObra(obraId);
@@ -42229,7 +42276,8 @@ main:has(#viewEAP[style*="block"]){
 #viewGuidedPlan,
 #viewGuidedApply,
 #viewEAP{
-  max-width:1220px !important;
+  width:100% !important;
+  max-width:none !important;
   margin:0 auto !important;
   padding:18px 18px 42px !important;
   color:var(--pln-v23-text) !important;
@@ -42481,7 +42529,7 @@ main:has(#viewEAP[style*="block"]){
 /* EAP: layout mais claro */
 #viewGuidedPlan .guidedSplit{
   display:grid !important;
-  grid-template-columns:minmax(330px, .85fr) minmax(520px, 1.35fr) !important;
+  grid-template-columns:minmax(0,1fr) !important;
   gap:16px !important;
   align-items:start !important;
   padding:0 !important;
@@ -43020,11 +43068,4 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
 
 </body>
 </html>
-
-
-
-
-
-
-
 

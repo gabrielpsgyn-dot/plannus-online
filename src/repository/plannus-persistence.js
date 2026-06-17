@@ -7,11 +7,13 @@ import {
   createOnlineObra as createOnlineObraRequest,
   listObraPermissions,
   listOnlineObras,
+  listServices as listServicesRequest,
   listUsers,
   loadOnlineObra,
   PLANNUS_ONLINE_CONFIG,
   revokeObraPermission,
   saveOnlineObra,
+  saveServicesCatalog as saveServicesCatalogRequest,
   upsertUser,
 } from "./plannus-online-repository.js";
 
@@ -90,6 +92,41 @@ function resolveRemoteObraNome(payload) {
   return payload?.obra_nome ?? payload?.obra?.nome ?? null;
 }
 
+function stableStringifyForSave(value) {
+  const seen = new WeakSet();
+  const walk = (v) => {
+    if (v === null || typeof v !== "object") return v;
+    if (seen.has(v)) return "[Circular]";
+    seen.add(v);
+    if (Array.isArray(v)) return v.map(walk);
+    const out = {};
+    Object.keys(v).sort().forEach((k) => {
+      const child = v[k];
+      if (child === undefined) return;
+      out[k] = walk(child);
+    });
+    return out;
+  };
+  try {
+    return JSON.stringify(walk(value));
+  } catch (error) {
+    return JSON.stringify(String(error?.message || error));
+  }
+}
+
+function buildOnlineSaveFingerprint(state) {
+  if (!state || typeof state !== "object") return "";
+  const clone = structuredClone(state);
+  delete clone.ui;
+  delete clone.dashboard;
+  delete clone.__plannusAux;
+  delete clone.__plannusSaveFingerprint;
+  if (clone.planning && typeof clone.planning === "object") {
+    delete clone.planning.lastEngineResult;
+  }
+  return stableStringifyForSave(clone);
+}
+
 function backupCurrentLocalState() {
   const raw = localStorage.getItem(APP_KEY);
   if (!raw) return null;
@@ -149,6 +186,11 @@ export function createPlannusPersistence() {
       if (source.planning && typeof source.planning === "object") {
         delete source.planning.lastEngineResult;
       }
+      Object.defineProperty(source, "__plannusSaveFingerprint", {
+        value: buildOnlineSaveFingerprint(source),
+        enumerable: false,
+        configurable: true,
+      });
       logSave("State consolidado capturado para persistencia online.", {
         keys: Object.keys(source),
         hasObra: Boolean(source.obra),
@@ -170,6 +212,16 @@ export function createPlannusPersistence() {
       const obras = extractObrasList(result.data);
       logObras("Lista recebida.", { total: obras.length });
       return { ...result, obras };
+    },
+    async listServicesCatalog() {
+      const result = await listServicesRequest();
+      if (result.ok) logSync("Catalogo de servicos carregado.");
+      return result;
+    },
+    async saveServicesCatalog(payload) {
+      const result = await saveServicesCatalogRequest(payload);
+      if (result.ok) logSync("Catalogo de servicos salvo.", { total: Array.isArray(payload) ? payload.length : 0 });
+      return result;
     },
     async createOnlineObra(payload) {
       const result = await createOnlineObraRequest(payload);
@@ -264,6 +316,7 @@ export function createPlannusPersistence() {
         pendingOnlineSave: false,
         conflict: false,
         lastError: null,
+        lastSavedStateSignature: buildOnlineSaveFingerprint(remoteState),
       };
       saveMeta(meta);
       setStatus(`Obra ${obraId} carregada online com sucesso.`);
@@ -282,7 +335,25 @@ export function createPlannusPersistence() {
       saveState(state);
       const previousMeta = loadMeta();
       const revision = Number(previousMeta.revision || 0);
+      const stateFingerprint = String(state?.__plannusSaveFingerprint || buildOnlineSaveFingerprint(state)).trim();
+      const lastSavedFingerprint = String(previousMeta.lastSavedStateSignature || "").trim();
       const localSaveAt = nowIso();
+      if (stateFingerprint && lastSavedFingerprint && stateFingerprint === lastSavedFingerprint && !previousMeta.pendingOnlineSave && !previousMeta.conflict) {
+        const metaSkipped = {
+          ...previousMeta,
+          obraId: resolvedObraId,
+          lastSyncAt: nowIso(),
+          lastLocalSaveAt: localSaveAt,
+          pendingOnlineSave: false,
+          conflict: false,
+          lastError: null,
+          lastSavedStateSignature: stateFingerprint,
+        };
+        saveMeta(metaSkipped);
+        setStatus("Nada novo para salvar online.");
+        logSync("Save online ignorado porque o estado nao mudou.", { obraId: resolvedObraId, signature: stateFingerprint });
+        return { ok: true, localSaved: true, onlineSaved: false, skipped: true, meta: metaSkipped };
+      }
       if (!PLANNUS_ONLINE_CONFIG.enabled) {
         const metaDisabled = {
           ...previousMeta,
@@ -311,6 +382,7 @@ export function createPlannusPersistence() {
           pendingOnlineSave: false,
           conflict: false,
           lastError: null,
+          lastSavedStateSignature: stateFingerprint || buildOnlineSaveFingerprint(state),
         };
         saveMeta(meta);
         setStatus(`Online salvo com sucesso. Revision ${meta.revision}.`);

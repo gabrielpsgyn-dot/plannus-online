@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -218,6 +218,107 @@ export default {
         });
       }
 
+      if (path === "/api/usuarios" && method === "DELETE") {
+        const actorEmail = getUserEmail(request);
+
+        if (!(await canUserDeleteUser(env, actorEmail))) {
+          return json({
+            ok: false,
+            erro: "Usuário sem permissão para excluir usuários."
+          }, 403);
+        }
+
+        const body = await readJson(request);
+        const targetEmail = normalizeEmail(body.email || url.searchParams.get("email"));
+
+        if (!targetEmail) {
+          return json({
+            ok: false,
+            erro: "E-mail obrigatório."
+          }, 400);
+        }
+
+        if (targetEmail === actorEmail) {
+          return json({
+            ok: false,
+            erro: "Não é permitido excluir o próprio usuário."
+          }, 400);
+        }
+
+        const existing = await env.DB.prepare(`
+          SELECT email, nome, perfil_global, ativo
+          FROM usuarios
+          WHERE email = ?
+        `).bind(targetEmail).first();
+
+        if (!existing) {
+          return json({
+            ok: false,
+            erro: "Usuário não encontrado."
+          }, 404);
+        }
+
+        const now = new Date().toISOString();
+
+        await env.DB.batch([
+          env.DB.prepare(`
+            UPDATE usuarios
+            SET ativo = 0,
+                updated_at = ?
+            WHERE email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            UPDATE usuario_roles
+            SET ativo = 0,
+                updated_at = ?
+            WHERE usuario_email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            UPDATE usuario_obras
+            SET ativo = 0,
+                updated_at = ?
+            WHERE usuario_email = ?
+          `).bind(now, targetEmail),
+
+          env.DB.prepare(`
+            INSERT INTO audit_log (
+              id,
+              usuario_email,
+              acao,
+              entidade,
+              entidade_id,
+              detalhes_json,
+              created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            crypto.randomUUID(),
+            actorEmail,
+            "DELETE_USUARIO",
+            "usuario",
+            targetEmail,
+            JSON.stringify({
+              targetEmail,
+              nome: existing.nome,
+              perfil_global: existing.perfil_global
+            }),
+            now
+          )
+        ]);
+
+        return json({
+          ok: true,
+          usuario: {
+            email: existing.email,
+            nome: existing.nome,
+            perfil_global: existing.perfil_global,
+            ativo: 0
+          }
+        });
+      }
+
       // ============================================================
       // OBRAS — LISTAR
       // ============================================================
@@ -280,6 +381,39 @@ export default {
       // OBRAS — CRIAR OBRA REAL NO D1
       // ============================================================
 
+      if (path === "/api/servicos" && method === "GET") {
+        const services = await loadServiceCatalogFromDb(env);
+
+        return json({
+          ok: true,
+          services
+        });
+      }
+
+      if (path === "/api/servicos" && method === "POST") {
+        const actorEmail = getUserEmail(request);
+        const body = await readJson(request);
+        const incoming = Array.isArray(body.services) ? body.services : [];
+        const normalized = incoming
+          .map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+          .filter((svc) => svc.id && svc.name);
+
+        if (!normalized.length) {
+          return json({
+            ok: false,
+            erro: "Catálogo de serviços vazio."
+          }, 400);
+        }
+
+        const saved = await replaceServiceCatalog(env, normalized, actorEmail);
+
+        return json({
+          ok: true,
+          services: saved,
+          total: saved.length
+        });
+      }
+
       if (path === "/api/obras" && method === "POST") {
         const email = getUserEmail(request);
         const role = await getUserRole(env, email);
@@ -306,12 +440,14 @@ export default {
         const obraId = "obra_" + crypto.randomUUID();
         const now = new Date().toISOString();
 
+        const serviceCatalog = await loadServiceCatalogFromDb(env);
+
         const state = buildInitialObraState({
           id: obraId,
           nome,
           codigo,
           descricao
-        });
+        }, serviceCatalog);
 
         const stateJson = JSON.stringify(state);
 
@@ -1041,8 +1177,76 @@ function getUserEmail(request) {
   return normalizeEmail(request.headers.get("x-plannus-user-email")) || "gabrielpsgyn@gmail.com";
 }
 
+async function ensureDefaultPlannerUser(env, email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (normalizedEmail !== "gabrielpsgyn@gmail.com") {
+    return false;
+  }
+
+  const now = new Date().toISOString();
+  const roleFlags = buildRoleFlags("planejador");
+
+  await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO usuarios (
+        email,
+        nome,
+        perfil_global,
+        ativo,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET
+        nome = excluded.nome,
+        perfil_global = excluded.perfil_global,
+        ativo = excluded.ativo,
+        updated_at = excluded.updated_at
+    `).bind(
+      normalizedEmail,
+      "Gabriel",
+      "usuario",
+      1,
+      now
+    ),
+
+    env.DB.prepare(`
+      INSERT INTO usuario_roles (
+        usuario_email,
+        role,
+        can_view_all_obras,
+        can_grant_permissions,
+        can_manage_users,
+        can_create_obras,
+        ativo,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(usuario_email) DO UPDATE SET
+        role = excluded.role,
+        can_view_all_obras = excluded.can_view_all_obras,
+        can_grant_permissions = excluded.can_grant_permissions,
+        can_manage_users = excluded.can_manage_users,
+        can_create_obras = excluded.can_create_obras,
+        ativo = excluded.ativo,
+        updated_at = excluded.updated_at
+    `).bind(
+      normalizedEmail,
+      "planejador",
+      roleFlags.can_view_all_obras,
+      roleFlags.can_grant_permissions,
+      roleFlags.can_manage_users,
+      roleFlags.can_create_obras,
+      1,
+      now
+    )
+  ]);
+
+  return true;
+}
+
 async function getUserRole(env, email) {
   const normalizedEmail = normalizeEmail(email);
+  await ensureDefaultPlannerUser(env, normalizedEmail);
 
   const row = await env.DB.prepare(`
     SELECT
@@ -1146,6 +1350,11 @@ async function canUserManageUsers(env, email) {
   return toBool(role.ativo) && toBool(role.can_manage_users);
 }
 
+async function canUserDeleteUser(env, email) {
+  const role = await getUserRole(env, email);
+  return toBool(role.ativo) && (toBool(role.can_manage_users) || role.role === "planejador");
+}
+
 async function canUserDeleteObra(env, email, obraId) {
   const role = await getUserRole(env, email);
 
@@ -1185,6 +1394,39 @@ async function canManageObraPermissions(env, email, obraId) {
 // HELPERS GERAIS
 // ============================================================
 
+const DEFAULT_SERVICE_CATALOG = [
+  {
+    id: "srv_alvenaria",
+    codigo: "ALV",
+    nome: "ALVENARIA",
+    classificacao: "",
+    cor: "#0F766E",
+    eq: 1,
+    duracao_padrao: 5,
+    company_default: "",
+    template_key: "",
+    scope_kind: "todos",
+    source_kind: "custom",
+    ordem: 1,
+    ativo: 1
+  },
+  {
+    id: "srv_superestrutura",
+    codigo: "SUP",
+    nome: "SUPERESTRUTURA",
+    classificacao: "",
+    cor: "#9A3412",
+    eq: 1,
+    duracao_padrao: 5,
+    company_default: "",
+    template_key: "",
+    scope_kind: "todos",
+    source_kind: "custom",
+    ordem: 2,
+    ativo: 1
+  }
+];
+
 async function readJson(request) {
   try {
     return await request.json();
@@ -1193,7 +1435,105 @@ async function readJson(request) {
   }
 }
 
-function buildInitialObraState({ id, nome, codigo, descricao }) {
+function buildDefaultObraSeed(obraId, serviceCatalog = null) {
+  const nowIso = new Date().toISOString();
+  const baseCatalog = Array.isArray(serviceCatalog) && serviceCatalog.length
+    ? serviceCatalog.map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+    : DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx));
+  const serviceBaseCatalog = baseCatalog.map((svc) => ({
+    id: String(svc.id || '').trim(),
+    obraId,
+    name: String(svc.name || '').trim(),
+    code: String(svc.code || '').trim(),
+    classification: String(svc.classification || '').trim(),
+    scopeKind: String(svc.scopeKind || 'todos').trim(),
+    teams: Math.max(1, Number(svc.teams || 1) || 1),
+    durationDefault: Math.max(1, Number(svc.durationDefault || 5) || 5),
+    companyDefault: String(svc.companyDefault || '').trim(),
+    templateKey: String(svc.templateKey || '').trim(),
+    sourceKind: String(svc.sourceKind || 'custom').trim() || 'custom',
+    color: String(svc.color || '').trim(),
+    order: Number(svc.order || 0) || 0
+  }));
+  const guidedDraftServices = serviceBaseCatalog.map((svc, idx) => ({
+    ...JSON.parse(JSON.stringify(svc)),
+    predecessorServiceId: idx === 0 ? '' : serviceBaseCatalog[idx - 1].id,
+    dependencyType: 'FS',
+    lagDays: 0,
+    locationOffsetAbove: 0,
+    matchMode: 'same_location',
+    expansionMode: 'per_location',
+    sourceKind: 'builtin',
+    predecessors: idx === 0 ? [] : [{
+      fromServiceId: serviceBaseCatalog[idx - 1].id,
+      type: 'FS',
+      lagDays: 0,
+      locationOffsetAbove: 0,
+      matchMode: 'same_location',
+      expansionMode: 'per_location',
+      sourceKind: 'builtin'
+    }]
+  }));
+  const dependencies = serviceBaseCatalog.slice(1).map((svc, idx) => ({
+    id: `dep_seed_${idx + 1}`,
+    obraId,
+    predecessorServiceId: serviceBaseCatalog[idx].id,
+    successorServiceId: svc.id,
+    type: 'FS',
+    lagDays: 0,
+    escopoAplicacao: 'MESMO_LOCAL',
+    obrigatoria: true
+  }));
+  const cycles = serviceBaseCatalog.map((svc) => ({
+    serviceId: svc.id,
+    locationsInOrder: [],
+    durationDefault: Number(svc.durationDefault || 5) || 5,
+    teams: Number(svc.teams || 1) || 1,
+    mode: 'serial',
+    lockLocations: true,
+    source: 'seed',
+    importBasis: 'seed',
+    importTeamBranches: [],
+    teamScopes: []
+  }));
+  const eapLibraryItem = {
+    key: 'residencial_vertical_padrao',
+    label: 'Residencial vertical padrão',
+    sourceKind: 'builtin',
+    description: 'Modelo inicial da obra com serviços comuns já cadastrados.',
+    draftDefaults: {
+      clusterName: 'Torre Principal',
+      executionDirection: 'baixo_alto',
+      floorStart: 800,
+      floorEnd: 3600,
+      floorStep: 100,
+      floorPrefix: 'PAV',
+      commonAreas: 'HALL\nLAZER',
+      specialAreas: 'SS1\nÁTICO'
+    },
+    services: JSON.parse(JSON.stringify(guidedDraftServices))
+  };
+  return {
+    services: JSON.parse(JSON.stringify(serviceBaseCatalog)),
+    serviceBaseCatalog: JSON.parse(JSON.stringify(serviceBaseCatalog)),
+    eap: {
+      draft: {
+        templateKey: 'residencial_vertical_padrao',
+        templateLabel: 'Residencial vertical padrão',
+        services: guidedDraftServices
+      },
+      library: [eapLibraryItem],
+      activeTemplateId: 'residencial_vertical_padrao',
+      lastSavedTemplate: null,
+      updatedAtISO: nowIso
+    },
+    dependencies,
+    cycles
+  };
+}
+
+function buildInitialObraState({ id, nome, codigo, descricao }, serviceCatalog = null) {
+  const seeded = buildDefaultObraSeed(id, serviceCatalog);
   return {
     version: "1.0",
     obra: {
@@ -1202,7 +1542,8 @@ function buildInitialObraState({ id, nome, codigo, descricao }) {
       codigo: codigo || null,
       descricao: descricao || ""
     },
-    services: [],
+    services: seeded.services,
+    serviceBaseCatalog: seeded.serviceBaseCatalog,
     locations: [],
     blocks: [],
     baseline: {
@@ -1211,11 +1552,203 @@ function buildInitialObraState({ id, nome, codigo, descricao }) {
     plan: {
       blocks: []
     },
-    deps: [],
-    cycles: [],
+    deps: seeded.dependencies,
+    cycles: seeded.cycles,
+    eap: seeded.eap,
     acompanhamento: {},
     config: {}
   };
+}
+
+function normalizeServiceCatalogInput(svc, idx = 0) {
+  const code = String(svc?.code || svc?.codigo || "").trim();
+  const name = String(svc?.name || svc?.nome || "").trim();
+  const slug = String(svc?.id || svc?.key || "").trim() ||
+    `srv_${slugify(`${code || name || "service"}_${idx + 1}`)}`;
+
+  return {
+    id: slug,
+    code,
+    name,
+    classification: String(svc?.classification || svc?.classificacao || "").trim(),
+    color: String(svc?.color || svc?.cor || "").trim() || colorFromKey(slug),
+    eq: Math.max(1, Number(svc?.eq || svc?.teams || 1) || 1),
+    durationDefault: Math.max(1, Number(svc?.durationDefault || svc?.duracao_padrao || 5) || 5),
+    companyDefault: String(svc?.companyDefault || svc?.company_default || "").trim(),
+    templateKey: String(svc?.templateKey || svc?.template_key || "").trim(),
+    scopeKind: String(svc?.scopeKind || svc?.scope_kind || "todos").trim() || "todos",
+    sourceKind: String(svc?.sourceKind || svc?.source_kind || "custom").trim() || "custom",
+    order: Number(svc?.order || svc?.ordem || idx + 1) || idx + 1,
+    ativo: toBool(svc?.ativo ?? svc?.active ?? 1) ? 1 : 0
+  };
+}
+
+function normalizeServiceCatalogRow(row, idx = 0) {
+  const svc = normalizeServiceCatalogInput({
+    id: row?.id,
+    code: row?.code,
+    codigo: row?.code,
+    name: row?.name,
+    nome: row?.name,
+    classification: row?.classification,
+    classificacao: row?.classification,
+    color: row?.color,
+    cor: row?.color,
+    eq: row?.eq,
+    teams: row?.eq,
+    durationDefault: row?.duration_default,
+    duracao_padrao: row?.duration_default,
+    companyDefault: row?.company_default,
+    company_default: row?.company_default,
+    templateKey: row?.template_key,
+    template_key: row?.template_key,
+    scopeKind: row?.scope_kind,
+    scope_kind: row?.scope_kind,
+    sourceKind: row?.source_kind,
+    source_kind: row?.source_kind,
+    order: row?.order_index,
+    ordem: row?.order_index,
+    ativo: row?.ativo
+  }, idx);
+
+  return {
+    ...svc,
+    obraId: row?.obra_id || row?.obraId || null
+  };
+}
+
+async function ensureServiceCatalogSchema(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS servicos_base (
+      id TEXT PRIMARY KEY,
+      code TEXT NOT NULL,
+      name TEXT NOT NULL,
+      classification TEXT NOT NULL DEFAULT '',
+      color TEXT NOT NULL DEFAULT '',
+      eq INTEGER NOT NULL DEFAULT 1,
+      duration_default INTEGER NOT NULL DEFAULT 5,
+      company_default TEXT NOT NULL DEFAULT '',
+      template_key TEXT NOT NULL DEFAULT '',
+      scope_kind TEXT NOT NULL DEFAULT 'todos',
+      source_kind TEXT NOT NULL DEFAULT 'custom',
+      order_index INTEGER NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `).run();
+}
+
+async function loadServiceCatalogFromDb(env) {
+  await ensureServiceCatalogSchema(env);
+
+  const countResult = await env.DB.prepare(`
+    SELECT COUNT(*) AS total
+    FROM servicos_base
+  `).first();
+
+  if (!Number(countResult?.total || 0)) {
+    const now = new Date().toISOString();
+    const seedRows = DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx));
+
+    await env.DB.batch(seedRows.map((svc) => env.DB.prepare(`
+      INSERT OR REPLACE INTO servicos_base (
+        id, code, name, classification, color, eq, duration_default,
+        company_default, template_key, scope_kind, source_kind, order_index,
+        ativo, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      svc.id,
+      svc.code,
+      svc.name,
+      svc.classification,
+      svc.color,
+      svc.eq,
+      svc.durationDefault,
+      svc.companyDefault,
+      svc.templateKey,
+      svc.scopeKind,
+      svc.sourceKind,
+      svc.order,
+      svc.ativo,
+      now,
+      now
+    )));
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT
+      id,
+      code,
+      name,
+      classification,
+      color,
+      eq,
+      duration_default,
+      company_default,
+      template_key,
+      scope_kind,
+      source_kind,
+      order_index,
+      ativo,
+      created_at,
+      updated_at
+    FROM servicos_base
+    ORDER BY order_index ASC, name COLLATE NOCASE ASC, id ASC
+  `).all();
+
+  return (result.results || []).map((row, idx) => normalizeServiceCatalogRow(row, idx));
+}
+
+async function replaceServiceCatalog(env, services, actorEmail = null) {
+  await ensureServiceCatalogSchema(env);
+  const now = new Date().toISOString();
+  const rows = (Array.isArray(services) ? services : [])
+    .map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+    .filter((svc) => svc.id && svc.name);
+
+  if (!rows.length) {
+    return [];
+  }
+
+  const queries = [
+    env.DB.prepare(`DELETE FROM servicos_base`)
+  ];
+
+  for (const svc of rows) {
+    queries.push(env.DB.prepare(`
+      INSERT OR REPLACE INTO servicos_base (
+        id, code, name, classification, color, eq, duration_default,
+        company_default, template_key, scope_kind, source_kind, order_index,
+        ativo, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      svc.id,
+      svc.code,
+      svc.name,
+      svc.classification,
+      svc.color,
+      svc.eq,
+      svc.durationDefault,
+      svc.companyDefault,
+      svc.templateKey,
+      svc.scopeKind,
+      svc.sourceKind,
+      svc.order,
+      svc.ativo,
+      now,
+      now
+    ));
+  }
+
+  await env.DB.batch(queries);
+
+  const saved = await loadServiceCatalogFromDb(env);
+  console.log("[API][SERVICOS]", {
+    actorEmail,
+    total: saved.length
+  });
+  return saved;
 }
 
 function buildRoleFlags(role, body = {}) {
@@ -1277,6 +1810,27 @@ function nullableText(value) {
   return text.length ? text : null;
 }
 
+function slugify(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .replace(/_{2,}/g, "_");
+}
+
+function colorFromKey(key) {
+  const text = String(key || "service");
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash |= 0;
+  }
+  const palette = ["#0F766E", "#9A3412", "#14532D", "#7C2D12", "#1D4ED8", "#7C3AED"];
+  return palette[Math.abs(hash) % palette.length];
+}
+
 function toBool(value) {
   return Number(value || 0) === 1 || value === true;
 }
@@ -1309,8 +1863,9 @@ function corsResponse(body, status = 200, headers = {}) {
     headers: {
       ...headers,
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, x-plannus-user-email"
     }
   });
 }
+

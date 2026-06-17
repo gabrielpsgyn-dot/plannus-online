@@ -38,6 +38,40 @@ export async function listOnlineObras() {
   }
 }
 
+export async function listServices() {
+  const url = buildUrl("/api/servicos");
+  try {
+    const response = await fetch(url);
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao listar servicos.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao listar servicos.", { error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao listar servicos.", data: null };
+  }
+}
+
+export async function saveServicesCatalog(payload) {
+  const url = buildUrl("/api/servicos");
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ services: Array.isArray(payload) ? payload : [] }),
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao salvar servicos.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao salvar servicos.", { error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao salvar servicos.", data: null };
+  }
+}
+
 export async function loadOnlineObra(obraId) {
   const url = buildUrl(`/api/obras/${encodeURIComponent(obraId)}`);
   try {
