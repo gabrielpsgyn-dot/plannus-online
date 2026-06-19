@@ -72,6 +72,92 @@ export async function saveServicesCatalog(payload) {
   }
 }
 
+export async function listEapTemplates() {
+  const url = buildUrl("/api/eap");
+  try {
+    const response = await fetch(url);
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao listar eaps.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao listar eaps.", { error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao listar eaps.", data: null };
+  }
+}
+
+export async function saveEapTemplates(payload) {
+  const url = buildUrl("/api/eap");
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ templates: Array.isArray(payload) ? payload : [] }),
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao salvar eaps.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao salvar eaps.", { error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao salvar eaps.", data: null };
+  }
+}
+
+export async function loadEapTemplate(key) {
+  const url = buildUrl(`/api/eap/${encodeURIComponent(key)}`);
+  try {
+    const response = await fetch(url);
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao carregar EAP.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao carregar EAP.", { key, error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao carregar EAP.", data: null };
+  }
+}
+
+export async function saveEapTemplate(key, payload) {
+  const url = buildUrl(`/api/eap/${encodeURIComponent(key)}`);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload || {}),
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao salvar EAP.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao salvar EAP.", { key, error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao salvar EAP.", data: null };
+  }
+}
+
+export async function deleteEapTemplate(key) {
+  const url = buildUrl(`/api/eap/${encodeURIComponent(key)}`);
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await readJsonSafe(response);
+    if (!response.ok || data?.ok === false) {
+      return { ok: false, status: response.status, erro: data?.erro || "Falha ao excluir EAP.", data };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    logOnline("Erro de rede ao excluir EAP.", { key, error: String(error) });
+    return { ok: false, status: 0, networkError: true, erro: "Erro de rede ao excluir EAP.", data: null };
+  }
+}
+
 export async function loadOnlineObra(obraId) {
   const url = buildUrl(`/api/obras/${encodeURIComponent(obraId)}`);
   try {

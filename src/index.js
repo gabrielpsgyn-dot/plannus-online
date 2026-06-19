@@ -414,6 +414,117 @@
         });
       }
 
+      if (path === "/api/eap" && method === "GET") {
+        const templates = await loadEapTemplatesFromDb(env);
+
+        return json({
+          ok: true,
+          templates
+        });
+      }
+
+      if (path === "/api/eap" && method === "POST") {
+        const actorEmail = getUserEmail(request);
+        const body = await readJson(request);
+        const incoming = Array.isArray(body.templates)
+          ? body.templates
+          : body?.template
+            ? [body.template]
+            : [];
+        const normalized = incoming
+          .map((template, idx) => normalizeEapTemplateInput(template, idx))
+          .filter((template) => template.key && template.label);
+
+        if (!normalized.length) {
+          return json({
+            ok: false,
+            erro: "Catálogo de EAP vazio."
+          }, 400);
+        }
+
+        const saved = await replaceEapTemplates(env, normalized, actorEmail);
+
+        return json({
+          ok: true,
+          templates: saved,
+          total: saved.length
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "GET") {
+        const key = decodeURIComponent(parts[2] || "").trim();
+        const templates = await loadEapTemplatesFromDb(env);
+        const template = templates.find((row) => row.key === key) || null;
+
+        if (!template) {
+          return json({
+            ok: false,
+            erro: "EAP não encontrada."
+          }, 404);
+        }
+
+        return json({
+          ok: true,
+          template
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "POST") {
+        const actorEmail = getUserEmail(request);
+        const key = decodeURIComponent(parts[2] || "").trim();
+        const body = await readJson(request);
+        const normalized = normalizeEapTemplateInput({
+          ...body,
+          key: body?.key || key
+        }, 0);
+
+        if (!normalized.key || !normalized.label) {
+          return json({
+            ok: false,
+            erro: "Chave e título da EAP são obrigatórios."
+          }, 400);
+        }
+
+        const saved = await replaceEapTemplates(env, [normalized], actorEmail);
+        const template = saved.find((row) => row.key === normalized.key) || null;
+
+        return json({
+          ok: true,
+          template,
+          templates: saved,
+          total: saved.length
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "DELETE") {
+        const actorEmail = getUserEmail(request);
+        const key = decodeURIComponent(parts[2] || "").trim();
+
+        if (!key) {
+          return json({
+            ok: false,
+            erro: "Chave da EAP obrigatória."
+          }, 400);
+        }
+
+        const existing = await loadEapTemplatesFromDb(env);
+        const remaining = existing.filter((row) => row.key !== key);
+
+        if (remaining.length === existing.length) {
+          return json({
+            ok: false,
+            erro: "EAP não encontrada."
+          }, 404);
+        }
+
+        const saved = await replaceEapTemplates(env, remaining, actorEmail);
+        return json({
+          ok: true,
+          templates: saved,
+          total: saved.length
+        });
+      }
+
       if (path === "/api/obras" && method === "POST") {
         const email = getUserEmail(request);
         const role = await getUserRole(env, email);
@@ -1427,6 +1538,45 @@ const DEFAULT_SERVICE_CATALOG = [
   }
 ];
 
+const DEFAULT_EAP_TEMPLATES = [
+  {
+    key: "residencial_vertical_padrao",
+    label: "Residencial vertical padrão",
+    description: "Modelo inicial da obra com serviços comuns já cadastrados.",
+    source_kind: "builtin",
+    base_template_key: "residencial_vertical_padrao",
+    draft_defaults: {
+      clusterName: "Torre Principal",
+      executionDirection: "baixo_alto",
+      floorStart: 800,
+      floorEnd: 3600,
+      floorStep: 100,
+      floorPrefix: "PAV",
+      commonAreas: "HALL\nLAZER",
+      specialAreas: "SS1\nÁTICO"
+    },
+    services: DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+  },
+  {
+    key: "condominio_horizontal_padrao",
+    label: "Condomínio horizontal padrão",
+    description: "Modelo simplificado para blocos horizontais e áreas de apoio.",
+    source_kind: "builtin",
+    base_template_key: "condominio_horizontal_padrao",
+    draft_defaults: {
+      clusterName: "Bloco Horizontal",
+      executionDirection: "esquerda_direita",
+      floorStart: 1,
+      floorEnd: 40,
+      floorStep: 1,
+      floorPrefix: "UN",
+      commonAreas: "PORTARIA\nGARAGEM",
+      specialAreas: "CHURRASQUEIRA\nLAZER"
+    },
+    services: DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+  }
+];
+
 async function readJson(request) {
   try {
     return await request.json();
@@ -1496,37 +1646,9 @@ function buildDefaultObraSeed(obraId, serviceCatalog = null) {
     importTeamBranches: [],
     teamScopes: []
   }));
-  const eapLibraryItem = {
-    key: 'residencial_vertical_padrao',
-    label: 'Residencial vertical padrão',
-    sourceKind: 'builtin',
-    description: 'Modelo inicial da obra com serviços comuns já cadastrados.',
-    draftDefaults: {
-      clusterName: 'Torre Principal',
-      executionDirection: 'baixo_alto',
-      floorStart: 800,
-      floorEnd: 3600,
-      floorStep: 100,
-      floorPrefix: 'PAV',
-      commonAreas: 'HALL\nLAZER',
-      specialAreas: 'SS1\nÁTICO'
-    },
-    services: JSON.parse(JSON.stringify(guidedDraftServices))
-  };
   return {
     services: JSON.parse(JSON.stringify(serviceBaseCatalog)),
     serviceBaseCatalog: JSON.parse(JSON.stringify(serviceBaseCatalog)),
-    eap: {
-      draft: {
-        templateKey: 'residencial_vertical_padrao',
-        templateLabel: 'Residencial vertical padrão',
-        services: guidedDraftServices
-      },
-      library: [eapLibraryItem],
-      activeTemplateId: 'residencial_vertical_padrao',
-      lastSavedTemplate: null,
-      updatedAtISO: nowIso
-    },
     dependencies,
     cycles
   };
@@ -1554,7 +1676,6 @@ function buildInitialObraState({ id, nome, codigo, descricao }, serviceCatalog =
     },
     deps: seeded.dependencies,
     cycles: seeded.cycles,
-    eap: seeded.eap,
     acompanhamento: {},
     config: {}
   };
@@ -1617,6 +1738,52 @@ function normalizeServiceCatalogRow(row, idx = 0) {
   };
 }
 
+function normalizeEapTemplateInput(template, idx = 0) {
+  const key = String(template?.key || template?.template_key || "").trim() ||
+    `eap_${slugify(`${template?.label || template?.name || "template"}_${idx + 1}`)}`;
+  const services = Array.isArray(template?.services)
+    ? template.services.map((svc, serviceIdx) => normalizeServiceCatalogInput(svc, serviceIdx))
+    : [];
+  const draftDefaults = template?.draft_defaults && typeof template.draft_defaults === "object"
+    ? template.draft_defaults
+    : template?.draft && typeof template.draft === "object"
+      ? template.draft
+      : {};
+
+  return {
+    key,
+    label: String(template?.label || template?.name || key).trim(),
+    description: String(template?.description || "").trim(),
+    sourceKind: String(template?.source_kind || template?.sourceKind || "custom").trim() || "custom",
+    baseTemplateKey: String(template?.base_template_key || template?.baseTemplateKey || "").trim(),
+    orderIndex: Number(template?.order_index || template?.orderIndex || idx + 1) || idx + 1,
+    ativo: toBool(template?.ativo ?? template?.active ?? 1) ? 1 : 0,
+    draftJson: JSON.stringify(draftDefaults || {}),
+    servicesJson: JSON.stringify(services),
+  };
+}
+
+function normalizeEapTemplateRow(row, idx = 0) {
+  const draftDefaults = safeJsonParse(row?.draft_json || row?.draft_defaults || "{}");
+  const services = safeJsonParse(row?.services_json || row?.services || "[]");
+
+  return {
+    key: String(row?.key || "").trim(),
+    label: String(row?.label || "").trim(),
+    description: String(row?.description || "").trim(),
+    source_kind: String(row?.source_kind || "custom").trim() || "custom",
+    base_template_key: String(row?.base_template_key || "").trim(),
+    order_index: Number(row?.order_index || idx + 1) || idx + 1,
+    ativo: toBool(row?.ativo),
+    draft_defaults: draftDefaults && typeof draftDefaults === "object" ? draftDefaults : {},
+    services: Array.isArray(services)
+      ? services.map((svc, serviceIdx) => normalizeServiceCatalogInput(svc, serviceIdx))
+      : [],
+    created_at: row?.created_at || null,
+    updated_at: row?.updated_at || null
+  };
+}
+
 async function ensureServiceCatalogSchema(env) {
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS servicos_base (
@@ -1633,6 +1800,24 @@ async function ensureServiceCatalogSchema(env) {
       source_kind TEXT NOT NULL DEFAULT 'custom',
       order_index INTEGER NOT NULL DEFAULT 0,
       ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `).run();
+}
+
+async function ensureEapTemplateSchema(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS eap_templates (
+      key TEXT PRIMARY KEY,
+      label TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      source_kind TEXT NOT NULL DEFAULT 'custom',
+      base_template_key TEXT NOT NULL DEFAULT '',
+      order_index INTEGER NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      draft_json TEXT NOT NULL DEFAULT '{}',
+      services_json TEXT NOT NULL DEFAULT '[]',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
@@ -1698,6 +1883,104 @@ async function loadServiceCatalogFromDb(env) {
   `).all();
 
   return (result.results || []).map((row, idx) => normalizeServiceCatalogRow(row, idx));
+}
+
+async function loadEapTemplatesFromDb(env) {
+  await ensureEapTemplateSchema(env);
+
+  const countResult = await env.DB.prepare(`
+    SELECT COUNT(*) AS total
+    FROM eap_templates
+  `).first();
+
+  if (!Number(countResult?.total || 0)) {
+    const now = new Date().toISOString();
+    const seedRows = DEFAULT_EAP_TEMPLATES.map((template, idx) => normalizeEapTemplateInput(template, idx));
+
+    await env.DB.batch(seedRows.map((template) => env.DB.prepare(`
+      INSERT OR REPLACE INTO eap_templates (
+        key, label, description, source_kind, base_template_key, order_index,
+        ativo, draft_json, services_json, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      template.key,
+      template.label,
+      template.description,
+      template.sourceKind,
+      template.baseTemplateKey,
+      template.orderIndex,
+      template.ativo,
+      template.draftJson,
+      template.servicesJson,
+      now,
+      now
+    )));
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT
+      key,
+      label,
+      description,
+      source_kind,
+      base_template_key,
+      order_index,
+      ativo,
+      draft_json,
+      services_json,
+      created_at,
+      updated_at
+    FROM eap_templates
+    ORDER BY order_index ASC, label COLLATE NOCASE ASC, key ASC
+  `).all();
+
+  return (result.results || []).map((row, idx) => normalizeEapTemplateRow(row, idx));
+}
+
+async function replaceEapTemplates(env, templates, actorEmail = null) {
+  await ensureEapTemplateSchema(env);
+  const now = new Date().toISOString();
+  const rows = (Array.isArray(templates) ? templates : [])
+    .map((template, idx) => normalizeEapTemplateInput(template, idx))
+    .filter((template) => template.key && template.label);
+
+  if (!rows.length) {
+    return [];
+  }
+
+  const queries = [
+    env.DB.prepare(`DELETE FROM eap_templates`)
+  ];
+
+  for (const template of rows) {
+    queries.push(env.DB.prepare(`
+      INSERT OR REPLACE INTO eap_templates (
+        key, label, description, source_kind, base_template_key, order_index,
+        ativo, draft_json, services_json, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      template.key,
+      template.label,
+      template.description,
+      template.sourceKind,
+      template.baseTemplateKey,
+      template.orderIndex,
+      template.ativo,
+      template.draftJson,
+      template.servicesJson,
+      now,
+      now
+    ));
+  }
+
+  await env.DB.batch(queries);
+
+  const saved = await loadEapTemplatesFromDb(env);
+  console.log("[API][EAP]", {
+    actorEmail,
+    total: saved.length
+  });
+  return saved;
 }
 
 async function replaceServiceCatalog(env, services, actorEmail = null) {

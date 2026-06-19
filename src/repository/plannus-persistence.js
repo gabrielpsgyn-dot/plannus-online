@@ -5,14 +5,19 @@ import {
   deleteOnlineObra as deleteOnlineObraRequest,
   grantObraPermission,
   createOnlineObra as createOnlineObraRequest,
+  deleteEapTemplate as deleteEapTemplateRequest,
   listObraPermissions,
   listOnlineObras,
+  loadEapTemplate as loadEapTemplateRequest,
+  listEapTemplates as listEapTemplatesRequest,
   listServices as listServicesRequest,
   listUsers,
   loadOnlineObra,
   PLANNUS_ONLINE_CONFIG,
   revokeObraPermission,
   saveOnlineObra,
+  saveEapTemplate as saveEapTemplateRequest,
+  saveEapTemplates as saveEapTemplatesRequest,
   saveServicesCatalog as saveServicesCatalogRequest,
   upsertUser,
 } from "./plannus-online-repository.js";
@@ -216,6 +221,31 @@ export function createPlannusPersistence() {
     async listServicesCatalog() {
       const result = await listServicesRequest();
       if (result.ok) logSync("Catalogo de servicos carregado.");
+      return result;
+    },
+    async listEapTemplates() {
+      const result = await listEapTemplatesRequest();
+      if (result.ok) logSync("Catalogo de EAP carregado.");
+      return result;
+    },
+    async loadEapTemplate(key) {
+      const result = await loadEapTemplateRequest(key);
+      if (result.ok) logSync("EAP carregada.", { key });
+      return result;
+    },
+    async saveEapTemplates(payload) {
+      const result = await saveEapTemplatesRequest(payload);
+      if (result.ok) logSync("Catalogo de EAP salvo.", { total: Array.isArray(payload) ? payload.length : 0 });
+      return result;
+    },
+    async saveEapTemplate(key, payload) {
+      const result = await saveEapTemplateRequest(key, payload);
+      if (result.ok) logSync("EAP salva.", { key });
+      return result;
+    },
+    async deleteEapTemplate(key) {
+      const result = await deleteEapTemplateRequest(key);
+      if (result.ok) logSync("EAP excluida.", { key });
       return result;
     },
     async saveServicesCatalog(payload) {

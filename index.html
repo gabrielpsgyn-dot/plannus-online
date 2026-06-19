@@ -2916,47 +2916,53 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 }
 .serviceCatalogTable{
   width:100%;
-  min-width:800px;
+  min-width:1120px;
   table-layout:fixed;
   border-collapse:separate;
   border-spacing:0;
-  border:1px solid rgba(15,23,42,.08);
-  border-radius:16px;
+  border:1px solid rgba(15,23,42,.07);
+  border-radius:18px;
   overflow:hidden;
   background:#fff;
   box-shadow:var(--surfaceShadowSoft);
+}
+.serviceCatalogTable tbody tr{
+  cursor:pointer;
+}
+.serviceCatalogTable tbody tr:hover{
+  background:#f8fafc;
 }
 .serviceCatalogTable thead th{
   position:sticky;
   top:0;
   z-index:1;
-  padding:8px 10px;
+  padding:9px 10px;
   font-size:10px;
   font-weight:900;
   text-transform:uppercase;
   letter-spacing:.05em;
-  color:#64748b;
-  background:#f8fbff;
-  border-bottom:1px solid rgba(15,23,42,.08);
+  color:#475569;
+  background:#fafafa;
+  border-bottom:1px solid rgba(15,23,42,.07);
   text-align:left;
 }
 .serviceCatalogTable tbody td{
   padding:6px 8px;
-  border-top:1px solid rgba(15,23,42,.06);
+  border-top:1px solid rgba(15,23,42,.05);
   vertical-align:middle;
   overflow:hidden;
 }
 .serviceCatalogTable tbody tr:first-child td{border-top:0;}
-.serviceCatalogTable tbody tr[data-selected="1"]{background:#eff6ff;}
+.serviceCatalogTable tbody tr[data-selected="1"]{background:#f8fafc;}
 .serviceCatalogTable .svcNum{
   width:42px;
   text-align:center;
   font-size:12px;
   font-weight:900;
-  color:#1d4ed8;
+  color:#0f172a;
   border-radius:12px;
-  background:#eff6ff;
-  border:1px solid rgba(37,99,235,.16);
+  background:#f3f4f6;
+  border:1px solid rgba(15,23,42,.10);
 }
 .serviceCatalogTable input,
 .serviceCatalogTable select{
@@ -2967,13 +2973,15 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
   font-size:12px;
   padding-top:4px;
   padding-bottom:4px;
+  border-color:rgba(15,23,42,.12);
+  background:#fff;
 }
 .serviceCatalogShell{
   overflow-x:auto;
   overflow-y:hidden;
   max-width:100%;
-  border:1px solid rgba(15,23,42,.08);
-  border-radius:16px;
+  border:1px solid rgba(15,23,42,.07);
+  border-radius:18px;
   background:#fff;
   box-shadow:var(--surfaceShadowSoft);
 }
@@ -2992,15 +3000,126 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
   font-size:11px;
   white-space:nowrap;
 }
-.serviceCatalogTable thead th:nth-child(1){width:44px;}
-.serviceCatalogTable thead th:nth-child(2){width:106px;}
-.serviceCatalogTable thead th:nth-child(3){width:320px;}
-.serviceCatalogTable thead th:nth-child(4){width:140px;}
-.serviceCatalogTable thead th:nth-child(5){width:58px;}
-.serviceCatalogTable thead th:nth-child(6){width:62px;}
-.serviceCatalogTable thead th:nth-child(7){width:170px;}
-.serviceCatalogTable tbody td:nth-child(2){padding-right:14px;}
-.serviceCatalogTable tbody td:nth-child(3){padding-left:14px;}
+.serviceCatalogTable thead th:nth-child(1){width:56px;}
+.serviceCatalogTable thead th:nth-child(2){width:250px;}
+.serviceCatalogTable thead th:nth-child(3){width:120px;}
+.serviceCatalogTable thead th:nth-child(4){width:150px;}
+.serviceCatalogTable thead th:nth-child(5){width:170px;}
+.serviceCatalogTable thead th:nth-child(6){width:150px;}
+.serviceCatalogTable thead th:nth-child(7){width:92px;}
+.serviceCatalogTable thead th:nth-child(8){width:92px;}
+.serviceCatalogTable tbody td:nth-child(1){padding-left:14px; padding-right:8px;}
+.serviceCatalogTable tbody td:nth-child(2){padding-left:14px; padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(3){padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(4){padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(5){padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(6){padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(7){padding-right:14px;}
+.serviceCatalogTable tbody td:nth-child(8){padding-right:14px;}
+.serviceCatalogFlag{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.serviceCatalogFlag input{
+  width:18px;
+  height:18px;
+  min-height:18px;
+  accent-color:#e4003a;
+}
+.packageMetricPair{
+  display:grid;
+  grid-template-columns:minmax(58px,.75fr) minmax(82px,1fr);
+  gap:6px;
+  align-items:center;
+}
+.packageTeamGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(52px,1fr));
+  gap:6px;
+  align-items:center;
+}
+.packageTeamGrid input,
+.packageMetricPair input,
+.packageMetricPair select{
+  text-align:center;
+}
+.packageAddOverlay{
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,23,42,.34);
+  backdrop-filter:blur(6px);
+  padding:24px;
+}
+.packageAddOverlay.isOpen{display:flex;}
+.packageAddModal{
+  width:min(820px, calc(100vw - 40px));
+  max-height:calc(100vh - 48px);
+  overflow:auto;
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 28px 80px rgba(15,23,42,.22);
+}
+.packageAddHeader{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:22px 24px 16px;
+  border-bottom:1px solid rgba(15,23,42,.08);
+}
+.packageAddHeader .k{
+  color:#64748b;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.packageAddHeader .t{
+  color:#07111d;
+  font-family:var(--pln-font-head);
+  font-size:28px;
+  line-height:1.05;
+  letter-spacing:-.04em;
+  font-weight:900;
+}
+.packageAddBody{
+  padding:20px 24px 24px;
+  display:grid;
+  gap:16px;
+}
+.packageAddGrid{
+  display:grid;
+  grid-template-columns:1.2fr .7fr .9fr;
+  gap:12px;
+}
+.packageAddMetrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.packageAddModal .field{margin:0;}
+.packageAddModal input,
+.packageAddModal select{
+  min-height:40px;
+  height:40px;
+}
+.packageAddFooter{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  padding-top:4px;
+}
+@media (max-width: 860px){
+  .packageAddGrid,
+  .packageAddMetrics{
+    grid-template-columns:1fr;
+  }
+}
 .guidedColorSwatch{
   width:100%;
   min-height:42px;
@@ -3008,6 +3127,194 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
   border:1px solid rgba(15,23,42,.12);
   background:#dbeafe;
   padding:4px;
+}
+.packageCatalogStats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+.packageCatalogStats .packageStat{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:16px;
+  background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
+  padding:12px 14px;
+  box-shadow:var(--surfaceShadowSoft);
+  min-height:86px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.packageCatalogStats .packageStat .k{
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#64748b;
+}
+.packageCatalogStats .packageStat strong{
+  display:block;
+  font-size:22px;
+  line-height:1.05;
+  color:#0f172a;
+  letter-spacing:-.03em;
+}
+.packageCatalogStats .packageStat .s{
+  font-size:12px;
+  color:#64748b;
+}
+.packageCatalogLayout{
+  display:block;
+}
+.packageCatalogMain{
+  min-width:0;
+}
+.packageCatalogDetail{
+  min-width:0;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:20px;
+  background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
+  box-shadow:var(--surfaceShadowSoft);
+  padding:16px;
+  position:sticky;
+  top:16px;
+}
+.packageCatalogDetail .detailKicker{
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:#ef4444;
+  margin-bottom:8px;
+}
+.packageCatalogDetail .detailTitle{
+  font-family:var(--pln-font-head);
+  font-size:24px;
+  line-height:1.05;
+  font-weight:900;
+  letter-spacing:-.04em;
+  color:#07111d;
+}
+.packageCatalogDetail .detailSub{
+  margin-top:4px;
+  font-size:13px;
+  color:#64748b;
+}
+.packageCatalogDetail .detailGrid{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+.packageCatalogDetail .detailCard{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:16px;
+  background:#fff;
+  padding:12px;
+}
+.packageCatalogDetail .detailCard .lbl{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#64748b;
+  margin-bottom:6px;
+}
+.packageCatalogDetail .detailCard .val{
+  font-size:15px;
+  font-weight:800;
+  line-height:1.25;
+  color:#0f172a;
+}
+.packageCatalogDetail .detailList{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+.packageCatalogDetail .detailListItem{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:12px;
+  background:#fff;
+  padding:10px 12px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.packageCatalogDetail .detailListItem .name{
+  font-size:13px;
+  font-weight:800;
+  color:#0f172a;
+}
+.packageCatalogDetail .detailListItem .meta{
+  font-size:12px;
+  color:#64748b;
+  margin-top:2px;
+}
+.packageCatalogDetail .detailEmpty{
+  padding:12px;
+  border:1px dashed rgba(15,23,42,.14);
+  border-radius:12px;
+  color:#64748b;
+  font-size:13px;
+  background:#fff;
+}
+.packageSubserviceForm{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 90px auto;
+  gap:8px;
+  margin-top:12px;
+  align-items:end;
+}
+.packageSubserviceForm .field{
+  margin:0;
+}
+.packageSubserviceForm input{
+  min-height:34px;
+  height:34px;
+  font-size:12px;
+}
+.packageSubserviceList{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+.packageSubserviceRow{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 78px auto;
+  gap:8px;
+  align-items:center;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background:#fff;
+  padding:8px;
+}
+.packageSubserviceRow input{
+  min-height:32px;
+  height:32px;
+  font-size:12px;
+}
+.packageSubserviceRow .btn{
+  height:32px;
+  padding:0 10px;
+}
+@media (max-width: 1180px){
+  .packageCatalogLayout{
+    display:block;
+  }
+  .packageCatalogDetail{
+    position:relative;
+    top:auto;
+  }
+  .packageSubserviceForm,
+  .packageSubserviceRow{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media (max-width: 1100px){
+  .packageCatalogStats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
 }
 .guidedColorSwatch input{
   width:100%;
@@ -5299,7 +5606,7 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
         <button class="navItem" id="btnViewPav" data-click="btnViewPav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></svg></span><span class="txt">Pavimentos</span><span class="k">↵</span></button>
         <button class="navItem" id="btnViewGuided" data-click="btnViewGuided" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 4v16"/><path d="M12 4v16"/></svg></span><span class="txt">Biblioteca EAP</span><span class="k">↵</span></button>
         <button class="navItem" id="btnOpenEapApplyNav" data-click="btnOpenEapApplyNav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h10"/><path d="M11 6l6 6-6 6"/><path d="M19 5v14"/></svg></span><span class="txt">Planejamento</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Serviços</span><span class="k">↵</span></button>
+        <button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Pacotes</span><span class="k">↵</span></button>
         <button class="navItem" id="btnViewPlanner" data-click="btnViewPlanner" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M6 15l4-4 3 2 5-6"/></svg></span><span class="txt">Acompanhamento</span><span class="k">↵</span></button>
         <button class="navItem" id="btnViewDashboard" data-click="btnViewDashboard" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6"/><path d="M10 19V10"/><path d="M16 19V4"/><path d="M22 19H2"/></svg></span><span class="txt">Dashboard</span><span class="k">↵</span></button>
         <button class="navItem" id="btnViewConfig" data-click="btnViewConfig" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h8"/><path d="M16 7h4"/><circle cx="14" cy="7" r="2"/><path d="M4 12h4"/><path d="M12 12h8"/><circle cx="8" cy="12" r="2"/><path d="M4 17h12"/><circle cx="18" cy="17" r="2"/></svg></span><span class="txt">Parâmetros</span><span class="k">↵</span></button>
@@ -5658,7 +5965,7 @@ document.addEventListener("click", function(ev){
         <span class="plannerActionLabel">Visual</span>
         <button class="btn" id="btnPlannerVisualMode" type="button" title="Alternar entre LOB e Serviços x Dias">Visual: LOB</button>
         <button class="btn" id="btnToggleBaselineCols" type="button" title="Ocultar ou mostrar a linha base no acompanhamento">LB: On</button>
-        <button class="btn" id="btnPlannerAutoUpdate" type="button" title="Ativar ou desativar atualização automática do acompanhamento">Auto: Off</button>
+        <button class="btn" id="btnPlannerSaveOnlineHeader" type="button" title="Salvar estado no banco online">Salvar Online</button>
       </div>
       <div class="plannerActionGroup" aria-label="Zoom">
         <span class="plannerActionLabel">Zoom</span>
@@ -5692,9 +5999,9 @@ document.addEventListener("click", function(ev){
       <div class="body projectSetupPage">
         <div class="projectSetupHero">
           <div>
-        <div class="projectSetupHeroKicker">ABERTURA</div>
-        <div class="title">Visão geral do empreendimento.</div>
-        <div class="hint">Estruture dados, pavimentos, EAP e planejamento operacional em uma base única, técnica e executiva.</div>
+        <div class="projectSetupHeroKicker">WORKSPACE</div>
+        <div class="title plnPageTitle">Dados da obra</div>
+        <div class="hint plnPageSubtitle">Dados iniciais, pavimentos, EAP e planejamento em uma base única.</div>
           </div>
           <div class="projectSetupHeroActions">
             <button class="btn primary" id="btnProjectSetupSave" type="button">Salvar</button>
@@ -5873,8 +6180,8 @@ document.addEventListener("click", function(ev){
     <section class="card" style="grid-column:1 / -1;">
       <div class="cardHead">
         <div>
-          <div class="title">EAP</div>
-              <div class="sub">Monte e salve a biblioteca de serviços.</div>
+          <div class="title plnPageTitle">EAP</div>
+              <div class="sub plnPageSubtitle">Monte e salve a biblioteca de serviços.</div>
         </div>
         <div class="actions guidedActions">
           <button class="btn" id="btnGuidedReset" type="button">Limpar questionário</button>
@@ -6138,8 +6445,8 @@ document.addEventListener("click", function(ev){
 <div id="viewPav" style="display:none;">
     <section class="card" style="grid-column:1 / -1;">
       <h2>
-        <span>Base de pavimentos</span>
-        <span class="hint">Adicionar, editar, remover e aplicar ao planejamento</span>
+        <span class="plnPageTitle">Pavimentos</span>
+        <span class="hint plnPageSubtitle">Base, ordem visual e agrupamento dos pavimentos.</span>
       </h2>
       <div class="body">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
@@ -6478,29 +6785,30 @@ document.addEventListener("click", function(ev){
 
   <div id="viewService" style="display:none;">
     <section class="card" style="grid-column:1 / -1;">
-      <div class="cardHead">
+      <div class="cardHead" style="justify-content:space-between; align-items:center;">
         <div>
-          <div class="title">Cadastro de serviços</div>
-          <div class="sub">Crie e organize os serviços base. A EAP puxa essa lista para montar predecessoras.</div>
+          <div class="title plnPageTitle packageScreenTitle">Tela de Pacotes</div>
+          <div class="sub plnPageSubtitle packageScreenSubtitle">Catálogo oficial para pacotes, serviços, equipes e subserviços.</div>
         </div>
-        <div class="actions">
-          <button class="btn" id="btnServiceCatalogOpenEap">Abrir EAP</button>
+        <div class="actions" style="margin-left:auto;">
+          <button class="btn" id="btnServiceCatalogOpenEap">Linha de Balanço</button>
         </div>
       </div>
       <div style="padding:14px;">
-        <div class="guidedServiceToolbar" style="margin-bottom:12px;">
-          <div class="field" style="margin:0;">
-            <label>Nome do serviço</label>
-            <input id="serviceCatalogName" placeholder="Ex.: ALVENARIA EXTERNA" />
-          </div>
-          <div class="field" style="margin:0;">
-            <label>Código EAP</label>
-            <input id="serviceCatalogCode" class="mono" maxlength="10" placeholder="Auto" />
-          </div>
-          <button class="btn primary" id="btnServiceCatalogAdd" type="button">Adicionar serviço</button>
+        <div class="packageCatalogStats" aria-label="Resumo da tela de pacotes">
+          <div class="packageStat"><span class="k">Pacotes</span><strong id="packageStatPackages">—</strong></div>
+          <div class="packageStat"><span class="k">Serviços</span><strong id="packageStatServices">—</strong></div>
+          <div class="packageStat"><span class="k">Equipes</span><strong id="packageStatTeams">—</strong></div>
+          <div class="packageStat"><span class="k">Subserviços</span><strong id="packageStatSubservices">—</strong></div>
         </div>
-        <div class="guidedServiceToolbarHint" style="margin-bottom:12px;">A montagem de predecessoras acontece na tela da EAP. Aqui fica apenas o cadastro base dos serviços.</div>
-        <div id="serviceCatalogEditor" class="guidedServiceEditor"></div>
+        <div class="actions" style="margin-bottom:12px; justify-content:flex-start;">
+          <button class="btn primary" id="btnServiceCatalogShowAdd" type="button">+ Novo pacote</button>
+        </div>
+        <div class="packageCatalogLayout">
+          <div class="packageCatalogMain">
+            <div id="serviceCatalogEditor" class="guidedServiceEditor"></div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -6509,8 +6817,8 @@ document.addEventListener("click", function(ev){
     <section class="card" style="grid-column:1 / -1;">
       <div class="cardHead">
         <div>
-          <div class="title">Linha de base</div>
-          <div class="sub">Gerencie o snapshot oficial do planejamento aplicado.</div>
+          <div class="title plnPageTitle">Linha de base</div>
+          <div class="sub plnPageSubtitle">Gerencie o snapshot oficial do planejamento aplicado.</div>
         </div>
       </div>
       <div style="padding:14px;">
@@ -6535,26 +6843,28 @@ document.addEventListener("click", function(ev){
     <section class="card" style="grid-column:1 / -1;">
       <div class="cardHead">
         <div>
-          <div class="title">Dashboards</div>
-          <div class="sub">Visões executiva e operacional do planejamento.</div>
+          <div class="title plnPageTitle">Indicadores</div>
+          <div class="sub plnPageSubtitle">Painel executivo de desempenho do planejamento e da execução.</div>
         </div>
       </div>
       <div style="padding:14px;">
         <div id="dashMenuTabs" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-          <button class="btn primary" id="btnDashExec" type="button">Dashboard executivo</button>
-          <button class="btn" id="btnDashGroup" type="button">Dashboard grupos</button>
-          <button class="btn" id="btnDashOper" type="button">Dashboard operacional</button>
+          <button class="btn primary" id="btnDashExec" type="button">Executivo</button>
+          <button class="btn" id="btnDashGroup" type="button">Grupos</button>
+          <button class="btn" id="btnDashOper" type="button">Operacional</button>
         </div>
 
         <div id="dashExecScreen">
-          <div id="dashKpis" style="display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:10px; margin-bottom:10px;"></div>
-          <div id="dashExecIndicators" style="display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:8px; margin-bottom:10px;"></div>
-          <div id="dashExecAlerts" style="padding:10px 12px; border:1px solid rgba(15,23,42,.08); border-radius:12px; background:#fff;"></div>
-          <div id="dashExecWorkChart" style="margin-top:12px; border:1px solid rgba(15,23,42,.10); border-radius:12px; overflow:hidden;">
-            <div style="padding:10px 12px; border-bottom:1px solid rgba(15,23,42,.08); background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.95)); font-size:12px; font-weight:900; color:#0f172a;">Obra inteira · previsto / projetado / realizado</div>
-            <div id="dashExecWorkChartBody" style="padding:10px 12px;"></div>
+          <div id="dashKpis" style="display:grid; grid-template-columns:repeat(4,minmax(190px,1fr)); gap:12px; margin-bottom:12px;"></div>
+          <div id="dashExecIndicators" style="display:none;"></div>
+          <div id="dashExecAlerts" style="display:none; padding:10px 12px; border:1px solid rgba(15,23,42,.08); border-radius:12px; background:#fff; margin-bottom:12px;"></div>
+          <div style="display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr); gap:12px; align-items:start;">
+            <div id="dashExecWorkChart" style="border:1px solid rgba(15,23,42,.10); border-radius:16px; overflow:hidden; background:#fff;">
+              <div style="padding:10px 12px; border-bottom:1px solid rgba(15,23,42,.08); background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.95)); font-size:12px; font-weight:900; color:#0f172a;">Curva S — Planejado × Realizado</div>
+              <div id="dashExecWorkChartBody" style="padding:10px 12px;"></div>
+            </div>
+            <div id="dashExecMonthPlanBars" style="border:1px solid rgba(15,23,42,.10); border-radius:16px; background:#fff; padding:10px 12px;"></div>
           </div>
-          <div id="dashExecMonthPlanBars" style="margin-top:12px; border:1px solid rgba(15,23,42,.10); border-radius:12px; background:#fff; padding:10px 12px;"></div>
         </div>
 
         <div id="dashGroupScreen" style="display:none;">
@@ -8065,6 +8375,8 @@ const BR = {
   todayISO(){ return getSystemTodayISO(); },
   addDays(d,n){ const x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; },
   isWorkday(d, workdaysSet, holidaysSet){
+    workdaysSet = workdaysSet instanceof Set ? workdaysSet : new Set([1,2,3,4,5]);
+    holidaysSet = holidaysSet instanceof Set ? holidaysSet : new Set();
     const wd=BR.weekdayISO(d);
     if(!workdaysSet.has(wd)) return false;
     const iso=BR.iso(d);
@@ -8072,11 +8384,17 @@ const BR = {
     return true;
   },
   nextWorkday(d, workdaysSet, holidaysSet){
+    if(!(d instanceof Date) || isNaN(d)) d = BR.parseISO(BR.todayISO()) || new Date();
+    workdaysSet = workdaysSet instanceof Set ? workdaysSet : new Set([1,2,3,4,5]);
+    holidaysSet = holidaysSet instanceof Set ? holidaysSet : new Set();
     let x=new Date(d.getTime());
     while(!BR.isWorkday(x, workdaysSet, holidaysSet)) x=BR.addDays(x,1);
     return x;
   },
   addWorkdays(startD, add, workdaysSet, holidaysSet){
+    if(!(startD instanceof Date) || isNaN(startD)) startD = BR.parseISO(BR.todayISO()) || new Date();
+    workdaysSet = workdaysSet instanceof Set ? workdaysSet : new Set([1,2,3,4,5]);
+    holidaysSet = holidaysSet instanceof Set ? holidaysSet : new Set();
     let x=new Date(startD.getTime());
     let n=add;
     while(n>0){
@@ -8182,7 +8500,7 @@ function defaultState(){
     activityGraph:{ activities:[], dependencies:[], importedAtISO:null, source:null },
     importPathStore:{ byService:{} },
     calendarDays:[],
-ui:{selectedServiceId:null, rowH:28, colW:220, planViewMode:"compact", plannerVisualMode:"lob", showBaseline:true, plannerServiceSort:"near_first", plannerServiceQuery:"", plannerServiceQueries:[], plannerLocationQuery:"", lobZoom:1, lobMonthsAhead:6, plannerGridFullscreen:false, autoDependencyMode:"explicit_only", autoPlannerUpdate:false, showWeekendInFollowUp:false, showHolidayInFollowUp:false},
+ui:{selectedServiceId:null, rowH:28, colW:220, planViewMode:"compact", plannerVisualMode:"matrix", showBaseline:true, plannerServiceSort:"near_first", plannerServiceQuery:"", plannerServiceQueries:[], plannerLocationQuery:"", lobZoom:1, lobMonthsAhead:6, plannerGridFullscreen:false, autoDependencyMode:"explicit_only", autoPlannerUpdate:false, showWeekendInFollowUp:false, showHolidayInFollowUp:false},
     companies:[],
     serviceCompanies:{},
     pavCompanies:{},
@@ -8224,7 +8542,7 @@ function savePlannerPrefsToStorage(){
       plannerServiceQuery: String(state?.ui?.plannerServiceQuery || ""),
       plannerServiceQueries: Array.isArray(state?.ui?.plannerServiceQueries) ? state.ui.plannerServiceQueries.map(x=>String(x||"").trim()).filter(Boolean) : [],
       plannerLocationQuery: String(state?.ui?.plannerLocationQuery || ""),
-      plannerVisualMode: String(state?.ui?.plannerVisualMode || "lob"),
+      plannerVisualMode: String(state?.ui?.plannerVisualMode || "matrix"),
       lobZoom: Math.max(0.4, Math.min(3, Number(state?.ui?.lobZoom||1))),
       lobMonthsAhead: Math.max(0, Math.min(24, Math.round(Number(state?.ui?.lobMonthsAhead||0)))),
       plannerGridFullscreen: !!state?.ui?.plannerGridFullscreen,
@@ -8523,6 +8841,7 @@ function _ensureStateContracts(){
     state.cycles = Array.isArray(state.cycles) ? state.cycles : [];
     state.blocks = Array.isArray(state.blocks) ? state.blocks : [];
     state.calendarDays = Array.isArray(state.calendarDays) ? state.calendarDays : [];
+    if(typeof ensureCalendarStateContract === "function") ensureCalendarStateContract(state, { source:"state_contract_guard" });
     state.dependencies = Array.isArray(state.dependencies) ? state.dependencies : [];
     state.plan = (state.plan && typeof state.plan==='object') ? state.plan : { blocks: [] };
     state.plan.blocks = Array.isArray(state.plan.blocks) ? state.plan.blocks : [];
@@ -9335,6 +9654,7 @@ function clearLog(){
 }
 initTestLog();
 loadProjectDatesFromStorage();
+try{ if(typeof ensureCalendarStateContract === "function") ensureCalendarStateContract(state, { source:"boot_after_project_dates" }); }catch(_){}
 loadCompaniesFromStorage();
 loadServicesFromStorage();
 loadDepsFromStorage();
@@ -9343,6 +9663,11 @@ ensureCyclesForServices();
 
 /** ===== Calendario (dias uteis) ===== */
 function buildCalendarDays(){
+  if(typeof ensureCalendarStateContract === "function"){
+    ensureCalendarStateContract(state, { source:"buildCalendarDays" });
+  }else if(!state.calendar || typeof state.calendar !== "object"){
+    state.calendar = { startDateISO:"2026-02-24", endDateISO:"2026-03-14", workdays:[1,2,3,4,5], holidays:[] };
+  }
   const {startDateISO,endDateISO,workdays,holidays}=state.calendar;
   const workdaysSet=new Set(workdays);
   const holidaysSet=new Set(holidays);
@@ -9396,6 +9721,63 @@ function buildCalendarDays(){
   try{ window.calendarDays = state.calendarDays; }catch(e){}
   log(`[CAL] workdays=${days.length} range=${startDateISO}..${endDateISO}`);
 }
+
+function auditPlannusCalendar(){
+  const st = window.state || state || {};
+  if(typeof ensureCalendarStateContract === "function"){
+    ensureCalendarStateContract(st, { source:"calendar_audit" });
+  }
+  const cal = st.calendar || {};
+  const planBlocks = (typeof _getActivePlanBlocks === "function" ? _getActivePlanBlocks() : (Array.isArray(st?.plan?.blocks) ? st.plan.blocks : [])).filter(Boolean);
+  const days = Array.isArray(st.calendarDays) ? st.calendarDays : [];
+  const isISO = (v)=>/^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
+  const starts = [];
+  const ends = [];
+  const invalidBlocks = [];
+  for(const b of planBlocks){
+    const s = String(b?.startDateISO || b?.startISO || b?.planStartISO || "").slice(0,10);
+    const e = String(b?.endDateISO || b?.endISO || b?.planFinishISO || s || "").slice(0,10);
+    if(isISO(s)) starts.push(s);
+    if(isISO(e)) ends.push(e);
+    if(!isISO(s) || !isISO(e)) invalidBlocks.push({ id:b?.id || null, serviceId:b?.serviceId || null, locationId:b?.locationId || null, start:s || null, end:e || null });
+  }
+  starts.sort();
+  ends.sort();
+  const minBlockStart = starts[0] || null;
+  const maxBlockEnd = ends[ends.length - 1] || null;
+  const calendarStart = String(cal.startDateISO || "").slice(0,10) || null;
+  const calendarEnd = String(cal.endDateISO || "").slice(0,10) || null;
+  const warnings = [];
+  if(!st.calendar) warnings.push("missing_state_calendar");
+  if(!isISO(calendarStart)) warnings.push("invalid_calendar_start");
+  if(!isISO(calendarEnd)) warnings.push("invalid_calendar_end");
+  if(calendarStart && calendarEnd && calendarEnd < calendarStart) warnings.push("calendar_end_before_start");
+  if(minBlockStart && calendarStart && minBlockStart < calendarStart) warnings.push("blocks_before_calendar_start");
+  if(maxBlockEnd && calendarEnd && maxBlockEnd > calendarEnd) warnings.push("blocks_after_calendar_end");
+  if(planBlocks.length && !days.length) warnings.push("empty_calendar_days_with_blocks");
+  const out = {
+    calendarStart,
+    calendarEnd,
+    fullStartISO: cal.fullStartISO || null,
+    fullEndISO: cal.fullEndISO || null,
+    forceFullRange: !!cal.forceFullRange,
+    autoExtend: cal.autoExtend !== false,
+    workdays: Array.isArray(cal.workdays) ? cal.workdays.slice() : [],
+    holidaysCount: Array.isArray(cal.holidays) ? cal.holidays.length : 0,
+    calendarDaysCount: days.length,
+    calendarFirstDay: days[0]?.dateISO || null,
+    calendarLastDay: days[days.length - 1]?.dateISO || null,
+    planBlocksCount: planBlocks.length,
+    minBlockStart,
+    maxBlockEnd,
+    invalidBlocksCount: invalidBlocks.length,
+    invalidBlockSamples: invalidBlocks.slice(0, 10),
+    warnings
+  };
+  console.log("[PLANNUS_CALENDAR_AUDIT]", out);
+  return out;
+}
+try{ window.PLANNUS_AUDIT_CALENDAR = auditPlannusCalendar; }catch(_){}
 
 
 function maxISO(a,b){ return (String(a) > String(b)) ? a : b; }
@@ -9560,6 +9942,54 @@ function _ensurePlannerCalendarFullProject(){
     return false;
   }
 }
+function prepareFollowUpFromActivePlanningSnapshot(options){
+  const cfg = (options && typeof options === "object") ? options : {};
+  try{
+    _ensureStateContracts();
+    state.ui = state.ui || {};
+    state.calendar = state.calendar || {};
+
+    const resolved = (typeof getCanonicalPlannerBlocksForFollowUp === "function")
+      ? getCanonicalPlannerBlocksForFollowUp()
+      : { blocks:_getActivePlanBlocks(), source:"active-plan" };
+    const blocks = Array.isArray(resolved?.blocks) ? resolved.blocks : [];
+
+    if(cfg.preferMatrix === true){
+      state.ui.plannerVisualMode = "matrix";
+    }
+
+    const range = syncCalendarRangeToBlocks(blocks, { applyToVisible:true });
+    if(range?.ok){
+      state.calendar.fullStartISO = range.minStart;
+      state.calendar.fullEndISO = range.maxEnd;
+      state.calendar.startDateISO = range.minStart;
+      state.calendar.endDateISO = range.maxEnd;
+      state.calendar.forceFullRange = true;
+    }
+
+    if(cfg.rebuildCalendar !== false && range?.ok){
+      buildCalendarDays();
+    }
+
+    const diagnostic = {
+      ok: !!range?.ok,
+      source: resolved?.source || "empty",
+      blocksCount: blocks.length,
+      visualMode: String(state.ui.plannerVisualMode || "matrix"),
+      startDateISO: state.calendar.startDateISO || null,
+      endDateISO: state.calendar.endDateISO || null
+    };
+    if(window.__PLANNUS_AUDIT_FOLLOWUP_SNAPSHOT === true){
+      console.log("[FOLLOWUP_SNAPSHOT_CONTRACT]", diagnostic);
+    }
+    return diagnostic;
+  }catch(error){
+    const diagnostic = { ok:false, error:String(error?.message || error) };
+    console.warn("[FOLLOWUP_SNAPSHOT_CONTRACT]", diagnostic);
+    return diagnostic;
+  }
+}
+try{ window.PLANNUS_PREPARE_FOLLOWUP_SNAPSHOT = prepareFollowUpFromActivePlanningSnapshot; }catch(_){}
 function _depRelCodeToTypeMap(){
   return { TI:"FS", II:"SS", TT:"FF", IT:"SF", FS:"FS", SS:"SS", FF:"FF", SF:"SF" };
 }
@@ -12011,23 +12441,60 @@ function _guidedBuiltinTemplateByKey(key){
   if(k && GUIDED_EAP_TEMPLATES[k]) return GUIDED_EAP_TEMPLATES[k];
   return GUIDED_EAP_TEMPLATES.residencial_vertical_padrao;
 }
+function _guidedTemplateLabelKey(value){
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+function _guidedTemplateSavedAt(value){
+  const raw = value && typeof value === "object"
+    ? (value.updatedAtISO || value.createdAtISO || value.savedAtISO || "")
+    : value;
+  const ts = Date.parse(String(raw || ""));
+  return Number.isFinite(ts) ? ts : 0;
+}
+function _guidedPickTemplateOption(current, next){
+  const a = current && typeof current === "object" ? current : null;
+  const b = next && typeof next === "object" ? next : null;
+  if(!a) return b;
+  if(!b) return a;
+  const aCustom = String(a.sourceKind || "") === "custom" ? 1 : 0;
+  const bCustom = String(b.sourceKind || "") === "custom" ? 1 : 0;
+  if(aCustom !== bCustom) return bCustom > aCustom ? b : a;
+  const aTime = _guidedTemplateSavedAt(a);
+  const bTime = _guidedTemplateSavedAt(b);
+  if(aTime !== bTime) return bTime > aTime ? b : a;
+  return a;
+}
 function _guidedTemplateOptions(){
   const builtins = Object.values(GUIDED_EAP_TEMPLATES || {}).map(t=>({
     key:String(t.key||"").trim(),
     label:String(t.label||t.key||"").trim(),
     sourceKind:String(t.sourceKind||"builtin").trim() || "builtin",
-    description:String(t.description||"Modelo padrão").trim()
+    description:String(t.description||"Modelo padrão").trim(),
+    createdAtISO:String(t.createdAtISO || "").trim(),
+    updatedAtISO:String(t.updatedAtISO || "").trim(),
+    savedAtISO:String(t.savedAtISO || "").trim()
   })).filter(x=>x.key);
   const custom = Object.values(_readGuidedEapLibrary()).map(t=>({
     key:String(t.key||"").trim(),
     label:String(t.label||t.key||"").trim(),
     sourceKind:"custom",
-    description:String(t.description||"Modelo salvo").trim()
+    description:String(t.description||"Modelo salvo").trim(),
+    createdAtISO:String(t.createdAtISO || "").trim(),
+    updatedAtISO:String(t.updatedAtISO || "").trim(),
+    savedAtISO:String(t.savedAtISO || "").trim()
   })).filter(x=>x.key);
-  const byKey = new Map();
-  builtins.forEach(t=>byKey.set(t.key, t));
-  custom.forEach(t=>byKey.set(t.key, t));
-  return Array.from(byKey.values()).sort((a,b)=>{
+  const byLabel = new Map();
+  [...builtins, ...custom].forEach(t=>{
+    const lk = _guidedTemplateLabelKey(t.label || t.key);
+    if(!lk) return;
+    const prev = byLabel.get(lk);
+    byLabel.set(lk, _guidedPickTemplateOption(prev, t));
+  });
+  return Array.from(byLabel.values()).sort((a,b)=>{
     const ak = String(a.sourceKind||"") === "builtin" ? 0 : 1;
     const bk = String(b.sourceKind||"") === "builtin" ? 0 : 1;
     if(ak !== bk) return ak - bk;
@@ -13778,21 +14245,25 @@ function renderGuidedPlanningView(){
   const model = _guidedBuildModel(normalizedDraft);
   if(templateSelect){
     const templateOptions = _guidedTemplateOptions();
+    const draftLabelKey = _guidedTemplateLabelKey(normalizedDraft.templateLabel || "");
     const hasCurrentInLibrary = templateOptions.some(t=>String(t.key||"").trim() === String(normalizedDraft.templateKey || "").trim());
     const showDraftOption = !hasCurrentInLibrary;
+    const visibleTemplateOptions = showDraftOption
+      ? templateOptions.filter(t=>_guidedTemplateLabelKey(t.label || t.key) !== draftLabelKey)
+      : templateOptions;
     const optionsHtml = [];
     if(showDraftOption){
       optionsHtml.push(`<option value="__draft_current__" data-template-key="${escapeHtml(String(normalizedDraft.templateKey || ""))}" data-source-kind="draft" selected>${escapeHtml(`${String(normalizedDraft.templateLabel || "EAP em edição").trim() || "EAP em edição"} • rascunho`)}</option>`);
     }
-    templateOptions.forEach(t=>{
+    visibleTemplateOptions.forEach(t=>{
       const selected = !showDraftOption && t.key===normalizedDraft.templateKey ? " selected" : "";
       optionsHtml.push(`<option value="${escapeHtml(t.key)}" data-template-key="${escapeHtml(String(t.key || ""))}" data-source-kind="custom"${selected}>${escapeHtml(t.label)}</option>`);
     });
     templateSelect.innerHTML = optionsHtml.length ? optionsHtml.join("") : `<option value="" selected>Nenhum modelo salvo</option>`;
     if(showDraftOption){
       templateSelect.value = "__draft_current__";
-    }else if(templateOptions.length){
-      templateSelect.value = templateOptions.some(t=>t.key===normalizedDraft.templateKey) ? normalizedDraft.templateKey : templateOptions[0].key;
+    }else if(visibleTemplateOptions.length){
+      templateSelect.value = visibleTemplateOptions.some(t=>t.key===normalizedDraft.templateKey) ? normalizedDraft.templateKey : visibleTemplateOptions[0].key;
     }else{
       templateSelect.value = "";
     }
@@ -13897,10 +14368,14 @@ function renderGuidedApplyView(){
   const draft = _readGuidedPlanDraftSafe();
   const savedTemplateOptions = _guidedTemplateOptions();
   const draftKey = String(draft.templateKey || "").trim();
+  const draftLabelKey = _guidedTemplateLabelKey(draft.templateLabel || "");
   const draftHasServices = Array.isArray(draft.services) && draft.services.length > 0;
-  const templateOptions = (draftHasServices && draftKey)
-    ? [{ key:"__draft_current__", templateKey:draftKey, label:String(draft.templateLabel || "EAP em edição").trim() || "EAP em edição", sourceKind:"draft" }].concat(savedTemplateOptions)
+  const visibleSavedOptions = draftHasServices
+    ? savedTemplateOptions.filter(t=>_guidedTemplateLabelKey(t.label || t.key) !== draftLabelKey)
     : savedTemplateOptions;
+  const templateOptions = (draftHasServices && draftKey)
+    ? [{ key:"__draft_current__", templateKey:draftKey, label:String(draft.templateLabel || "EAP em edição").trim() || "EAP em edição", sourceKind:"draft" }].concat(visibleSavedOptions)
+    : visibleSavedOptions;
   const optionsHtml = templateOptions.length
     ? templateOptions.map(t=>{
         const source = String(t.sourceKind || "").trim() === "draft" ? "atual" : "salvo";
@@ -16266,16 +16741,25 @@ function _guidedPersistTemplateFromDraft(mode){
   const isUpdate = mode==="update" && String(currentTemplate?.sourceKind||"builtin")==="custom";
   let key = isUpdate ? String(currentTemplate.key||"").trim() : "";
   let label = String(draft.templateLabel || currentTemplate?.label || "").trim();
+  const labelKey = _guidedTemplateLabelKey(label);
+  const sameLabelCustom = Object.values(library).reduce((best, item)=>{
+    if(String(item?.sourceKind || "") !== "custom") return best;
+    if(_guidedTemplateLabelKey(item?.label || item?.key) !== labelKey) return best;
+    return _guidedPickTemplateOption(best, item);
+  }, null);
   if(!isUpdate){
     if(!label){
       try{ document.getElementById("guidedTemplateLabel")?.focus(); }catch(_){}
       alert("Informe o nome da EAP antes de salvar o modelo.");
       return false;
     }
-    key = _sanitizeGuidedTemplateKey(label);
-    let seq = 2;
-    while(GUIDED_EAP_TEMPLATES[key] || library[key]){
-      key = `${_sanitizeGuidedTemplateKey(label)}_${seq++}`;
+    key = String(sameLabelCustom?.key || "").trim();
+    if(!key){
+      key = _sanitizeGuidedTemplateKey(label);
+      let seq = 2;
+      while(GUIDED_EAP_TEMPLATES[key] || library[key]){
+        key = `${_sanitizeGuidedTemplateKey(label)}_${seq++}`;
+      }
     }
   }
   const nowISO = new Date().toISOString();
@@ -16381,6 +16865,7 @@ function _guidedDeleteTemplateByKey(templateKey){
     if(preservedServiceBase.length){
       state.serviceBaseCatalog = preservedServiceBase.map(x=>Object.assign({}, x));
       _syncServiceBaseCatalogToStateServicesWhenSafe();
+      _markServiceCatalogMutation("template_delete_preserved_service_base");
       saveServicesToStorage(state.serviceBaseCatalog);
       console.log("[PLANNUS_EAP]", { event:"template_delete_preserved_service_base", count:state.serviceBaseCatalog.length });
     }
@@ -16406,6 +16891,7 @@ function _guidedClearSavedTemplates(){
     if(preservedServiceBase.length){
       state.serviceBaseCatalog = preservedServiceBase.map(x=>Object.assign({}, x));
       _syncServiceBaseCatalogToStateServicesWhenSafe();
+      _markServiceCatalogMutation("clear_templates_preserved_service_base");
       saveServicesToStorage(state.serviceBaseCatalog);
       console.log("[PLANNUS_EAP]", { event:"clear_templates_preserved_service_base", count:state.serviceBaseCatalog.length });
     }
@@ -17133,7 +17619,7 @@ function _applyGuidedPlanningModelCore(){
   state.ui = state.ui || {};
   state.ui.autoDependencyMode = "explicit_only";
   state.ui.autoPlannerUpdate = false;
-  state.ui.plannerVisualMode = "lob";
+  state.ui.plannerVisualMode = "matrix";
   state.ui.plannerServiceQuery = "";
   state.ui.plannerServiceQueries = [];
   state.ui.plannerLocationQuery = "";
@@ -17153,10 +17639,16 @@ function _applyGuidedPlanningModelCore(){
       state.ui.__guidedApplyingPhase = true;
       try{ generateBlocks(); }catch(e){ console.warn("[GUIDED] generateBlocks after apply failed", e); restorePreviousPlanningState("generateBlocks_exception"); alert("A fase não foi aplicada porque a geração de blocos falhou. O planejamento anterior foi preservado."); return false; }
       try{
-        const sync = syncCalendarRangeToBlocks(_getActivePlanBlocks(), {});
-        if(sync && sync.changed){
+        const sync = syncCalendarRangeToBlocks(_getActivePlanBlocks(), { applyToVisible:true });
+        if(sync && sync.ok){
+          state.calendar = state.calendar || {};
+          state.calendar.fullStartISO = sync.minStart;
+          state.calendar.fullEndISO = sync.maxEnd;
+          state.calendar.startDateISO = sync.minStart;
+          state.calendar.endDateISO = sync.maxEnd;
+          state.calendar.forceFullRange = true;
           buildCalendarDays();
-          saveProjectDatesToStorage();
+          if(sync.changed) saveProjectDatesToStorage();
         }
       }catch(_){}
       if(!(_getActivePlanBlocks() || []).length){
@@ -17181,7 +17673,8 @@ function _applyGuidedPlanningModelCore(){
   }catch(_){}
   try{ scheduleRenderAll(); }catch(_){}
   try{ renderProjectHeader(); }catch(_){}
-  log(`[GUIDED] EAP aplicada ao planejamento: mode=${effectiveApplyMode} template=${model.template.key} serviçosBase=${model.services.length} atividades=${operational.services.length} locais=${model.locations.length} deps=${operational.dependencies.length} blocks=${(_getActivePlanBlocks()||[]).length} autoDeps=explicit_only`);
+  const appliedTemplateKey = String(model?.template?.key || model?.templateKey || model?.baseTemplateKey || assembly?.baseSnapshot?.templateKey || "sem_template").trim() || "sem_template";
+  log(`[GUIDED] EAP aplicada ao planejamento: mode=${effectiveApplyMode} template=${appliedTemplateKey} serviçosBase=${model.services.length} atividades=${operational.services.length} locais=${model.locations.length} deps=${operational.dependencies.length} blocks=${(_getActivePlanBlocks()||[]).length} autoDeps=explicit_only`);
   return true;
 }
 function _bindGuidedPlanningUI(){
@@ -24269,7 +24762,51 @@ function saveProjectDatesToStorage(){
 /** ===== EAP (Serviços) – Storage ===== */
 var __serviceCatalogLoadPromise = window.__serviceCatalogLoadPromise || null;
 let __serviceCatalogSaveTimer = null;
+var __serviceCatalogMutationSeq = Number(window.__serviceCatalogMutationSeq || 0) || 0;
+function _markServiceCatalogMutation(reason){
+  __serviceCatalogMutationSeq = (Number(__serviceCatalogMutationSeq || 0) + 1) || 1;
+  try{ window.__serviceCatalogMutationSeq = __serviceCatalogMutationSeq; }catch(_){}
+  try{ window.__serviceCatalogLastMutationReason = String(reason || "mutation"); }catch(_){}
+  return __serviceCatalogMutationSeq;
+}
+function _normalizePackageSubservices(list){
+  return (Array.isArray(list) ? list : []).map((sub, idx)=>({
+    id: String(sub?.id || sub?.key || `sub_${idx+1}`).trim(),
+    name: String(sub?.name || sub?.nome || "").trim(),
+    object: String(sub?.object || sub?.objeto || sub?.target || "").trim(),
+    durationDefault: Math.max(1, Number(sub?.durationDefault || sub?.duration || sub?.duracaoDias || 5) || 5)
+  })).filter(sub=>sub.name || sub.object);
+}
+function _serviceNumber(value, fallback = 0){
+  const n = Number(String(value ?? "").replace(",", "."));
+  return Number.isFinite(n) ? n : fallback;
+}
+function _normalizeProductivityUnit(value){
+  const unit = String(value || "").trim();
+  return unit || "m²/dia";
+}
+function _buildProductivityText(value, unit){
+  const n = _serviceNumber(value, 0);
+  return n > 0 ? `${n} ${_normalizeProductivityUnit(unit)}` : "";
+}
+function _buildTeamBaseText(professionals, helpers, teams){
+  const prof = Math.max(0, Math.round(_serviceNumber(professionals, 0)));
+  const aid = Math.max(0, Math.round(_serviceNumber(helpers, 0)));
+  const teamCount = Math.max(1, Math.round(_serviceNumber(teams, 1)));
+  const people = [];
+  if(prof) people.push(`${prof} oficial${prof === 1 ? "" : "is"}`);
+  if(aid) people.push(`${aid} ajud.`);
+  return people.length ? `${people.join(" + ")} · ${teamCount} equipe${teamCount === 1 ? "" : "s"}` : `${teamCount} equipe${teamCount === 1 ? "" : "s"}`;
+}
 function _normalizeServiceCatalogItem(svc, idx){
+  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const productivityValue = Math.max(0, _serviceNumber(svc?.productivityValue ?? svc?.productivityQty ?? svc?.produtividadeValor ?? 0));
+  const productivityUnit = _normalizeProductivityUnit(svc?.productivityUnit || svc?.productivityUnity || svc?.produtividadeUnidade || "");
+  const teamProfessionals = Math.max(0, Math.round(_serviceNumber(svc?.teamProfessionals ?? svc?.professionals ?? svc?.oficiais ?? 0)));
+  const teamHelpers = Math.max(0, Math.round(_serviceNumber(svc?.teamHelpers ?? svc?.helpers ?? svc?.ajudantes ?? 0)));
+  const teams = Math.max(1, Math.round(_serviceNumber(svc?.teams || 1, 1)));
+  const productivityText = String(svc?.productivityText || svc?.productivity || svc?.productivityLabel || "").trim() || _buildProductivityText(productivityValue, productivityUnit);
+  const teamBaseText = String(svc?.teamBaseText || svc?.teamBase || svc?.teamBaseLabel || "").trim() || _buildTeamBaseText(teamProfessionals, teamHelpers, teams);
   return _ensureServiceColorRecord({
     id: String(svc?.id || svc?.key || "").trim(),
     name: String(svc?.name || "").trim(),
@@ -24277,12 +24814,21 @@ function _normalizeServiceCatalogItem(svc, idx){
     code: String(svc?.code || "").trim(),
     classification: String(svc?.classification || "").trim(),
     scopeKind: _guidedScopeKey(String(svc?.scopeKind || "todos")),
-    teams: Math.max(1, Number(svc?.teams || 1) || 1),
+    teams,
+    teamProfessionals,
+    teamHelpers,
     durationDefault: Math.max(1, Number(svc?.durationDefault || 5) || 5),
     companyDefault: String(svc?.companyDefault || "").trim(),
     templateKey: String(svc?.templateKey || "").trim(),
     sourceKind: String(svc?.sourceKind || "").trim(),
-    color: String(svc?.color || svc?.serviceColor || "").trim()
+    color: String(svc?.color || svc?.serviceColor || "").trim(),
+    productivityValue,
+    productivityUnit,
+    productivityText,
+    teamBaseText,
+    strategic: svc?.strategic === true || svc?.estrategico === true || svc?.isStrategic === true || String(svc?.strategic || svc?.estrategico || svc?.isStrategic || "").toLowerCase() === "sim" || String(svc?.strategic || svc?.estrategico || svc?.isStrategic || "").toLowerCase() === "true",
+    subservices,
+    subservicesCount: subservices.length || Math.max(0, Number(svc?.subservicesCount || svc?.subservicesTotal || 0) || 0)
   }, idx + 1);
 }
 function _serviceRepoApi(){
@@ -24361,6 +24907,14 @@ function _isOperationalPlanningServiceRecord(svc){
   ));
 }
 function _stripServiceBaseRecord(svc, idx){
+  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const productivityValue = Math.max(0, _serviceNumber(svc?.productivityValue ?? svc?.productivityQty ?? svc?.produtividadeValor ?? 0));
+  const productivityUnit = _normalizeProductivityUnit(svc?.productivityUnit || svc?.productivityUnity || svc?.produtividadeUnidade || "");
+  const teamProfessionals = Math.max(0, Math.round(_serviceNumber(svc?.teamProfessionals ?? svc?.professionals ?? svc?.oficiais ?? 0)));
+  const teamHelpers = Math.max(0, Math.round(_serviceNumber(svc?.teamHelpers ?? svc?.helpers ?? svc?.ajudantes ?? 0)));
+  const teams = Math.max(1, Math.round(_serviceNumber(svc?.teams || 1, 1)));
+  const productivityText = String(svc?.productivityText || svc?.productivity || svc?.productivityLabel || "").trim() || _buildProductivityText(productivityValue, productivityUnit);
+  const teamBaseText = String(svc?.teamBaseText || svc?.teamBase || svc?.teamBaseLabel || "").trim() || _buildTeamBaseText(teamProfessionals, teamHelpers, teams);
   const clean = {
     id: String(svc?.id || svc?.key || "").trim(),
     name: String(svc?.name || "").trim(),
@@ -24368,12 +24922,21 @@ function _stripServiceBaseRecord(svc, idx){
     code: String(svc?.code || "").trim(),
     classification: String(svc?.classification || "").trim(),
     scopeKind: _guidedScopeKey(String(svc?.scopeKind || "todos")),
-    teams: Math.max(1, Number(svc?.teams || 1) || 1),
+    teams,
+    teamProfessionals,
+    teamHelpers,
     durationDefault: Math.max(1, Number(svc?.durationDefault || svc?.duration || 5) || 5),
     companyDefault: String(svc?.companyDefault || "").trim(),
     templateKey: String(svc?.templateKey || "").trim(),
     sourceKind: String(svc?.sourceKind || "").trim() || "custom",
-    color: String(svc?.color || svc?.serviceColor || "").trim()
+    color: String(svc?.color || svc?.serviceColor || "").trim(),
+    productivityValue,
+    productivityUnit,
+    productivityText,
+    teamBaseText,
+    strategic: svc?.strategic === true || svc?.estrategico === true || svc?.isStrategic === true || String(svc?.strategic || svc?.estrategico || svc?.isStrategic || "").toLowerCase() === "sim" || String(svc?.strategic || svc?.estrategico || svc?.isStrategic || "").toLowerCase() === "true",
+    subservices,
+    subservicesCount: subservices.length || Math.max(0, Number(svc?.subservicesCount || svc?.subservicesTotal || 0) || 0)
   };
   return _ensureServiceColorRecord(clean, idx + 1);
 }
@@ -24459,6 +25022,7 @@ function _syncServiceBaseCatalogToStateServicesWhenSafe(){
 }
 async function saveServicesToStorage(sourceList, forceImmediate = false){
   try{
+    const requestSeq = Number(__serviceCatalogMutationSeq || 0) || 0;
     const arr = _getServiceBaseCatalogForStorage(sourceList).map((s, idx)=>_normalizeServiceCatalogItem(s, idx));
     state.serviceBaseCatalog = arr.map(x=>Object.assign({}, x));
     _syncServiceBaseCatalogToStateServicesWhenSafe();
@@ -24470,16 +25034,24 @@ async function saveServicesToStorage(sourceList, forceImmediate = false){
     }
     const persist = async ()=>{
       try{
+        if(requestSeq !== (Number(__serviceCatalogMutationSeq || 0) || 0)){
+          console.log("[EAP] saveServicesToStorage ignorado por mutacao mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
+          return { ok:false, skipped:true, stale:true };
+        }
         const repo = _serviceRepoApi();
         if(!repo || typeof repo.saveServicesCatalog !== "function"){
           console.warn("[EAP] saveServicesToStorage skipped; API repo unavailable");
           return { ok:false, skipped:true };
         }
         const { res, data } = await repo.saveServicesCatalog(arr);
+        if(requestSeq !== (Number(__serviceCatalogMutationSeq || 0) || 0)){
+          console.log("[EAP] saveServicesToStorage resposta ignorada por mutacao mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
+          return { ok:false, skipped:true, stale:true, res, data };
+        }
         if(res.ok && data?.ok !== false){
           log(`[EAP] serviços salvos na API: ${arr.length}`);
           if(document.getElementById("serviceCatalogEditor")){
-            try{ renderServiceCatalogView(); }catch(_){}
+            try{ await loadServicesFromStorage(); }catch(_){}
           }
           if(document.getElementById("viewGuided")){
             try{ renderGuidedPlanningView(); }catch(_){}
@@ -25194,6 +25766,7 @@ document.addEventListener("keydown", (ev)=>{
   }
 });
 __bindOn("btnExportHTMLTop","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
+__bindOn("btnPlannerSaveOnlineHeader","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
 __bindOn("btnExportPlannerPDFTop","click", ()=>{ try{ exportPlannerPDFNow(); }catch(e){ console.warn(e);} });
 // [MIGRATED_TO_ACTIONS] btnBaselineSave
 __bindOn("btnExportHTML", "click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
@@ -25482,6 +26055,7 @@ function setView(name){
   // planner | pav | service | config | eap
   if(name==="projectpath" || name==="mspimport" || name==="eap") name = "guided";
   if(name==="guidedapply") name = "guidedapply";
+  const previousViewName = String(state?.ui?.currentViewName || "").trim().toLowerCase();
   try{
     state.ui = state.ui || {};
     state.ui.currentViewName = String(name || "").trim().toLowerCase();
@@ -25560,7 +26134,18 @@ function setView(name){
   }else if(isPav){
     rebuildLocTable();
   }else if(isService){
-    try{ renderServiceCatalogView(); }catch(e){ console.warn("[SERVICE_VIEW] render fail", e); }
+    try{
+      const p = loadServicesFromStorage();
+      if(p && typeof p.then === "function"){
+        p.then(()=>{
+          if(viewServiceEl && viewServiceEl.style.display === "block"){
+            try{ renderServiceCatalogView(); }catch(e){ console.warn("[SERVICE_VIEW] render fail", e); }
+          }
+        }).catch(e=>console.warn("[SERVICE_VIEW] reload fail", e));
+      }else{
+        try{ renderServiceCatalogView(); }catch(e){ console.warn("[SERVICE_VIEW] render fail", e); }
+      }
+    }catch(e){ console.warn("[SERVICE_VIEW] reload fail", e); }
   }else if(isDashboard){
     try{ renderDashboardView(); }catch(e){ console.warn("[DASHBOARD_VIEW] render fail", e); }
   }else if(isBaseline){
@@ -25573,6 +26158,12 @@ function setView(name){
     // nothing special; keep current values visible
     // (inputs already bound to state on change)
   }else{
+    try{
+      prepareFollowUpFromActivePlanningSnapshot({
+        preferMatrix: previousViewName !== "planner",
+        rebuildCalendar: true
+      });
+    }catch(_){}
     renderAll();
   try{ renderProjectHeader(); }catch(_){ }
   }
@@ -25818,64 +26409,144 @@ function renderServiceEngineView(){
 }
 function renderServiceCatalogView(){
   const root = document.getElementById("serviceCatalogEditor");
-  const btnAdd = document.getElementById("btnServiceCatalogAdd");
+  const btnShowAdd = document.getElementById("btnServiceCatalogShowAdd");
   const btnOpenEap = document.getElementById("btnServiceCatalogOpenEap");
-  const nameEl = document.getElementById("serviceCatalogName");
-  const codeEl = document.getElementById("serviceCatalogCode");
-  if(!root || !btnAdd || !btnOpenEap || !nameEl || !codeEl) return;
+  if(!root || !btnShowAdd || !btnOpenEap) return;
   try{ _ensureServiceBaseCatalogVisible(); }catch(_){}
   const services = _getServiceBaseCatalogForStorage().slice().sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
   const selectedId = String(state?.ui?.selectedServiceId || services[0]?.id || "").trim();
   state.ui = state.ui || {};
   if(selectedId) state.ui.selectedServiceId = selectedId;
-  const renderRow = (svc, idx)=>`
-    <tr data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}"${String(svc.id||"").trim()===selectedId ? ` data-selected="1"` : ""}>
+  const getSubservicesCount = (svc)=>{
+    const nested = Array.isArray(svc?.subservices) ? svc.subservices : (Array.isArray(svc?.subservicos) ? svc.subservicos : []);
+    if(nested.length) return nested.length;
+    const raw = Number(svc?.subservicesCount ?? svc?.subservicesTotal ?? 0);
+    return Number.isFinite(raw) ? Math.max(0, raw) : 0;
+  };
+  const getSubservices = (svc)=>_normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const productivityUnits = ["m²/dia", "m³/dia", "m/dia", "un/dia", "pacote/dia"];
+  const renderProductivityUnitOptions = (selected)=>{
+    const current = _normalizeProductivityUnit(selected);
+    const units = productivityUnits.includes(current) ? productivityUnits : [current].concat(productivityUnits);
+    return units.map(unit=>`<option value="${escapeHtml(unit)}"${unit===current ? " selected" : ""}>${escapeHtml(unit)}</option>`).join("");
+  };
+  const getProductivityText = (svc)=>{
+    const n = _serviceNumber(svc?.productivityValue ?? svc?.productivityQty ?? 0, 0);
+    if(n > 0) return _buildProductivityText(n, svc?.productivityUnit);
+    const txt = String(svc?.productivityText || svc?.productivity || svc?.productivityLabel || "").trim();
+    return txt || "—";
+  };
+  const getTeamBaseText = (svc)=>{
+    const prof = Number(svc?.teamProfessionals ?? svc?.professionals ?? 0);
+    const aid = Number(svc?.teamHelpers ?? svc?.helpers ?? 0);
+    const teams = Number(svc?.teams || 0);
+    if(prof || aid || teams) return _buildTeamBaseText(prof, aid, teams || 1);
+    const txt = String(svc?.teamBaseText || svc?.teamBase || svc?.teamBaseLabel || "").trim();
+    if(txt) return txt;
+    return "—";
+  };
+  const isStrategic = (svc)=>{
+    const raw = svc?.strategic ?? svc?.estrategico ?? svc?.isStrategic ?? false;
+    return raw === true || raw === 1 || String(raw).toLowerCase() === "sim" || String(raw).toLowerCase() === "true";
+  };
+  const getClassificationText = (svc)=>{
+    const txt = String(svc?.classification || svc?.classificacao || svc?.classificationLabel || "").trim();
+    return txt || "—";
+  };
+  const totalSubservices = services.reduce((acc,svc)=>acc + getSubservicesCount(svc), 0);
+  const totalTeams = services.reduce((acc,svc)=>{
+    const n = Number(svc?.teams ?? svc?.teamCount ?? 0);
+    return acc + (Number.isFinite(n) ? Math.max(0, n) : 0);
+  }, 0);
+  const selected = services.find(s=>String(s?.id||"").trim()===selectedId) || services[0] || null;
+  const renderRow = (svc, idx)=>{
+    const sid = String(svc.id||"").trim();
+    return `
+    <tr data-service-catalog-select="${escapeHtml(sid)}" data-service-catalog-key="${escapeHtml(sid)}"${sid===selectedId ? ` data-selected="1"` : ""}>
       <td style="width:44px;"><div class="svcNum">${idx+1}</div></td>
-      <td style="width:106px; padding-right:14px;">
-        <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="code" class="mono" value="${escapeHtml(String(svc.code || ""))}" />
+      <td style="width:250px; padding-left:14px; padding-right:14px;">
+        <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="name" value="${escapeHtml(String(svc.name || ""))}" placeholder="Nome do pacote" />
       </td>
-      <td style="width:320px; padding-left:14px; padding-right:14px;">
-        <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="name" value="${escapeHtml(String(svc.name || ""))}" />
+      <td style="width:120px; padding-right:14px;">
+        <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="code" class="mono" value="${escapeHtml(String(svc.code || ""))}" placeholder="PAC-000" />
       </td>
-      <td style="width:140px; padding-right:14px;">
-        <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="classification" value="${escapeHtml(String(svc.classification || ""))}" placeholder="Ex.: Estrutural" />
+      <td style="width:150px; padding-right:14px;">
+        <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="classification" value="${escapeHtml(getClassificationText(svc) === "—" ? "" : getClassificationText(svc))}" placeholder="Ex.: Estrutural" />
       </td>
-      <td style="width:98px; padding-right:14px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="color" type="color" value="${escapeHtml(String(svc.color || svc.serviceColor || _plannerServiceColor(svc.id, svc) || "#2563eb"))}" style="width:34px; height:28px; padding:0; border:none; background:transparent;" />
-          <span style="display:inline-flex; width:26px; height:26px; border-radius:8px; border:1px solid rgba(148,163,184,.35); background:${escapeHtml(String(svc.color || svc.serviceColor || _plannerServiceColor(svc.id, svc) || "#2563eb"))};"></span>
+      <td style="width:170px; padding-right:14px;">
+        <div class="packageMetricPair">
+          <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="productivityValue" type="number" min="0" step="0.01" value="${escapeHtml(String(_serviceNumber(svc?.productivityValue ?? 0, 0) || ""))}" placeholder="Qtd." title="Quantidade por dia" />
+          <select data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="productivityUnit" title="Unidade de produtividade">
+            ${renderProductivityUnitOptions(svc?.productivityUnit)}
+          </select>
         </div>
       </td>
-      <td style="width:58px;">
-        <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="teams" class="mono" type="number" min="1" max="20" value="${escapeHtml(String(svc.teams || 1))}" />
-      </td>
-      <td style="width:62px;">
-        <input data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}" data-service-catalog-field="durationDefault" class="mono" type="number" min="1" value="${escapeHtml(String(svc.durationDefault || 5))}" />
-      </td>
-      <td style="width:170px; white-space:nowrap;">
-        <div class="serviceCatalogActions">
-          <button class="btn" type="button" data-service-catalog-action="up" data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}">↑</button>
-          <button class="btn" type="button" data-service-catalog-action="down" data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}">↓</button>
-          <button class="btn" type="button" data-service-catalog-action="open-eap" data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}">EAP</button>
-          <button class="btn" type="button" data-service-catalog-action="duplicate" data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}">Dup</button>
-          <button class="btn danger" type="button" data-service-catalog-action="remove" data-service-catalog-key="${escapeHtml(String(svc.id||"").trim())}">Del</button>
+      <td style="width:150px; padding-right:14px;">
+        <div class="packageTeamGrid">
+          <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="teamProfessionals" type="number" min="0" step="1" value="${escapeHtml(String(Math.max(0, Math.round(_serviceNumber(svc?.teamProfessionals ?? 0, 0)))))}" placeholder="Oficiais" title="Oficiais" />
+          <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="teamHelpers" type="number" min="0" step="1" value="${escapeHtml(String(Math.max(0, Math.round(_serviceNumber(svc?.teamHelpers ?? 0, 0)))))}" placeholder="Ajud." title="Ajudantes" />
         </div>
+      </td>
+      <td style="width:92px; padding-right:14px;">
+        <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="durationDefault" class="mono" type="number" min="1" value="${escapeHtml(String(svc.durationDefault || 5))}" />
+      </td>
+      <td style="width:92px; padding-right:14px;">
+        <label class="serviceCatalogFlag" title="Marcar pacote critico">
+          <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="strategic" type="checkbox"${isStrategic(svc) ? " checked" : ""} />
+        </label>
       </td>
     </tr>
-  `;
+  `;};
+  const buildPackageDetailHtml = (pkg)=>{
+    const selectedSubservices = pkg ? getSubservices(pkg) : [];
+    return pkg ? `
+    <div class="detailKicker">Pacote selecionado</div>
+    <div class="detailTitle">${escapeHtml(String(pkg.name || "Pacote"))}</div>
+    <div class="detailSub">Código: ${escapeHtml(String(pkg.code || "—"))}</div>
+    <div class="detailGrid">
+      <div class="detailCard"><span class="lbl">Subserviços</span><span class="val">${escapeHtml(String(getSubservicesCount(pkg)))}</span></div>
+      <div class="detailCard"><span class="lbl">Classificação</span><span class="val">${escapeHtml(getClassificationText(pkg))}</span></div>
+      <div class="detailCard"><span class="lbl">Produtividade</span><span class="val">${escapeHtml(getProductivityText(pkg))}</span></div>
+      <div class="detailCard"><span class="lbl">Equipe base</span><span class="val">${escapeHtml(getTeamBaseText(pkg))}</span></div>
+      <div class="detailCard"><span class="lbl">Duração</span><span class="val">${escapeHtml(String(pkg.durationDefault || 5))} dias</span></div>
+      <div class="detailCard"><span class="lbl">Crítico</span><span class="val">${isStrategic(pkg) ? "Sim" : "Não"}</span></div>
+    </div>
+    <div style="margin-top:14px; font-weight:900; color:#0f172a;">Subserviços explícitos do pacote</div>
+    <div class="packageSubserviceForm">
+      <div class="field"><label>Subserviço</label><input id="packageSubserviceName" placeholder="Ex.: Marcação" /></div>
+      <div class="field"><label>Objeto</label><input id="packageSubserviceObject" placeholder="Ex.: parede, bloco, fachada" /></div>
+      <div class="field"><label>Duração</label><input id="packageSubserviceDuration" class="mono" type="number" min="1" value="1" /></div>
+      <button class="btn primary" type="button" data-package-subservice-action="add" data-service-catalog-key="${escapeHtml(String(pkg.id || ""))}">Adicionar</button>
+    </div>
+    <div class="packageSubserviceList">
+      ${
+        selectedSubservices.length
+          ? selectedSubservices.map((sub, idx)=>`
+              <div class="packageSubserviceRow" data-package-subservice-index="${idx}" data-service-catalog-key="${escapeHtml(String(pkg.id || ""))}">
+                <input data-package-subservice-field="name" value="${escapeHtml(String(sub.name || ""))}" placeholder="Subserviço" />
+                <input data-package-subservice-field="object" value="${escapeHtml(String(sub.object || ""))}" placeholder="Objeto" />
+                <input data-package-subservice-field="durationDefault" class="mono" type="number" min="1" value="${escapeHtml(String(sub.durationDefault || 1))}" />
+                <button class="btn danger" type="button" data-package-subservice-action="remove" data-service-catalog-key="${escapeHtml(String(pkg.id || ""))}" data-package-subservice-index="${idx}">Del</button>
+              </div>
+            `).join("")
+          : `<div class="detailEmpty">Nenhum subserviço vinculado ao pacote selecionado.</div>`
+      }
+    </div>
+  ` : `<div class="detailEmpty">Nenhum pacote selecionado.</div>`;
+  };
   root.innerHTML = services.length ? `
     <div class="serviceCatalogShell">
       <table class="serviceCatalogTable">
         <thead>
           <tr>
             <th>#</th>
-            <th>Cód.</th>
-            <th>Nome do serviço</th>
+            <th>Pacote</th>
+            <th>Código</th>
             <th>Classificação</th>
-            <th>Cor</th>
-            <th>Eq.</th>
-            <th>Dur.</th>
-            <th>Ações</th>
+            <th>Produtividade</th>
+            <th>Equipe base</th>
+            <th>Duração</th>
+            <th>Crítico</th>
           </tr>
         </thead>
         <tbody>
@@ -25883,7 +26554,127 @@ function renderServiceCatalogView(){
         </tbody>
       </table>
     </div>
-  ` : `<div class="hint">Nenhum serviço cadastrado. Crie o primeiro serviço acima.</div>`;
+  ` : `<div class="hint">Nenhum pacote cadastrado. Crie o primeiro pacote acima.</div>`;
+  const pkgStats = {
+    packages: services.length,
+    services: services.length,
+    teams: totalTeams,
+    subservices: totalSubservices
+  };
+  const statPackages = document.getElementById("packageStatPackages");
+  const statServices = document.getElementById("packageStatServices");
+  const statTeams = document.getElementById("packageStatTeams");
+  const statSubservices = document.getElementById("packageStatSubservices");
+  if(statPackages) statPackages.textContent = String(pkgStats.packages);
+  if(statServices) statServices.textContent = String(pkgStats.services);
+  if(statTeams) statTeams.textContent = String(pkgStats.teams);
+  if(statSubservices) statSubservices.textContent = String(pkgStats.subservices);
+  const ensurePackageEditModal = ()=>{
+    let overlay = document.getElementById("servicePackageEditOverlay");
+    if(overlay) return overlay;
+    overlay = document.createElement("div");
+    overlay.id = "servicePackageEditOverlay";
+    overlay.className = "packageAddOverlay packageEditOverlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = `
+      <div class="packageAddModal" role="dialog" aria-modal="true" aria-labelledby="servicePackageEditTitle">
+        <div class="packageAddHeader">
+          <div>
+            <div class="k">Pacotes / Serviços</div>
+            <div class="t" id="servicePackageEditTitle">Editar pacote</div>
+          </div>
+          <button class="btn" type="button" data-package-edit-close>Fechar</button>
+        </div>
+        <div class="packageAddBody">
+          <div id="servicePackageEditBody" class="packageCatalogDetail" style="position:relative; top:auto; box-shadow:none;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = ()=>{
+      overlay.classList.remove("isOpen");
+      overlay.setAttribute("aria-hidden", "true");
+    };
+    overlay.addEventListener("click", ev=>{
+      if(ev.target === overlay || (ev.target instanceof HTMLElement && ev.target.closest("[data-package-edit-close]"))) close();
+    });
+    overlay.addEventListener("input", ev=>{
+      const el = ev.target;
+      if(!(el instanceof HTMLElement)) return;
+      const row = el.closest("[data-package-subservice-index]");
+      if(!row) return;
+      const key = String(row.getAttribute("data-service-catalog-key") || "").trim();
+      const subIdx = Number(row.getAttribute("data-package-subservice-index") || -1);
+      const field = String(el.getAttribute("data-package-subservice-field") || "").trim();
+      if(!key || subIdx < 0 || !field) return;
+      const items = _getServiceBaseCatalogForStorage().slice();
+      const idx = items.findIndex(s=>String(s.id||"").trim()===key);
+      if(idx < 0) return;
+      const next = { ...items[idx] };
+      const subs = getSubservices(next);
+      const sub = { ...(subs[subIdx] || {}) };
+      if(field === "durationDefault") sub.durationDefault = Math.max(1, Number(el.value || 0) || 1);
+      else sub[field] = String(el.value || "").trim();
+      subs[subIdx] = sub;
+      next.subservices = subs;
+      next.subservicesCount = subs.length;
+      items[idx] = next;
+      state.serviceBaseCatalog = items;
+      _syncServiceBaseCatalogToStateServicesWhenSafe();
+      _markServiceCatalogMutation(`subservice:${field}`);
+      try{ saveServicesToStorage(state.serviceBaseCatalog, false); }catch(_){}
+    });
+    overlay.addEventListener("click", async ev=>{
+      const btn = ev.target instanceof HTMLElement ? ev.target.closest("[data-package-subservice-action]") : null;
+      if(!btn) return;
+      const action = String(btn.getAttribute("data-package-subservice-action") || "").trim();
+      const key = String(btn.getAttribute("data-service-catalog-key") || "").trim();
+      if(!key || !action) return;
+      const items = _getServiceBaseCatalogForStorage().slice();
+      const idx = items.findIndex(s=>String(s.id||"").trim()===key);
+      if(idx < 0) return;
+      const next = { ...items[idx] };
+      const subs = getSubservices(next);
+      if(action === "add"){
+        const name = String(overlay.querySelector("#packageSubserviceName")?.value || "").trim();
+        const object = String(overlay.querySelector("#packageSubserviceObject")?.value || "").trim();
+        const durationDefault = Math.max(1, Number(overlay.querySelector("#packageSubserviceDuration")?.value || 1) || 1);
+        if(!name){
+          try{ overlay.querySelector("#packageSubserviceName")?.focus(); }catch(_){}
+          return;
+        }
+        subs.push({ id:`sub_${Date.now()}_${subs.length+1}`, name, object, durationDefault });
+      }else if(action === "remove"){
+        const subIdx = Number(btn.getAttribute("data-package-subservice-index") || -1);
+        if(subIdx < 0) return;
+        subs.splice(subIdx, 1);
+      }else{
+        return;
+      }
+      next.subservices = subs;
+      next.subservicesCount = subs.length;
+      items[idx] = next;
+      state.serviceBaseCatalog = items;
+      _syncServiceBaseCatalogToStateServicesWhenSafe();
+      state.ui.selectedServiceId = key;
+      _markServiceCatalogMutation(`subservice:${action}`);
+      try{ await saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
+      const current = _getServiceBaseCatalogForStorage().find(s=>String(s.id||"").trim()===key);
+      const body = overlay.querySelector("#servicePackageEditBody");
+      if(body) body.innerHTML = buildPackageDetailHtml(current);
+      renderServiceCatalogView();
+    });
+    return overlay;
+  };
+  const openPackageEditModal = (key)=>{
+    const pkg = _getServiceBaseCatalogForStorage().find(s=>String(s.id||"").trim()===String(key||"").trim());
+    if(!pkg) return;
+    const overlay = ensurePackageEditModal();
+    const body = overlay.querySelector("#servicePackageEditBody");
+    if(body) body.innerHTML = buildPackageDetailHtml(pkg);
+    overlay.classList.add("isOpen");
+    overlay.setAttribute("aria-hidden", "false");
+  };
   if(!root.dataset.serviceCatalogBound){
     root.dataset.serviceCatalogBound = "1";
     root.addEventListener("input", ev=>{
@@ -25896,69 +26687,110 @@ function renderServiceCatalogView(){
       const idx = items.findIndex(s=>String(s.id||"").trim()===key);
       if(idx < 0) return;
       const next = { ...items[idx] };
+      const input = el instanceof HTMLInputElement ? el : null;
       if(field === "order") next.order = Math.max(1, Number(el.value || 0) || 1);
       else if(field === "teams") next.teams = Math.max(1, Number(el.value || 0) || 1);
+      else if(field === "teamProfessionals") next.teamProfessionals = Math.max(0, Math.round(_serviceNumber(el.value, 0)));
+      else if(field === "teamHelpers") next.teamHelpers = Math.max(0, Math.round(_serviceNumber(el.value, 0)));
+      else if(field === "productivityValue") next.productivityValue = Math.max(0, _serviceNumber(el.value, 0));
+      else if(field === "productivityUnit") next.productivityUnit = _normalizeProductivityUnit(el.value);
+      else if(field === "productivityText") next.productivityText = String(el.value || "").trim();
+      else if(field === "teamBaseText") next.teamBaseText = String(el.value || "").trim();
       else if(field === "durationDefault") next.durationDefault = Math.max(1, Number(el.value || 0) || 1);
       else if(field === "code") next.code = String(el.value || "").trim();
       else if(field === "name") next.name = String(el.value || "").trim();
+      else if(field === "strategic") next.strategic = !!(input && input.checked);
       else if(field === "classification") next.classification = String(el.value || "").trim();
       else if(field === "color") next.color = String(el.value || "").trim() || _plannerServiceColor(next.id || next.code || next.name, next);
+      if(["productivityValue", "productivityUnit"].includes(field)) next.productivityText = _buildProductivityText(next.productivityValue, next.productivityUnit);
+      if(["teamProfessionals", "teamHelpers"].includes(field)) next.teamBaseText = _buildTeamBaseText(next.teamProfessionals, next.teamHelpers, 1);
       if(field === "color") next.serviceColor = next.color;
       items[idx] = next;
       state.serviceBaseCatalog = items.sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
       _syncServiceBaseCatalogToStateServicesWhenSafe();
+      _markServiceCatalogMutation(`input:${field}`);
       try{ saveServicesToStorage(state.serviceBaseCatalog, false); }catch(_){}
       state.ui.selectedServiceId = key;
     });
-    root.addEventListener("click", async ev=>{
-      const btn = ev.target instanceof HTMLElement ? ev.target.closest("[data-service-catalog-action]") : null;
-      if(!btn) return;
-      const action = String(btn.getAttribute("data-service-catalog-action") || "").trim();
-      const key = String(btn.getAttribute("data-service-catalog-key") || "").trim();
-      const items = _getServiceBaseCatalogForStorage().slice().sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
-      const idx = items.findIndex(s=>String(s.id||"").trim()===key);
-      if(idx < 0) return;
-      const current = items[idx];
-      if(action === "up" && idx > 0){
-        [items[idx-1], items[idx]] = [items[idx], items[idx-1]];
-      }else if(action === "down" && idx < items.length-1){
-        [items[idx+1], items[idx]] = [items[idx], items[idx+1]];
-      }else if(action === "duplicate"){
-        const slug = (window._slugifyName || _slugifyName)(current.name || current.code || "servico");
-        const copy = {
-          ...current,
-          id: (window._makeUniqueServiceId || _makeUniqueServiceId)(`srv_${slug}`),
-          name: `${String(current.name || "Serviço").trim()} - cópia`,
-          order: (window._nextServiceOrder || _nextServiceOrder)(),
-          sourceKind: "custom"
-        };
-        _ensureServiceColorRecord(copy);
-        items.splice(idx+1, 0, copy);
-        state.ui.selectedServiceId = copy.id;
-      }else if(action === "remove"){
-        if(!confirm(`Remover o serviço "${current.name || current.id}"?`)) return;
-        items.splice(idx, 1);
-        state.ui.selectedServiceId = String(items[idx]?.id || items[idx-1]?.id || items[0]?.id || "").trim();
-      }else if(action === "open-eap"){
-        try{ openGuidedServicesEditor(key); }catch(_){}
-        return;
-      }else{
-        return;
-      }
-      items.forEach((svc, i)=>{ svc.order = i + 1; });
-      state.serviceBaseCatalog = items;
-      _syncServiceBaseCatalogToStateServicesWhenSafe();
-      try{ await saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
+    root.addEventListener("click", ev=>{
+      const target = ev.target instanceof HTMLElement ? ev.target : null;
+      if(!target) return;
+      if(target.closest("input, select, textarea, button")) return;
+      const row = target.closest("[data-service-catalog-select]");
+      if(!row) return;
+      const key = String(row.getAttribute("data-service-catalog-select") || "").trim();
+      if(!key) return;
+      state.ui.selectedServiceId = key;
       renderServiceCatalogView();
+      openPackageEditModal(key);
     });
   }
-  btnAdd.onclick = async ()=>{
-    const name = String(nameEl.value || "").trim();
-    if(!name){
-      nameEl.focus();
-      alert("Informe o nome do serviço.");
-      return;
-    }
+  const ensurePackageAddModal = ()=>{
+    let overlay = document.getElementById("servicePackageAddOverlay");
+    if(overlay) return overlay;
+    overlay = document.createElement("div");
+    overlay.id = "servicePackageAddOverlay";
+    overlay.className = "packageAddOverlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = `
+      <div class="packageAddModal" role="dialog" aria-modal="true" aria-labelledby="servicePackageAddTitle">
+        <div class="packageAddHeader">
+          <div>
+            <div class="k">Pacotes / Serviços</div>
+            <div class="t" id="servicePackageAddTitle">Novo pacote</div>
+          </div>
+          <button class="btn" type="button" data-package-add-close>Fechar</button>
+        </div>
+        <div class="packageAddBody">
+          <div class="packageAddGrid">
+            <div class="field"><label>Nome do pacote</label><input id="serviceCatalogName" placeholder="Ex.: Estrutura" /></div>
+            <div class="field"><label>Código</label><input id="serviceCatalogCode" class="mono" maxlength="16" placeholder="PAC-EST" /></div>
+            <div class="field"><label>Classificação</label><input id="serviceCatalogClassification" placeholder="Ex.: Estrutural" /></div>
+          </div>
+          <div class="packageAddMetrics">
+            <div class="field"><label>Produtividade</label><input id="serviceCatalogProductivityValue" class="mono" type="number" min="0" step="0.01" placeholder="25" /></div>
+            <div class="field"><label>Unidade</label><select id="serviceCatalogProductivityUnit">${renderProductivityUnitOptions("m²/dia")}</select></div>
+            <div class="field"><label>Oficiais</label><input id="serviceCatalogTeamProfessionals" class="mono" type="number" min="0" step="1" value="0" /></div>
+            <div class="field"><label>Ajudantes</label><input id="serviceCatalogTeamHelpers" class="mono" type="number" min="0" step="1" value="0" /></div>
+            <div class="field"><label>Duração</label><input id="serviceCatalogDuration" class="mono" type="number" min="1" step="1" value="5" /></div>
+            <div class="field"><label>Crítico</label><select id="serviceCatalogStrategic"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+          </div>
+          <div class="packageAddFooter">
+            <button class="btn" type="button" data-package-add-close>Cancelar</button>
+            <button class="btn primary" id="btnServiceCatalogAdd" type="button">Criar pacote</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = ()=>{
+      overlay.classList.remove("isOpen");
+      overlay.setAttribute("aria-hidden", "true");
+    };
+    overlay.addEventListener("click", ev=>{
+      if(ev.target === overlay || (ev.target instanceof HTMLElement && ev.target.closest("[data-package-add-close]"))) close();
+    });
+    overlay.querySelector("#btnServiceCatalogAdd")?.addEventListener("click", async ()=>{
+      const nameEl = overlay.querySelector("#serviceCatalogName");
+      const codeEl = overlay.querySelector("#serviceCatalogCode");
+      const classificationEl = overlay.querySelector("#serviceCatalogClassification");
+      const productivityValueEl = overlay.querySelector("#serviceCatalogProductivityValue");
+      const productivityUnitEl = overlay.querySelector("#serviceCatalogProductivityUnit");
+      const teamProfessionalsEl = overlay.querySelector("#serviceCatalogTeamProfessionals");
+      const teamHelpersEl = overlay.querySelector("#serviceCatalogTeamHelpers");
+      const durationEl = overlay.querySelector("#serviceCatalogDuration");
+      const strategicEl = overlay.querySelector("#serviceCatalogStrategic");
+      const name = String(nameEl?.value || "").trim();
+      if(!name){
+        try{ nameEl?.focus(); }catch(_){}
+        alert("Informe o nome do pacote.");
+        return;
+      }
+      const productivityValue = Math.max(0, _serviceNumber(productivityValueEl?.value, 0));
+      const productivityUnit = _normalizeProductivityUnit(productivityUnitEl?.value);
+      const teamProfessionals = Math.max(0, Math.round(_serviceNumber(teamProfessionalsEl?.value, 0)));
+      const teamHelpers = Math.max(0, Math.round(_serviceNumber(teamHelpersEl?.value, 0)));
+      const teams = 1;
     const slugify = window._slugifyName || _slugifyName;
     const uniqueId = window._makeUniqueServiceId || _makeUniqueServiceId;
     const nextOrder = window._nextServiceOrder || _nextServiceOrder;
@@ -25967,12 +26799,21 @@ function renderServiceCatalogView(){
       id,
       name,
       code: String(codeEl.value || "").trim() || "",
-      classification: "",
       order: nextOrder(),
       scopeKind: "todos",
-      teams: 1,
-      durationDefault: 5,
-      sourceKind: "custom"
+      teams,
+      teamProfessionals,
+      teamHelpers,
+      durationDefault: Math.max(1, Number(durationEl?.value || 5) || 5),
+      sourceKind: "custom",
+      subservices: [],
+      subservicesCount: 0,
+      productivityValue,
+      productivityUnit,
+      productivityText: _buildProductivityText(productivityValue, productivityUnit),
+      teamBaseText: _buildTeamBaseText(teamProfessionals, teamHelpers, teams),
+      strategic: String(strategicEl?.value || "").trim() === "sim",
+      classification: String(classificationEl?.value || "").trim()
     };
     _ensureServiceColorRecord(item);
     const existing = (typeof _getMergedServiceBaseCatalogSnapshot === "function")
@@ -25984,16 +26825,31 @@ function renderServiceCatalogView(){
     state.serviceBaseCatalog = items;
     _syncServiceBaseCatalogToStateServicesWhenSafe();
     state.ui.selectedServiceId = id;
+    _markServiceCatalogMutation("add");
     try{ await saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
-    nameEl.value = "";
-    codeEl.value = "";
+      if(nameEl) nameEl.value = "";
+      if(codeEl) codeEl.value = "";
+      if(classificationEl) classificationEl.value = "";
+      if(productivityValueEl) productivityValueEl.value = "";
+      if(productivityUnitEl) productivityUnitEl.value = "m²/dia";
+      if(teamProfessionalsEl) teamProfessionalsEl.value = "0";
+      if(teamHelpersEl) teamHelpersEl.value = "0";
+      if(durationEl) durationEl.value = "5";
+      if(strategicEl) strategicEl.value = "nao";
+      close();
     renderServiceCatalogView();
     try{ document.querySelector(`[data-service-catalog-key="${CSS.escape(id)}"] input[data-service-catalog-field="name"]`)?.focus(); }catch(_){}
+    });
+    return overlay;
+  };
+  btnShowAdd.onclick = ()=>{
+    const overlay = ensurePackageAddModal();
+    overlay.classList.add("isOpen");
+    overlay.setAttribute("aria-hidden", "false");
+    setTimeout(()=>{ try{ overlay.querySelector("#serviceCatalogName")?.focus(); }catch(_){} }, 0);
   };
   btnOpenEap.onclick = ()=>{
-    const sid = String(state?.ui?.selectedServiceId || selectedId || "").trim();
-    if(!sid) return;
-    try{ openGuidedServicesEditor(sid); }catch(_){}
+    try{ setView("planner"); }catch(_){}
   };
   try{
     const selectedRow = selectedId ? root.querySelector(`[data-service-catalog-key="${CSS.escape(selectedId)}"]`) : null;
@@ -27974,10 +28830,10 @@ function renderDashboardView(){
   };
   const _renderTopKpis = ()=>{
     kpisEl.innerHTML = [
-      _kpi("Representatividade medida", `${measuredPctTotal.toFixed(1)}%`, "teal"),
-      _kpi("Avanço ponderado", `${totalPct}%`, "red"),
-      _kpi("Grupos no plano", `${rows.length}`, "dark"),
-      _kpi("PPC", `${ppc.toFixed(1)}%`, ppc>=80 ? "teal" : "red")
+      _kpi("SPI (cronograma)", `${spi.toFixed(2)}`, spi >= 1 ? "teal" : "red"),
+      _kpi("Aderência", `${ppc.toFixed(0)}%`, ppc >= 80 ? "teal" : "red"),
+      _kpi("Atividades atrasadas", `${delayedCount}`, delayedCount > 0 ? "red" : "dark"),
+      _kpi("Avanço físico", `${totalPct}%`, totalPct >= 60 ? "teal" : "red")
     ].join("");
   };
   _renderTopKpis();
@@ -28089,7 +28945,6 @@ function renderDashboardView(){
     return !!(endHit && endHit <= pe);
   }).length;
   ppc = plannedByNow.length ? ((completedOnTime / plannedByNow.length) * 100) : 0;
-  _renderTopKpis();
   let critRows = [];
   try{
     if(typeof window.buildCriticalRowsForWindow === "function"){
@@ -28115,31 +28970,38 @@ function renderDashboardView(){
     return !!measured;
   }).length;
   const critPct = critRows.length ? ((critDone / critRows.length) * 100) : 0;
-  const _miniKpi = (title, value, tone)=>{
-    const border = tone==="red" ? "rgba(213,0,50,.22)" : (tone==="teal" ? "rgba(15,118,110,.22)" : "rgba(15,23,42,.12)");
-    return `<div style="border:1px solid ${border}; border-radius:10px; background:#fff; padding:6px 8px;">
-      <div style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.04em;">${escapeHtml(title)}</div>
-      <div style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;">${escapeHtml(String(value))}</div>
+  const measuredCount = blocks.reduce((acc,b)=>acc + (typeof isMeasuredBlock==="function" ? (isMeasuredBlock(b) ? 1 : 0) : ((b?.measured || b?.realStart || b?.realEnd) ? 1 : 0)), 0);
+  const delayedCount = blocks.reduce((acc,b)=>{
+    const measured = !!(typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b?.measured || b?.realStart || b?.realEnd));
+    if(measured) return acc;
+    const end = parseISO(b?.endDateISO || b?.endISO);
+    return acc + (end && end < today ? 1 : 0);
+  }, 0);
+  const runningCount = blocks.reduce((acc,b)=>{
+    const measured = !!(typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b?.measured || b?.realStart || b?.realEnd));
+    if(measured) return acc;
+    const s = parseISO(b?.startDateISO || b?.startISO);
+    const e = parseISO(b?.endDateISO || b?.endISO);
+    return acc + (s && e && s <= today && today <= e ? 1 : 0);
+  }, 0);
+  const futureCount = Math.max(0, blocks.length - measuredCount - delayedCount - runningCount);
+  const plannedCount = Math.max(0, blocks.length - measuredCount);
+  const _kpi = (title, value, tone, hint)=>{
+    const dot = tone==="red" ? "#D50032" : (tone==="teal" ? "#0F766E" : "#5F666A");
+    const border = tone==="red" ? "rgba(213,0,50,.20)" : (tone==="teal" ? "rgba(15,118,110,.20)" : "rgba(15,23,42,.12)");
+    return `<div style="border:1px solid ${border}; border-radius:16px; background:#fff; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.06);">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+        <div style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.08em;">${escapeHtml(title)}</div>
+        <span style="width:10px; height:10px; border-radius:999px; background:${dot}; flex:0 0 auto;"></span>
+      </div>
+      <div style="font-size:34px; font-weight:950; letter-spacing:-0.04em; line-height:1; margin-top:10px; color:${dot};">${escapeHtml(String(value))}</div>
+      <div style="margin-top:6px; font-size:12px; color:#64748b;">${escapeHtml(String(hint || ""))}</div>
     </div>`;
   };
-  execIndicatorsEl.innerHTML = [
-    _miniKpi("SPI", `${spi.toFixed(2)}`, spi>=1 ? "teal" : "red"),
-    _miniKpi("SV (dias)", `${svDays.toFixed(1)}`, svDays>=0 ? "teal" : "red"),
-    _miniKpi("SV (%)", `${svPct.toFixed(1)}%`, svPct>=0 ? "teal" : "red"),
-    _miniKpi("Forecast", `${forecastDur.toFixed(1)}d`, "dark"),
-    _miniKpi("PPC", `${ppc.toFixed(1)}%`, ppc>=80 ? "teal" : "red"),
-    _miniKpi("Críticas", `${critPct.toFixed(1)}%`, critPct>=80 ? "teal" : "red")
-  ].join("");
-  execAlertsEl.innerHTML = `
-    <div style="display:flex; gap:12px; flex-wrap:wrap; font-size:12px;">
-      <div><strong>EV:</strong> ${escapeHtml(ev.toFixed(1))} d</div>
-      <div><strong>PV:</strong> ${escapeHtml(pv.toFixed(1))} d</div>
-      <div><strong>Atividades planejadas até hoje:</strong> ${escapeHtml(String(plannedByNow.length))}</div>
-      <div><strong>Concluídas no prazo:</strong> ${escapeHtml(String(completedOnTime))}</div>
-      <div><strong>Críticas avaliadas:</strong> ${escapeHtml(String(critRows.length))}</div>
-      <div><strong>Maior atraso:</strong> ${escapeHtml(worstDelay.name)}${worstDelay.days>0 ? ` (${worstDelay.days}d)` : ""}</div>
-    </div>
-  `;
+  execIndicatorsEl.style.display = "none";
+  execIndicatorsEl.innerHTML = "";
+  execAlertsEl.style.display = "none";
+  execAlertsEl.innerHTML = "";
   groupProgressEl.innerHTML = rows.length ? rows.map(r=>{
     const planShare = totalPlan ? ((r.plan / totalPlan) * 100) : 0;
     const measuredShare = totalPlan ? ((r.measured / totalPlan) * 100) : 0;
@@ -28161,14 +29023,13 @@ function renderDashboardView(){
   }catch(e){
     console.warn("[DASH_EXEC] indicadores fail", e);
     execIndicatorsEl.innerHTML = `
-      <div class="kpi"><span class="k">SPI</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">SV (dias)</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">SV (%)</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">Forecast (dias)</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">PPC</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">Críticas no prazo</span><span class="v">—</span></div>
+      <div class="kpi"><span class="k">SPI (cronograma)</span><span class="v">—</span></div>
+      <div class="kpi"><span class="k">Aderência</span><span class="v">—</span></div>
+      <div class="kpi"><span class="k">Atividades atrasadas</span><span class="v">—</span></div>
+      <div class="kpi"><span class="k">Avanço físico</span><span class="v">—</span></div>
     `;
-    execAlertsEl.innerHTML = `<div style="font-size:12px; color:#b91c1c;">Falha no cálculo dos indicadores executivos. Ver console para diagnóstico.</div>`;
+    execAlertsEl.style.display = "none";
+    execAlertsEl.innerHTML = "";
   }
   const allDates = [];
   const pushRange = (arr, sKey, eKey)=>{
@@ -28291,22 +29152,34 @@ function renderDashboardView(){
     return { key:p.key, previsto, projetado, realizado };
   });
   const totalPrevistoObra = monthlySeries.reduce((acc,m)=>acc + Number(m.previsto || 0), 0);
-  const monthPlanBarsHtml = monthlySeries.length ? monthlySeries.map(m=>{
-    const pct = totalPrevistoObra > 0 ? ((Number(m.previsto || 0) / totalPrevistoObra) * 100) : 0;
-    return `<div style="display:grid; grid-template-columns:78px 1fr 56px; gap:8px; align-items:center; margin:6px 0;">
-      <div style="font-size:11px; font-weight:800; color:#334155;">${escapeHtml(monthLabel(m.key))}</div>
-      <div style="height:10px; border-radius:999px; background:rgba(15,23,42,.10); overflow:hidden;">
-        <span style="display:block; height:100%; width:${Math.max(0, Math.min(100, pct)).toFixed(2)}%; background:linear-gradient(90deg,#D50032,#101820);"></span>
-      </div>
-      <div style="font-size:11px; font-weight:900; color:#0f172a; text-align:right;">${escapeHtml(pct.toFixed(1))}%</div>
-    </div>`;
-  }).join("") : `<div style="font-size:12px; color:var(--muted);">Sem dados para meses previstos.</div>`;
+  const totalStatus = Math.max(1, blocks.length);
+  const statusRows = [
+    { label:"Concluído", count: measuredCount, tone:"teal", color:"#0F766E" },
+    { label:"Em execução", count: runningCount, tone:"red", color:"#D50032" },
+    { label:"Atrasado", count: delayedCount, tone:"red", color:"#D50032" },
+    { label:"Planejado", count: futureCount, tone:"dark", color:"#5F666A" }
+  ];
   execMonthPlanBarsEl.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;">
-      <div style="font-size:12px; font-weight:900; color:#0f172a;">Previsto da obra por mês</div>
-      <div style="font-size:11px; color:#64748b;">% de cada mês sobre o previsto total da obra</div>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;">
+      <div>
+        <div style="font-size:12px; font-weight:900; color:#0f172a;">Status das atividades</div>
+        <div style="font-size:11px; color:#64748b;">Distribuição atual</div>
+      </div>
     </div>
-    ${monthPlanBarsHtml}
+    <div style="display:grid; gap:10px;">
+      ${statusRows.map(r=>{
+        const pct = (r.count / totalStatus) * 100;
+        return `<div>
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:5px;">
+            <div style="font-size:11px; font-weight:800; color:#0f172a;">${escapeHtml(r.label)}</div>
+            <div style="font-size:11px; color:#64748b;">${escapeHtml(String(r.count))}</div>
+          </div>
+          <div style="height:10px; border-radius:999px; background:rgba(15,23,42,.08); overflow:hidden;">
+            <span style="display:block; height:100%; width:${Math.max(0, Math.min(100, pct)).toFixed(2)}%; background:${r.color};"></span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
   `;
   if(!monthlySeries.length){
     const _emptyChart = `<div style="font-size:12px; color:var(--muted);">Sem dados para gráfico mensal.</div>`;
@@ -38999,8 +39872,58 @@ function readJsonLocalStorage(key){
       if(raw != null) localStorage.setItem(`plannus.backup.before_aux_hydration.${Date.now()}.${key}`, raw);
     }catch(_){}
   }
+  function ensureCalendarStateContract(inputState, options){
+    const s = (inputState && typeof inputState === "object") ? inputState : {};
+    const opts = (options && typeof options === "object") ? options : {};
+    const isISO = (v)=>/^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
+    const defaults = (typeof defaultState === "function" ? defaultState().calendar : null) || {
+      startDateISO:"2026-02-24",
+      endDateISO:"2026-03-14",
+      workdays:[1,2,3,4,5],
+      holidays:[]
+    };
+    if(!s.calendar || typeof s.calendar !== "object" || Array.isArray(s.calendar)) s.calendar = {};
+    if(!Array.isArray(s.calendar.workdays) || !s.calendar.workdays.length){
+      s.calendar.workdays = [1,2,3,4,5];
+    }else{
+      s.calendar.workdays = Array.from(new Set(s.calendar.workdays.map(Number).filter(n=>Number.isFinite(n) && n >= 1 && n <= 7))).sort((a,b)=>a-b);
+      if(!s.calendar.workdays.length) s.calendar.workdays = [1,2,3,4,5];
+    }
+    if(!Array.isArray(s.calendar.holidays)) s.calendar.holidays = [];
+    s.calendar.holidays = Array.from(new Set(s.calendar.holidays.map(x=>String(x||"").slice(0,10)).filter(isISO))).sort();
+
+    let startISO = String(s.calendar.startDateISO || "").slice(0,10);
+    let endISO = String(s.calendar.endDateISO || "").slice(0,10);
+    const fullStart = String(s.calendar.fullStartISO || "").slice(0,10);
+    const fullEnd = String(s.calendar.fullEndISO || "").slice(0,10);
+    if(!isISO(startISO)) startISO = isISO(fullStart) ? fullStart : (isISO(defaults.startDateISO) ? defaults.startDateISO : BR.todayISO());
+    if(!isISO(endISO)) endISO = isISO(fullEnd) ? fullEnd : (isISO(defaults.endDateISO) ? defaults.endDateISO : startISO);
+    if(isISO(startISO) && isISO(endISO) && endISO < startISO){
+      const workdaysSet = new Set(s.calendar.workdays);
+      const holidaysSet = new Set(s.calendar.holidays);
+      const base = BR.parseISO(startISO) || BR.parseISO(BR.todayISO()) || new Date();
+      const fallbackEnd = BR.iso(BR.addWorkdays(base, 30, workdaysSet, holidaysSet)) || startISO;
+      console.warn("[CALENDAR_STATE_CONTRACT]", {
+        event:"end_before_start_fixed",
+        source: opts.source || "unknown",
+        previousStart:startISO,
+        previousEnd:endISO,
+        nextEnd:fallbackEnd
+      });
+      endISO = fallbackEnd;
+    }
+    s.calendar.startDateISO = startISO;
+    s.calendar.endDateISO = endISO;
+    if(s.calendar.fullStartISO != null && !isISO(fullStart)) delete s.calendar.fullStartISO;
+    if(s.calendar.fullEndISO != null && !isISO(fullEnd)) delete s.calendar.fullEndISO;
+    if(typeof s.calendar.autoExtend !== "boolean") s.calendar.autoExtend = true;
+    if(typeof s.calendar.forceFullRange !== "boolean") s.calendar.forceFullRange = !!s.calendar.forceFullRange;
+    if(!Array.isArray(s.calendarDays)) s.calendarDays = [];
+    return s.calendar;
+  }
   function ensurePlanningStateContract(inputState){
     const s = (inputState && typeof inputState === "object") ? inputState : {};
+    ensureCalendarStateContract(s, { source:"planning_state_contract" });
     if(!s.eap || typeof s.eap !== "object") s.eap = {};
     if(s.eap.draft === undefined) s.eap.draft = null;
     if(!Array.isArray(s.eap.library)) s.eap.library = [];
@@ -41447,7 +42370,7 @@ html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionLabel,
 html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionDivider{display:none!important;}
 html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup{display:flex!important;align-items:center!important;gap:6px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;}
 html body.withSideNav:not(.plannerGridFullscreen) > header .plannerActionGroup:not(.plannerActionGroupPrimary):not(.plannerActionGroupExport){display:none!important;}
-html body.withSideNav:not(.plannerGridFullscreen) > header button:not(#btnPlannerAutoUpdate),
+html body.withSideNav:not(.plannerGridFullscreen) > header button:not(#btnPlannerSaveOnlineHeader),
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerVisualMode,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnToggleBaselineCols,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnLobZoomOut,
@@ -41458,7 +42381,7 @@ html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWDown,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnColWUp,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportHTMLTop,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportPlannerPDFTop{display:none!important;}
-html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerAutoUpdate{
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerSaveOnlineHeader{
   display:inline-flex!important;align-items:center!important;justify-content:center!important;height:34px!important;min-height:34px!important;border:1px solid var(--pln-v20-border)!important;border-radius:13px!important;background:#fff!important;color:#111827!important;padding:0 13px!important;font-size:12px!important;font-weight:850!important;box-shadow:none!important;white-space:nowrap!important;
 }
 html body.withSideNav:not(.plannerGridFullscreen) > header #plannusSyncIndicator,
@@ -41850,7 +42773,7 @@ html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportHTMLTop,
 html body.withSideNav:not(.plannerGridFullscreen) > header #btnExportPlannerPDFTop{
   display:none!important;
 }
-html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerAutoUpdate{
+html body.withSideNav:not(.plannerGridFullscreen) > header #btnPlannerSaveOnlineHeader{
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -42311,16 +43234,21 @@ main:has(#viewEAP[style*="block"]){
 }
 
 /* cabeçalhos de página no padrão Minhas Obras */
+#viewProject .projectSetupHero,
 #viewPav > section.card > h2,
 #viewGuidedPlan > section.card > .cardHead,
-#viewGuidedApply > section.card > .planningApplyToolbar{
+#viewGuidedApply > section.card > .planningApplyToolbar,
+#viewService > section.card > .cardHead,
+#viewBaseline > section.card > .cardHead,
+#viewDashboard > section.card > .cardHead{
   position:relative !important;
   display:flex !important;
   align-items:flex-end !important;
   justify-content:space-between !important;
   gap:18px !important;
   margin:0 0 18px !important;
-  padding:22px 26px !important;
+  padding:26px 28px 22px !important;
+  min-height:112px !important;
   background:rgba(255,255,255,.88) !important;
   border:1px solid var(--pln-v23-border) !important;
   border-radius:var(--pln-v23-radius) !important;
@@ -42328,13 +43256,21 @@ main:has(#viewEAP[style*="block"]){
 }
 
 #viewPav > section.card > h2{
-  min-height:124px !important;
   flex-wrap:wrap !important;
   align-content:flex-end !important;
 }
+#viewProject .projectSetupHeroVisual{
+  display:none !important;
+}
+#viewProject .projectSetupHero > div:first-child{
+  min-width:0 !important;
+}
 #viewPav > section.card > h2::before,
 #viewGuidedPlan > section.card > .cardHead::before,
-#viewGuidedApply > section.card > .planningApplyToolbar::before{
+#viewGuidedApply > section.card > .planningApplyToolbar::before,
+#viewService > section.card > .cardHead::before,
+#viewBaseline > section.card > .cardHead::before,
+#viewDashboard > section.card > .cardHead::before{
   content:"WORKSPACE";
   position:absolute;
   top:22px;
@@ -42346,14 +43282,25 @@ main:has(#viewEAP[style*="block"]){
   font-weight:900;
   color:#344052;
 }
+#viewProject .projectSetupHeroKicker{
+  position:static !important;
+  display:block !important;
+  margin:0 0 12px !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  letter-spacing:.28em !important;
+  text-transform:uppercase !important;
+  font-weight:900 !important;
+  color:#344052 !important;
+}
 #viewPav > section.card > h2 > span:first-child,
 #viewGuidedPlan .cardHead .title{
   display:block !important;
   margin-top:22px !important;
-  font-size:30px !important;
-  line-height:1.02 !important;
-  font-weight:900 !important;
-  letter-spacing:-.04em !important;
+  font-size:22px !important;
+  line-height:1.12 !important;
+  font-weight:600 !important;
+  letter-spacing:-.018em !important;
   color:#07111d !important;
 }
 #viewPav > section.card > h2 > .hint,
@@ -42366,7 +43313,8 @@ main:has(#viewEAP[style*="block"]){
   max-width:760px !important;
 }
 #viewGuidedPlan > section.card > .cardHead > div:first-child,
-#viewGuidedApply > section.card > .planningApplyToolbar::after{
+#viewGuidedApply > section.card > .planningApplyToolbar::after,
+#viewService > section.card > .cardHead > div:first-child{
   min-width:0 !important;
 }
 #viewGuidedApply > section.card > .planningApplyToolbar{
@@ -42379,10 +43327,10 @@ main:has(#viewEAP[style*="block"]){
   position:absolute;
   left:26px;
   bottom:22px;
-  font-size:26px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-.035em;
+  font-size:22px;
+  line-height:1.12;
+  font-weight:600;
+  letter-spacing:-.018em;
   color:#07111d;
   pointer-events:none;
 }
@@ -42390,6 +43338,43 @@ main:has(#viewEAP[style*="block"]){
   margin-left:auto !important;
   max-width:720px !important;
   justify-content:flex-end !important;
+}
+.plnPageTitle,
+#viewProject .projectSetupHero .plnPageTitle,
+#viewPav > section.card > h2 > .plnPageTitle,
+#viewGuidedPlan .cardHead .title.plnPageTitle,
+#viewService .cardHead .title.plnPageTitle,
+#viewEAP .cardHead .title.plnPageTitle,
+#viewBaseline .cardHead .title.plnPageTitle,
+#viewDashboard .cardHead .title.plnPageTitle{
+  display:block !important;
+  margin:0 !important;
+  font-family:var(--pln-font-head) !important;
+  font-size:22px !important;
+  line-height:1.12 !important;
+  font-weight:600 !important;
+  letter-spacing:-.018em !important;
+  color:#07111d !important;
+}
+#viewService .cardHead .title.packageScreenTitle{
+  font-size:22px !important;
+  font-weight:600 !important;
+  letter-spacing:-.018em !important;
+}
+.plnPageSubtitle,
+#viewProject .projectSetupHero .plnPageSubtitle,
+#viewPav > section.card > h2 > .plnPageSubtitle,
+#viewGuidedPlan .cardHead .sub.plnPageSubtitle,
+#viewService .cardHead .sub.packageScreenSubtitle{
+  margin-top:4px !important;
+  max-width:620px !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  font-weight:400 !important;
+  color:#4b5563 !important;
+}
+#viewService .cardHead .actions{
+  margin-left:auto !important;
 }
 
 /* cartões e painéis */
@@ -43079,6 +44064,18 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
 #viewGuidedPlan .guidedFlowSearchBox{
   padding:14px 16px !important;
   border-radius:18px !important;
+}
+
+/* Acompanhamento usa toda a largura disponível do shell oficial. */
+html body.withSideNav:not(.plannerGridFullscreen) > main > #viewPlanner{
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #viewPlanner .plannerWrap,
+html body.withSideNav:not(.plannerGridFullscreen) #viewPlanner .plannerShell{
+  width:100% !important;
+  max-width:none !important;
 }
 </style>
 
