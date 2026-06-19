@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
@@ -2385,7 +2385,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 }
 .guidedServiceAdvanced summary::-webkit-details-marker{display:none;}
 .guidedServiceAdvanced summary::before{
-  content:"▸";
+  content:"?";
   font-size:10px;
   color:#64748b;
   transition:transform .15s ease;
@@ -2409,7 +2409,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 }
 .guidedServiceStageBox summary::-webkit-details-marker{display:none;}
 .guidedServiceStageBox summary::before{
-  content:"▸";
+  content:"?";
   font-size:10px;
   color:#64748b;
   transition:transform .15s ease;
@@ -3961,7 +3961,7 @@ body.withSideNav.navCollapsed #sideNav .navToggle:hover{ background:#000; border
     body.withSideNav.navOpenMobile .navMobileScrim{ display:block; }
   }
 
-  /* === Plannus UX v6: colapsado = só botão ☰ visível === */
+  /* === Plannus UX v6: colapsado = só botão ? visível === */
   body.withSideNav.navCollapsed #sideNav .brandDot,
   body.withSideNav.navCollapsed #sideNav .brandWrap,
   body.withSideNav.navCollapsed #sideNav .navScroll{ display:none !important; }
@@ -5597,28 +5597,14 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
         <img class="brandWordmarkSide" src="brand-assets/plannus-logo-horizontal-negative.svg?v=20260528v4" alt="Plannus." />
         <div class="brandSub">Planejamento e controle</div>
       </div>
-      <button class="navToggle" id="btnNavToggle" type="button" title="Recolher/expandir menu" aria-label="Recolher/expandir menu">☰</button>
+      <button class="navToggle" id="btnNavToggle" type="button" title="Recolher/expandir menu" aria-label="Recolher/expandir menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
     </div>
     <div class="navScroll">
       <div class="navSec">
-        <div class="navSecTitle">Navegação principal</div>
-        <button class="navItem" id="btnViewProject" data-click="btnViewProject" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg></span><span class="txt">Visão geral</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewPav" data-click="btnViewPav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></svg></span><span class="txt">Pavimentos</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewGuided" data-click="btnViewGuided" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 4v16"/><path d="M12 4v16"/></svg></span><span class="txt">Biblioteca EAP</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnOpenEapApplyNav" data-click="btnOpenEapApplyNav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h10"/><path d="M11 6l6 6-6 6"/><path d="M19 5v14"/></svg></span><span class="txt">Planejamento</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Pacotes</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewPlanner" data-click="btnViewPlanner" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M6 15l4-4 3 2 5-6"/></svg></span><span class="txt">Acompanhamento</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewDashboard" data-click="btnViewDashboard" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6"/><path d="M10 19V10"/><path d="M16 19V4"/><path d="M22 19H2"/></svg></span><span class="txt">Dashboard</span><span class="k">↵</span></button>
-        <button class="navItem" id="btnViewConfig" data-click="btnViewConfig" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h8"/><path d="M16 7h4"/><circle cx="14" cy="7" r="2"/><path d="M4 12h4"/><path d="M12 12h8"/><circle cx="8" cy="12" r="2"/><path d="M4 17h12"/><circle cx="18" cy="17" r="2"/></svg></span><span class="txt">Parâmetros</span><span class="k">↵</span></button>
+<div class="navSecTitle">Navegação principal</div>
+<button class="navItem" id="btnViewPlanner" data-click="btnViewPlanner" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M6 15l4-4 3 2 5-6"/></svg></span><span class="txt">Acompanhamento</span><span class="k">?</span></button>
+<button class="navItem" id="btnViewDashboard" data-click="btnViewDashboard" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6"/><path d="M10 19V10"/><path d="M16 19V4"/><path d="M22 19H2"/></svg></span><span class="txt">Dashboard</span><span class="k">?</span></button>
       </div>
-
-      <div class="navSec">
-        <div class="navSecTitle">Saídas</div>
-        <button id="btnExportHTML" data-click="btnExportHTML" type="button" class="navItem" title="Salvar estado no banco online"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h6l4 4v14H8z"/><path d="M14 3v4h4"/><path d="M11 13l-2 2 2 2"/><path d="M13 13l2 2-2 2"/></svg></span><span class="txt">Salvar Online</span></button>
-        <button id="btnExportPlannerPDF" data-click="btnExportPlannerPDF" type="button" class="navItem"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l6-6 4 4 6-8"/><path d="M4 18h16"/></svg></span><span class="txt">Linha de balanço</span></button>
-
-      </div>
-
 
       <div class="navSec">
         <div class="navSecTitle">Relatórios</div>
@@ -5630,13 +5616,13 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
         <button class="navItem" id="btnViewBaseline" data-click="btnViewBaseline" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 10h8"/><path d="M8 14h5"/></svg></span><span class="txt">Linha de base</span></button>
       </div>
 
-      <div class="navSec">
-        <div class="navSecTitle">Administração</div>
-        <button id="btnClearMeasuresLS" data-click="btnClearMeasuresLS" type="button" class="navItem"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M7 16l10-10"/><path d="M13 6l5 5"/><path d="M6 18l2-2"/></svg></span><span class="txt">Limpar medições</span></button>
-        <button id="btnClearLocsLS" data-click="btnClearLocsLS" type="button" class="navItem"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/><path d="M4 4l16 16"/></svg></span><span class="txt">Limpar pavimentos</span></button>
-        <button id="btnClearAllLS" data-click="btnClearAllLS" type="button" class="navItem"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M12 4v16"/><path d="M6.5 6.5l11 11"/></svg></span><span class="txt">Reset LS</span></button>
-        <button class="navItem" id="btnPlanViewMode" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="6" height="14" rx="1.4"/><rect x="14" y="5" width="6" height="8" rx="1.4"/><path d="M14 15h6"/></svg></span><span class="txt">Visual: Diário</span></button>
-        <button class="navItem" id="btnReset" data-click="btnReset" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 1-5.5 11.3"/><path d="M6 4v5h5"/></svg></span><span class="txt">Reset modelo</span></button>
+      <div class="navSec navSecPlanning">
+        <div class="navSecTitle">Planejamento</div>
+        <button class="navItem" id="btnViewPav" data-click="btnViewPav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></svg></span><span class="txt">Pavimentos</span><span class="k">?</span></button>
+        <button class="navItem" id="btnViewGuided" data-click="btnViewGuided" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 4v16"/><path d="M12 4v16"/></svg></span><span class="txt">Biblioteca EAP</span><span class="k">?</span></button>
+        <button class="navItem" id="btnOpenEapApplyNav" data-click="btnOpenEapApplyNav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h10"/><path d="M11 6l6 6-6 6"/><path d="M19 5v14"/></svg></span><span class="txt">Planejamento</span><span class="k">?</span></button>
+        <button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Pacotes</span><span class="k">?</span></button>
+        <button class="navItem" id="btnViewConfig" data-click="btnViewConfig" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h8"/><path d="M16 7h4"/><circle cx="14" cy="7" r="2"/><path d="M4 12h4"/><path d="M12 12h8"/><circle cx="8" cy="12" r="2"/><path d="M4 17h12"/><circle cx="18" cy="17" r="2"/></svg></span><span class="txt">Parâmetros</span><span class="k">?</span></button>
       </div>
     </div>
   </nav>
@@ -5957,7 +5943,7 @@ document.addEventListener("click", function(ev){
       <div class="kpi" id="hdrKpiStart"><span class="k">Início (LB)</span><span class="v">—</span></div>
       <div class="kpi" id="hdrKpiEnd"><span class="k">Fim (LB)</span><span class="v">—</span></div>
       <div class="kpi" id="hdrKpiProjectedEnd"><span class="k">Fim projetado</span><span class="v">—</span></div>
-      <div class="kpi" id="hdrKpiVariance"><span class="k">Variação (LB→Proj)</span><span class="v">—</span></div>
+      <div class="kpi" id="hdrKpiVariance"><span class="k">Variação (LB?Proj)</span><span class="v">—</span></div>
 </div>
 </div>
     <div class="actions plannerHeaderActions" aria-label="Ações do acompanhamento">
@@ -5969,16 +5955,16 @@ document.addEventListener("click", function(ev){
       </div>
       <div class="plannerActionGroup" aria-label="Zoom">
         <span class="plannerActionLabel">Zoom</span>
-        <button class="btn" id="btnLobZoomOut" type="button" title="Diminuir zoom da LOB">−</button>
+        <button class="btn" id="btnLobZoomOut" type="button" title="Diminuir zoom da LOB">-</button>
         <button class="btn" id="btnLobZoomIn" type="button" title="Aumentar zoom da LOB">+</button>
       </div>
       <div class="plannerActionGroup" aria-label="Dimensões da grade">
         <span class="plannerActionLabel">Linhas</span>
-        <button class="btn" id="btnLobRowDown" type="button" title="Diminuir altura dos pavimentos">−</button>
+        <button class="btn" id="btnLobRowDown" type="button" title="Diminuir altura dos pavimentos">-</button>
         <button class="btn" id="btnLobRowUp" type="button" title="Aumentar altura dos pavimentos">+</button>
         <span class="plannerActionDivider" aria-hidden="true"></span>
         <span class="plannerActionLabel">Colunas</span>
-        <button class="btn" id="btnColWDown" type="button" title="Diminuir largura das colunas">−</button>
+        <button class="btn" id="btnColWDown" type="button" title="Diminuir largura das colunas">-</button>
         <button class="btn" id="btnColWUp" type="button" title="Aumentar largura das colunas">+</button>
       </div>
       <div class="plannerActionGroup plannerActionGroupExport" aria-label="Exportação">
@@ -5999,7 +5985,6 @@ document.addEventListener("click", function(ev){
       <div class="body projectSetupPage">
         <div class="projectSetupHero">
           <div>
-        <div class="projectSetupHeroKicker">WORKSPACE</div>
         <div class="title plnPageTitle">Dados da obra</div>
         <div class="hint plnPageSubtitle">Dados iniciais, pavimentos, EAP e planejamento em uma base única.</div>
           </div>
@@ -6145,6 +6130,7 @@ document.addEventListener("click", function(ev){
           <option value="12">12 meses</option>
         </select>
       </div>
+      <button class="btn primary" id="btnPlannerVisualModeBar" type="button" title="Alternar entre LOB e Serviços x Dias">Visual: LOB</button>
       <button class="btn" id="btnPlannerServiceFilterAdd" type="button">Adicionar</button>
       <button class="btn" id="btnPlannerServiceFilterClear" type="button">Limpar filtro</button>
       <button class="btn" id="btnPlannerAutoUpdateBar" type="button" title="Ativar ou desativar atualização automática do acompanhamento">Auto: Off</button>
@@ -6155,7 +6141,7 @@ document.addEventListener("click", function(ev){
       <div class="plannerRail" id="plannerRail">
         <div class="plannerRailTop" id="plannerRailTop">
           <span>Calendário</span>
-          <span style="margin-left:auto;">EAP →</span>
+          <span style="margin-left:auto;">EAP ?</span>
         </div>
         <div class="plannerRailBody" id="plannerRailBody">
           <div class="leftDates" id="leftDates"></div>
@@ -6405,9 +6391,9 @@ document.addEventListener("click", function(ev){
             <button class="btn danger" id="btnClearHolidays" type="button">Limpar feriados</button>
           </div>
           <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-            <button class="btn" id="btnHolidayPrevYear" type="button" title="Ano anterior">◀</button>
+            <button class="btn" id="btnHolidayPrevYear" type="button" title="Ano anterior">?</button>
             <span id="holidayYearViewLabel" class="mono" style="font-size:12px; font-weight:800; color:#0f172a;">—</span>
-            <button class="btn" id="btnHolidayNextYear" type="button" title="Próximo ano">▶</button>
+            <button class="btn" id="btnHolidayNextYear" type="button" title="Próximo ano">?</button>
           </div>
           <div id="holidayList" style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;"></div>
         </div>
@@ -6719,7 +6705,7 @@ document.addEventListener("click", function(ev){
                   <th>Início</th>
                   <th>Término</th><th data-col="tipo" style="display:none;">Tipo</th><th data-col="folga" style="display:none;">Folga</th>
                   <th>Pred Equipe</th>
-                  <th>Pred Serviço 🔒</th>
+                  <th>Pred Serviço ??</th>
                   <th>Serviço que trava</th>
                 </tr>
               </thead>
@@ -6858,7 +6844,7 @@ document.addEventListener("click", function(ev){
           <div id="dashKpis" style="display:grid; grid-template-columns:repeat(4,minmax(190px,1fr)); gap:12px; margin-bottom:12px;"></div>
           <div id="dashExecIndicators" style="display:none;"></div>
           <div id="dashExecAlerts" style="display:none; padding:10px 12px; border:1px solid rgba(15,23,42,.08); border-radius:12px; background:#fff; margin-bottom:12px;"></div>
-          <div style="display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr); gap:12px; align-items:start;">
+          <div class="dashExecMainGrid" style="display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr); gap:12px; align-items:start;">
             <div id="dashExecWorkChart" style="border:1px solid rgba(15,23,42,.10); border-radius:16px; overflow:hidden; background:#fff;">
               <div style="padding:10px 12px; border-bottom:1px solid rgba(15,23,42,.08); background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.95)); font-size:12px; font-weight:900; color:#0f172a;">Curva S — Planejado × Realizado</div>
               <div id="dashExecWorkChartBody" style="padding:10px 12px;"></div>
@@ -7089,7 +7075,7 @@ document.addEventListener("click", function(ev){
             <label>Modo de correspondência</label>
             <select id="depMatchMode">
               <option value="same_location">Mesmo pavimento</option>
-              <option value="last_of_previous">Último do anterior → primeiro do sucessor</option>
+              <option value="last_of_previous">Último do anterior ? primeiro do sucessor</option>
               <option value="custom">Custom</option>
             </select>
           </div>
@@ -9687,7 +9673,7 @@ function buildCalendarDays(){
         const oldEnd = state.calendar.endDateISO;
         state.calendar.endDateISO = BR.iso(end2);
         // rebind local var end will be recomputed below by recursion
-        log(`[CAL][GUARD] Range muito grande (${spanDays}d). Limitando para ${state.calendar.startDateISO}..${state.calendar.endDateISO}. (antigo fim=${oldEnd}) Use Ações→Calendário e ative "Range completo" se necessário.`);
+        log(`[CAL][GUARD] Range muito grande (${spanDays}d). Limitando para ${state.calendar.startDateISO}..${state.calendar.endDateISO}. (antigo fim=${oldEnd}) Use Ações?Calendário e ative "Range completo" se necessário.`);
         return buildCalendarDays();
       }
     }
@@ -11343,7 +11329,7 @@ function generateBlocksRespectingEdits(){
         _asISOorNull(existingBlock && (existingBlock.constraintDateISO || existingBlock.constraintDate || existingBlock.startConstraintISO || existingBlock.lockStartISO)) ||
         (isGuidedApplyRun ? null : _asISOorNull(svcObj && (svcObj.constraintDateISO || svcObj.constraintDate || svcObj.startConstraintISO || svcObj.lockStartISO)));
 
-      // ✅ REGRA: se RI (início real) existe, ele IGNORA predecessoras/restrições e ancora o início no RI.
+      // ? REGRA: se RI (início real) existe, ele IGNORA predecessoras/restrições e ancora o início no RI.
       // (RF, quando existir, trava o fim no real; caso contrário o fim será recalculado pelo motor a partir de RI)
       if(RI){
         startISO = RI;
@@ -13308,7 +13294,7 @@ function _bindGuidedServiceFlowUI(){
     if(cyclic){
       const pathLabel = path
         .map(id=>String(items.find(x=>String(x.key || x.id || "").trim()===id)?.name || id || "—"))
-        .join(" → ");
+        .join(" ? ");
       const sourceName = String(source?.name || source?.code || predSid || "—").trim();
       const targetName = String(target?.name || target?.code || succTid || "—").trim();
       const breakerId = predSid;
@@ -13319,7 +13305,7 @@ function _bindGuidedServiceFlowUI(){
         target.predecessors = Array.isArray(target.predecessors) ? target.predecessors : [];
       }
       try{
-        alert(`Ligação circular detectada: ${pathLabel} → ${sourceName}. Quebrei apenas o elo "${String(items.find(x=>String(x.key || x.id || "").trim()===breakerPrevId)?.name || breakerPrevId || "—")}" em "${String(breaker?.name || breakerId || "—")}" e mantive a nova ligação (${sourceName} → ${targetName}).`);
+        alert(`Ligação circular detectada: ${pathLabel} ? ${sourceName}. Quebrei apenas o elo "${String(items.find(x=>String(x.key || x.id || "").trim()===breakerPrevId)?.name || breakerPrevId || "—")}" em "${String(breaker?.name || breakerId || "—")}" e mantive a nova ligação (${sourceName} ? ${targetName}).`);
       }catch(_){}
     }
     const nextLink = _normalizeGuidedPredecessorLink({
@@ -13702,7 +13688,7 @@ function _renderGuidedServiceFlowRail(services){
     <div class="guidedFlowHeader">
       <div>
         <div class="ttl">Fluxo visual dos serviços</div>
-         <div class="subttl"><span style="color:#ef4444;font-weight:800;">● vermelho</span> = saída, <span style="color:#16a34a;font-weight:800;">● verde</span> = entrada. Use as setas de raia para ajustar a posição visual. Ramificações iguais aparecem em escada.</div>
+         <div class="subttl"><span style="color:#ef4444;font-weight:800;">? vermelho</span> = saída, <span style="color:#16a34a;font-weight:800;">? verde</span> = entrada. Use as setas de raia para ajustar a posição visual. Ramificações iguais aparecem em escada.</div>
       </div>
       <div class="guidedSectionActions">
         ${linkSource ? `<span class="guidedTag">Ligando: ${escapeHtml(String(linkSource.name || linkSource.code || linkSource.id || "—"))}</span>` : ""}
@@ -13725,8 +13711,8 @@ function _renderGuidedServiceFlowRail(services){
               <div class="name">${escapeHtml(String(svc.name || "—"))}</div>
             </div>
             <div class="guidedFlowLaneNudger">
-              <button class="btn" type="button" title="Mover para cima" aria-label="Mover para cima" data-guided-service-action="lane-up" data-guided-service-key="${escapeHtml(item.sid)}">↑</button>
-              <button class="btn" type="button" title="Mover para baixo" aria-label="Mover para baixo" data-guided-service-action="lane-down" data-guided-service-key="${escapeHtml(item.sid)}">↓</button>
+              <button class="btn" type="button" title="Mover para cima" aria-label="Mover para cima" data-guided-service-action="lane-up" data-guided-service-key="${escapeHtml(item.sid)}">?</button>
+              <button class="btn" type="button" title="Mover para baixo" aria-label="Mover para baixo" data-guided-service-action="lane-down" data-guided-service-key="${escapeHtml(item.sid)}">?</button>
             </div>
           </div>
         `;
@@ -13867,7 +13853,7 @@ function _openGuidedAddServiceModal(){
         const label = `${String(s.name || s.code || s.id || "—")} (${String(s.code || "—")})`;
         return `
           <button type="button" class="btn ${active ? "primary" : ""}" data-guided-service-pick="${escapeHtml(sid)}" style="justify-content:flex-start; text-align:left; width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px;">
-            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "✓" : "○"}</span>
+            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "?" : "?"}</span>
             <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(label)}</span>
             ${exists ? `<span class="guidedTag" style="white-space:nowrap;">já na EAP</span>` : ``}
           </button>
@@ -14012,7 +13998,7 @@ function _openGuidedRemoveServiceModal(){
         const label = `${String(s.name || s.code || s.id || "—")} (${String(s.code || "—")})`;
         return `
           <button type="button" class="btn ${active ? "primary" : ""}" data-guided-remove-service-pick="${escapeHtml(sid)}" style="justify-content:flex-start; text-align:left; width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px;">
-            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "✓" : "○"}</span>
+            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "?" : "?"}</span>
             <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(label)}</span>
           </button>
         `;
@@ -14110,7 +14096,7 @@ function _renderGuidedServiceEditor(services, model){
     return `
       <div class="guidedServiceRow" data-guided-service-key="${escapeHtml(sid)}" draggable="true">
         <div class="guidedServiceRowTop">
-          <div class="guidedServiceIndex" title="Arraste para mudar a ordem">↕ ${idx+1}</div>
+          <div class="guidedServiceIndex" title="Arraste para mudar a ordem">? ${idx+1}</div>
           <div class="field" style="margin:0;">
             <label>Serviço</label>
             <div class="guidedServiceCellMeta">
@@ -14121,9 +14107,9 @@ function _renderGuidedServiceEditor(services, model){
             </div>
           </div>
           <div class="guidedServiceMiniActions">
-            <span class="guidedServiceDragHandle" title="Arrastar serviço">⋮⋮</span>
-            <button class="btn" type="button" data-guided-service-action="up" data-guided-service-key="${escapeHtml(sid)}">↑</button>
-            <button class="btn" type="button" data-guided-service-action="down" data-guided-service-key="${escapeHtml(sid)}">↓</button>
+            <span class="guidedServiceDragHandle" title="Arrastar serviço">??</span>
+            <button class="btn" type="button" data-guided-service-action="up" data-guided-service-key="${escapeHtml(sid)}">?</button>
+            <button class="btn" type="button" data-guided-service-action="down" data-guided-service-key="${escapeHtml(sid)}">?</button>
             <button class="btn" type="button" data-guided-service-action="duplicate" data-guided-service-key="${escapeHtml(sid)}">Duplicar</button>
             <button class="btn danger" type="button" data-guided-service-action="remove" data-guided-service-key="${escapeHtml(sid)}">Remover serviço</button>
           </div>
@@ -14196,8 +14182,8 @@ function _renderGuidedServiceEditor(services, model){
                     <input data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}" data-guided-stage-field="notes" value="${escapeHtml(String(stage.notes || ""))}" placeholder="Ex.: trecho 01" />
                   </div>
                   <div class="guidedStageActions">
-                    <button class="btn" type="button" data-guided-service-action="stage-up" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">↑</button>
-                    <button class="btn" type="button" data-guided-service-action="stage-down" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">↓</button>
+                    <button class="btn" type="button" data-guided-service-action="stage-up" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">?</button>
+                    <button class="btn" type="button" data-guided-service-action="stage-down" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">?</button>
                     <button class="btn danger" type="button" data-guided-service-action="stage-remove" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">Del</button>
                   </div>
                 </div>
@@ -16491,7 +16477,7 @@ function renderPlanningAssemblyView(model, locations){
         assembly.deps = assembly.deps.filter((_, idx)=>idx !== removeEdge.idx);
         const removedFrom = nodeById.get(String(removed?.from || "")) || nodeById.get(String(removeEdge.from || ""));
         const removedTo = nodeById.get(String(removed?.to || "")) || nodeById.get(String(removeEdge.to || ""));
-        alert(`Vínculo circular detectado. O elo mais antigo foi removido: ${String(removedFrom?.serviceName || removed?.from || removeEdge.from || "")} → ${String(removedTo?.serviceName || removed?.to || removeEdge.to || "")}.`);
+        alert(`Vínculo circular detectado. O elo mais antigo foi removido: ${String(removedFrom?.serviceName || removed?.from || removeEdge.from || "")} ? ${String(removedTo?.serviceName || removed?.to || removeEdge.to || "")}.`);
       }else{
         alert("Vínculo circular identificado. Foi necessário corrigir a ligação existente antes de prosseguir.");
       }
@@ -17278,6 +17264,9 @@ function syncActivePhaseSnapshotBeforeApply(draftModelArg){
     beforeSnapshotServices: 0,
     afterSnapshotServices: 0,
     liveServices: 0,
+    beforeSnapshotDependencies: 0,
+    afterSnapshotDependencies: 0,
+    liveDependencies: 0,
     source: "none",
     warning: null
   };
@@ -17287,6 +17276,7 @@ function syncActivePhaseSnapshotBeforeApply(draftModelArg){
     const liveDeps = Array.isArray(draftModel?.dependencies) ? draftModel.dependencies : [];
     const liveLocs = Array.isArray(draftModel?.locations) ? draftModel.locations : [];
     diag.liveServices = liveServices.length;
+    diag.liveDependencies = liveDeps.length;
 
     const assembly = _planningSyncActivePhaseToAssembly(_readPlanningAssemblyState());
     const phases = Array.isArray(assembly?.phases) ? assembly.phases.slice() : [];
@@ -17307,16 +17297,41 @@ function syncActivePhaseSnapshotBeforeApply(draftModelArg){
     const currentSnapshot = _planningNormalizeBaseSnapshot(activePhase.baseSnapshot || null) || null;
     const currentModel = currentSnapshot?.model && typeof currentSnapshot.model === "object" ? currentSnapshot.model : null;
     const currentServices = Array.isArray(currentModel?.services) ? currentModel.services : [];
+    const currentDeps = Array.isArray(currentModel?.dependencies) ? currentModel.dependencies : [];
     diag.beforeSnapshotServices = currentServices.length;
+    diag.beforeSnapshotDependencies = currentDeps.length;
 
     const currentIds = new Set(currentServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
     const liveIds = new Set(liveServices.map(s=>String(_planningServiceId(s) || "").trim()).filter(Boolean));
     const liveHasMissingInSnapshot = Array.from(liveIds).some(id=>!currentIds.has(id));
-    const shouldSync = liveServices.length > 0 && (!currentServices.length || liveHasMissingInSnapshot);
+    const dependencyKey = (raw)=>{
+      const dep = normalizeDependencyRule(raw || {});
+      return [
+        String(dep.predServiceId || "").trim(),
+        String(dep.succServiceId || "").trim(),
+        String(dep.type || "FS").trim(),
+        Number(dep.lagDays || 0) || 0,
+        String(dep.scope || "per_location").trim(),
+        String(dep.matchMode || "same_location").trim(),
+        Number(dep.locationOffset || 0) || 0
+      ].join("|");
+    };
+    const currentDepKeys = new Set(currentDeps.map(dependencyKey).filter(key=>!key.startsWith("|")));
+    const liveDepKeys = new Set(liveDeps.map(dependencyKey).filter(key=>!key.startsWith("|")));
+    const liveDependenciesDiffer = liveDepKeys.size > 0 && (
+      liveDepKeys.size !== currentDepKeys.size ||
+      Array.from(liveDepKeys).some(key=>!currentDepKeys.has(key))
+    );
+    const shouldSync = liveServices.length > 0 && (
+      !currentServices.length ||
+      liveHasMissingInSnapshot ||
+      liveDependenciesDiffer
+    );
 
     if(!shouldSync){
       diag.ok = true;
       diag.afterSnapshotServices = currentServices.length;
+      diag.afterSnapshotDependencies = currentDeps.length;
       diag.source = "activePhaseSnapshot_kept";
       return diag;
     }
@@ -17359,7 +17374,10 @@ function syncActivePhaseSnapshotBeforeApply(draftModelArg){
     _savePlanningAssemblyState(nextAssembly);
     diag.ok = true;
     diag.afterSnapshotServices = Array.isArray(nextPhase?.baseSnapshot?.model?.services) ? nextPhase.baseSnapshot.model.services.length : 0;
-    diag.source = !currentServices.length ? "snapshot_filled_from_live" : "snapshot_refreshed_from_live";
+    diag.afterSnapshotDependencies = Array.isArray(nextPhase?.baseSnapshot?.model?.dependencies) ? nextPhase.baseSnapshot.model.dependencies.length : 0;
+    diag.source = !currentServices.length
+      ? "snapshot_filled_from_live"
+      : (liveDependenciesDiffer ? "snapshot_dependencies_refreshed_from_live" : "snapshot_refreshed_from_live");
     if(diag.afterSnapshotServices === 0 && liveServices.length > 0){
       diag.warning = "snapshot_still_empty_after_sync";
     }
@@ -18318,12 +18336,8 @@ function renderProjectHeader(){
 
 // abrir modal no primeiro acesso
 window.addEventListener("load", ()=>{
-  const meta = _getProjectMeta();
   try{ renderProjectHeader(); }catch(_){}
-  try{ renderProjectSetupView(); }catch(_){}
-  if(!meta){
-    try{ setView("project"); }catch(_){}
-  }
+  try{ setView("dashboard"); }catch(_){}
 });
 
 
@@ -20575,7 +20589,7 @@ function renderAll(){
       }
     };
     const railTop = document.getElementById("plannerRailTop");
-    if(railTop) railTop.innerHTML = `<span>Pavimentos</span><span style="margin-left:auto;">Datas →</span>`;
+    if(railTop) railTop.innerHTML = `<span>Pavimentos</span><span style="margin-left:auto;">Datas ?</span>`;
     gridBg.innerHTML = "";
     gridBg.style.background = `
       repeating-linear-gradient(
@@ -20624,7 +20638,7 @@ function renderAll(){
     }
   }else{
     const railTop = document.getElementById("plannerRailTop");
-    if(railTop) railTop.innerHTML = `<span>Calendário</span><span style="margin-left:auto;">EAP →</span>`;
+    if(railTop) railTop.innerHTML = `<span>Calendário</span><span style="margin-left:auto;">EAP ?</span>`;
     document.documentElement.style.setProperty("--rowH", `${rowH}px`);
     gridBg.innerHTML = "";
     gridBg.style.background = `
@@ -21216,9 +21230,14 @@ function refreshPlannerHeaderControls(){
   try{
     const lobMode = _plannerUseLobMatrix();
     const btnVisual = document.getElementById("btnPlannerVisualMode");
+    const btnVisualBar = document.getElementById("btnPlannerVisualModeBar");
     if(btnVisual){
       btnVisual.textContent = lobMode ? "Visual: LOB" : "Visual: Serviços x Dias";
       btnVisual.classList.toggle("primary", lobMode);
+    }
+    if(btnVisualBar){
+      btnVisualBar.textContent = lobMode ? "Visual: LOB" : "Visual: Serviços x Dias";
+      btnVisualBar.classList.toggle("primary", lobMode);
     }
     const title = document.getElementById("plannerViewTitle");
     if(title){
@@ -22095,11 +22114,11 @@ function _renderSvcCycleSummary(cycle){
   const firstLoc = orderedLocIds.length ? _svcPipelineLocationName(orderedLocIds[0]) : "—";
   const lastLoc = orderedLocIds.length ? _svcPipelineLocationName(orderedLocIds[orderedLocIds.length - 1]) : "—";
   const cycleText = orderedLocIds.length
-    ? `${orderedLocIds.length} pavimentos • ${firstLoc} → ${lastLoc}`
+    ? `${orderedLocIds.length} pavimentos • ${firstLoc} ? ${lastLoc}`
     : "Sem pavimentos definidos";
   const companyText = _getSvcCompanySummary(serviceId, teams);
   const orderText = orderedLocIds.length
-    ? orderedLocIds.map(_svcPipelineLocationName).slice(0, 6).join(" → ") + (orderedLocIds.length > 6 ? ` → ... (${orderedLocIds.length})` : "")
+    ? orderedLocIds.map(_svcPipelineLocationName).slice(0, 6).join(" ? ") + (orderedLocIds.length > 6 ? ` ? ... (${orderedLocIds.length})` : "")
     : "Sem ordem de execução";
   const sourceText = String(cycle?.configuredBasis || cycle?.source || cycle?.origin || "").trim() || "eap_configurada";
   boxes[0].textContent = cycleText;
@@ -22267,7 +22286,7 @@ function _renderSvcPipelineEditor(cycle){
     imported.className = "svcPipeInlineSummary";
     imported.innerHTML = `
       <div class="main">${branchLocIds.length} pav.</div>
-      <div class="sub">${branchFirst} → ${branchLast}</div>
+      <div class="sub">${branchFirst} ? ${branchLast}</div>
     `;
     const entryMini = document.createElement("div");
     entryMini.className = "svcPipeEntryMini";
@@ -22765,13 +22784,13 @@ function renderDependencyPreview(){
   const modeLabel = m.matchMode==='last_of_previous' ? 'Último do anterior' : (m.matchMode==='custom' ? 'Custom' : 'Mesmo pavimento');
   const offsetLabel = m.locationOffset > 0 ? ` • +${m.locationOffset} pav. acima` : "";
   const latestTeamLinks = (Array.isArray(m.teamLinks) && m.teamLinks.length) ? [m.teamLinks[m.teamLinks.length-1]] : [];
-  depPreviewMeta.textContent = `${_depSvcName(m.predServiceId)} → ${_depSvcName(m.succServiceId)} • ${m.type}+${m.lag}d${offsetLabel} • ${m.scope==='global'?'Global':'Por pavimento'} • ${modeLabel} • equipes ${m.teams}`;
+  depPreviewMeta.textContent = `${_depSvcName(m.predServiceId)} ? ${_depSvcName(m.succServiceId)} • ${m.type}+${m.lag}d${offsetLabel} • ${m.scope==='global'?'Global':'Por pavimento'} • ${modeLabel} • equipes ${m.teams}`;
   depPreviewStats.textContent = `${m.expanded.length} links pavimento • ${latestTeamLinks.length} predecessora de equipe`;
   const sample = (arr, formatter) => arr.slice(0,8).map(formatter).join('<br>') + (arr.length>8 ? `<br><span style="color:var(--muted)">… +${arr.length-8} vínculos</span>` : '');
   const html = [];
-  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Serviço</div><div class="mono" style="font-size:12px; line-height:1.45;">${_depSvcName(m.predServiceId)} → ${_depSvcName(m.succServiceId)}<br>${m.type}+${m.lag}d${offsetLabel} • ${modeLabel}</div></div>`);
-  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Expansão por pavimento</div><div class="mono" style="font-size:12px; line-height:1.45; max-height:190px; overflow:auto;">${m.expanded.length ? sample(m.expanded, x=>`${_depLocName(x.from.locationId)} → ${_depLocName(x.to.locationId)} (${x.type}+${x.lag})`) : '<span style="color:var(--muted)">Nenhum vínculo expandido.</span>'}</div></div>`);
-  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Predecessora de equipe</div><div class="mono" style="font-size:12px; line-height:1.45; max-height:190px; overflow:auto;">${latestTeamLinks.length ? latestTeamLinks.map(x=>`${_depLocName(x.from.locationId)} → ${_depLocName(x.to.locationId)} (FS+0)`).join('<br>') : '<span style="color:var(--muted)">Sem geração automática de equipe para esta configuração.</span>'}</div></div>`);
+  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Serviço</div><div class="mono" style="font-size:12px; line-height:1.45;">${_depSvcName(m.predServiceId)} ? ${_depSvcName(m.succServiceId)}<br>${m.type}+${m.lag}d${offsetLabel} • ${modeLabel}</div></div>`);
+  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Expansão por pavimento</div><div class="mono" style="font-size:12px; line-height:1.45; max-height:190px; overflow:auto;">${m.expanded.length ? sample(m.expanded, x=>`${_depLocName(x.from.locationId)} ? ${_depLocName(x.to.locationId)} (${x.type}+${x.lag})`) : '<span style="color:var(--muted)">Nenhum vínculo expandido.</span>'}</div></div>`);
+  html.push(`<div style="border:1px solid rgba(15,23,42,.08); border-radius:12px; padding:10px; background:rgba(248,250,252,.8);"><div style="font-weight:800; font-size:12px; margin-bottom:6px;">Predecessora de equipe</div><div class="mono" style="font-size:12px; line-height:1.45; max-height:190px; overflow:auto;">${latestTeamLinks.length ? latestTeamLinks.map(x=>`${_depLocName(x.from.locationId)} ? ${_depLocName(x.to.locationId)} (FS+0)`).join('<br>') : '<span style="color:var(--muted)">Sem geração automática de equipe para esta configuração.</span>'}</div></div>`);
   if(m.issues.length){
     html.push(`<div style="border:1px solid rgba(245,158,11,.18); border-radius:12px; padding:10px; background:rgba(255,247,237,.95);"><div style="font-weight:800; font-size:12px; margin-bottom:6px; color:#92400e;">Alertas da prévia</div><div style="font-size:12px; line-height:1.45; color:#92400e;">${m.issues.slice(0,8).join('<br>')}${m.issues.length>8 ? `<br>… +${m.issues.length-8} alertas` : ''}</div></div>`);
   }
@@ -23395,7 +23414,7 @@ function __cmp_renderCompanySuggestions(query){
   let htmlItems = '';
   if(q && !exact){
     const safe = String(query).replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    htmlItems += '<div class="it" data-create="1" style="font-weight:700;">➕ Inserir &quot;'+ safe +'&quot;</div>';
+    htmlItems += '<div class="it" data-create="1" style="font-weight:700;">? Inserir &quot;'+ safe +'&quot;</div>';
   }
 
   if(!hits.length){
@@ -23418,7 +23437,7 @@ document.addEventListener('click', (ev)=>{
   const it = (t && t.closest) ? t.closest('#svcCompanySug .it') : null;
   if(!it) return;
 
-  // Criar direto pela lista (➕ Inserir "...")
+  // Criar direto pela lista (? Inserir "...")
   const isCreate = it.getAttribute('data-create') === "1";
   if(isCreate){
     const val = (svcCompanySearch && svcCompanySearch.value || "").trim();
@@ -23794,7 +23813,7 @@ function refreshDepsTable(){
     const tr=document.createElement("tr");
     const scopeLabel = draftScope==="per_location" ? "Por pavimento" : "Global";
     const modeLabel = draftMode==="last_of_previous"
-      ? "Último→Primeiro"
+      ? "Último?Primeiro"
       : (draftMode==="custom" ? "Custom" : "Mesmo pavimento");
     const offsetLabel = draftOffset > 0 ? ` • +${draftOffset} acima` : "";
     const compact = `${draftType}+${draftLag}${offsetLabel} • ${scopeLabel} • ${modeLabel}`;
@@ -23879,7 +23898,7 @@ function refreshDepsTable(){
     const tr=document.createElement("tr");
     const scopeLabel = d.scope==="per_location" ? "Por pavimento" : "Global";
     const modeLabel = String(d.matchMode||"same_location")==="last_of_previous"
-      ? "Último→Primeiro"
+      ? "Último?Primeiro"
       : (String(d.matchMode||"same_location")==="custom" ? "Custom" : "Mesmo pavimento");
     const offsetLabel = Math.max(0, Number(d.locationOffset||0)) > 0 ? ` • +${Math.max(0, Number(d.locationOffset||0))} acima` : "";
     const compact = `${d.type || "FS"}+${Number(d.lagDays||0)}${offsetLabel} • ${scopeLabel} • ${modeLabel}`;
@@ -25306,13 +25325,13 @@ function applyInputs(){
   if(isISODate10(candStart)) state.calendar.startDateISO = candStart;
   else {
     state.calendar.startDateISO = prevStart;
-    log(`[CAL] ⚠ Inicio (ISO) invalido: "${candStart}". Mantido: ${prevStart}`);
+    log(`[CAL] ? Inicio (ISO) invalido: "${candStart}". Mantido: ${prevStart}`);
   }
 
   if(isISODate10(candEnd)) state.calendar.endDateISO = candEnd;
   else {
     state.calendar.endDateISO = prevEnd;
-    log(`[CAL] ⚠ Fim (ISO) invalido: "${candEnd}". Mantido: ${prevEnd}`);
+    log(`[CAL] ? Fim (ISO) invalido: "${candEnd}". Mantido: ${prevEnd}`);
   }
 
   state.ui.rowH = Math.max(18, Math.min(60, Number(inRowH.value||28)));
@@ -25430,7 +25449,7 @@ function _validateTeamConflicts(blocks){
       const c = conflicts[i];
       log(`[TEAM_CONFLICT] lane=${c.laneKey} ${c.msg}`);
     }
-    alert(`⚠️ Conflito de equipe (mesmo serviço + mesma equipe):\n\n` +
+    alert(`?? Conflito de equipe (mesmo serviço + mesma equipe):\n\n` +
       conflicts.slice(0,5).map((c,ix)=>`${ix+1}) ${c.msg}`).join("\n") +
       (conflicts.length>5 ? `\n... (+${conflicts.length-5} conflito(s))` : "") +
       `\n\nO plano foi gerado e exibido. Corrija RI/RF ou troque a equipe no modal do bloco.`);
@@ -25701,6 +25720,12 @@ __bindOn("btnPlannerGridFullscreen", "click", ()=>{
   scheduleRenderAll();
 });
 __bindOn("btnPlannerVisualMode", "click", ()=>{
+  state.ui = state.ui || {};
+  state.ui.plannerVisualMode = _plannerUseLobMatrix() ? "matrix" : "lob";
+  try{ savePlannerPrefsToStorage(); }catch(_){}
+  scheduleRenderAll();
+});
+__bindOn("btnPlannerVisualModeBar", "click", ()=>{
   state.ui = state.ui || {};
   state.ui.plannerVisualMode = _plannerUseLobMatrix() ? "matrix" : "lob";
   try{ savePlannerPrefsToStorage(); }catch(_){}
@@ -26164,6 +26189,15 @@ function setView(name){
         rebuildCalendar: true
       });
     }catch(_){}
+    try{
+      const __gridOuter = document.getElementById("gridOuter");
+      const __plannerRailBody = document.getElementById("plannerRailBody");
+      if(__gridOuter){
+        __gridOuter.scrollLeft = 0;
+        __gridOuter.scrollTop = 0;
+      }
+      if(__plannerRailBody) __plannerRailBody.scrollTop = 0;
+    }catch(_){}
     renderAll();
   try{ renderProjectHeader(); }catch(_){ }
   }
@@ -26345,7 +26379,7 @@ function renderServiceEngineView(){
     { k:"Equipes config. / plano", v:`${Math.max(1, Number(cycle?.teams || teamIds.length || 1))} / ${Math.max(planBranchMap.size, teamIds.length || 1)}` },
     { k:"Origem do caminho", v:String(cycle?.configuredBasis || "eap_configurada") },
     { k:"Ramos configurados / efetivos", v:`${configuredBranches.length || displayedManualBranches.length || 0} / ${Math.max(planBranchMap.size, displayedManualBranches.length || 0)}` },
-    { k:"Janela do plano", v: planStart || planEnd ? `${_fmtBR(planStart)} → ${_fmtBR(planEnd)}` : "—" },
+    { k:"Janela do plano", v: planStart || planEnd ? `${_fmtBR(planStart)} ? ${_fmtBR(planEnd)}` : "—" },
     { k:"Fim LB / plano", v: lbEnd || planEnd ? `${_fmtBR(lbEnd)} / ${_fmtBR(planEnd)}` : "—" },
     { k:"Serviço", v:String(service?.name || serviceId || "—") }
   ];
@@ -27557,7 +27591,7 @@ function rebuildLocTable(){
     tdA.style.whiteSpace="nowrap";
     const btnTop=document.createElement("button");
     btnTop.className="miniBtn";
-    btnTop.textContent="⇑";
+    btnTop.textContent="?";
     btnTop.title="Mover para o topo";
     btnTop.style.marginRight="4px";
     btnTop.addEventListener("click", ()=>{
@@ -27570,7 +27604,7 @@ function rebuildLocTable(){
     });
     const btnUp=document.createElement("button");
     btnUp.className="miniBtn";
-    btnUp.textContent="↑";
+    btnUp.textContent="?";
     btnUp.title="Subir";
     btnUp.style.marginRight="4px";
     btnUp.addEventListener("click", ()=>{
@@ -27583,7 +27617,7 @@ function rebuildLocTable(){
     });
     const btnDown=document.createElement("button");
     btnDown.className="miniBtn";
-    btnDown.textContent="↓";
+    btnDown.textContent="?";
     btnDown.title="Descer";
     btnDown.style.marginRight="4px";
     btnDown.addEventListener("click", ()=>{
@@ -27596,7 +27630,7 @@ function rebuildLocTable(){
     });
     const btnBottom=document.createElement("button");
     btnBottom.className="miniBtn";
-    btnBottom.textContent="⇓";
+    btnBottom.textContent="?";
     btnBottom.title="Mover para a base";
     btnBottom.style.marginRight="4px";
     btnBottom.addEventListener("click", ()=>{
@@ -28633,8 +28667,26 @@ function renderDashboardView(){
   const weekMonthEl = document.getElementById("dashWeekMonth");
   const weeklyTogglesEl = document.getElementById("dashWeeklyToggles");
   if(!kpisEl || !execWorkChartBodyEl || !execMonthPlanBarsEl || !bodyEl || !weeklyChartEl || !weekMonthEl || !weeklyTogglesEl || !execIndicatorsEl || !execAlertsEl || !groupProgressEl || !execChartsEl || !operMonthCompareEl) return;
-  const blocks = JSON.parse(JSON.stringify(getCanonicalPlanBlocks() || []));
+  const resolveDashboardPlanBlocks = ()=>{
+    try{
+      const canonical = (typeof getCanonicalPlanBlocks === "function") ? getCanonicalPlanBlocks() : [];
+      if(Array.isArray(canonical) && canonical.length) return { source:"canonical", blocks:canonical };
+    }catch(_){}
+    if(Array.isArray(state?.plan?.blocks) && state.plan.blocks.length) return { source:"state.plan.blocks", blocks:state.plan.blocks };
+    if(Array.isArray(state?.blocks) && state.blocks.length) return { source:"state.blocks", blocks:state.blocks };
+    return { source:"empty", blocks:[] };
+  };
+  const dashboardBlocksResolved = resolveDashboardPlanBlocks();
+  const blocks = JSON.parse(JSON.stringify(dashboardBlocksResolved.blocks || []));
+  if(window.__PLANNUS_AUDIT_DASHBOARD === true){
+    console.log("[DASHBOARD_RENDER]", { source:dashboardBlocksResolved.source, blocks:blocks.length });
+  }
   _applyMeasuredEditsToBlocks(blocks);
+  let measuredCount = 0;
+  let delayedCount = 0;
+  let runningCount = 0;
+  let futureCount = 0;
+  let plannedCount = 0;
   const baselineBlocks = JSON.parse(JSON.stringify(Array.isArray(state?.baseline?.blocks) ? state.baseline.blocks : []));
   const operationalBlocks = JSON.parse(JSON.stringify(Array.isArray(state?.operational?.blocks) ? state.operational.blocks : []));
   const operationalMonthly = (function(){
@@ -28816,27 +28868,30 @@ function renderDashboardView(){
 
   let ppc = 0;
   const measuredPctTotal = totalPlan > 0 ? ((totalMeasured / totalPlan) * 100) : 0;
-  const _kpi = (title, value, tone)=>{
-    const map = {
-      red: "linear-gradient(180deg,#fff 0%,#fff5f7 100%)",
-      dark: "linear-gradient(180deg,#fff 0%,#f8fafc 100%)",
-      teal: "linear-gradient(180deg,#fff 0%,#f0fdfa 100%)"
-    };
-    const border = tone==="red" ? "rgba(213,0,50,.22)" : (tone==="teal" ? "rgba(15,118,110,.22)" : "rgba(15,23,42,.12)");
-    return `<div style="border:1px solid ${border}; border-radius:12px; background:${map[tone]||map.dark}; padding:8px 10px;">
-      <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.04em;">${escapeHtml(title)}</div>
-      <div style="font-size:20px; font-weight:900; color:#0f172a; line-height:1.05; margin-top:4px;">${escapeHtml(String(value))}</div>
+  const _kpi = (title, value, tone, hint)=>{
+    const color = tone==="red" ? "#D50032" : (tone==="teal" ? "#0F766E" : (tone==="amber" ? "#D97706" : "#101820"));
+    const icon = tone==="red" ? "?" : (tone==="teal" ? "?" : (tone==="amber" ? "?" : "-"));
+    return `<div class="plnDashKpiCard">
+      <div class="plnDashKpiTop">
+        <span>${escapeHtml(title)}</span>
+        <i style="color:${color};">${escapeHtml(icon)}</i>
+      </div>
+      <div class="plnDashKpiValue" style="color:${color};">${escapeHtml(String(value))}</div>
+      <div class="plnDashKpiHint">${escapeHtml(String(hint || ""))}</div>
     </div>`;
   };
-  const _renderTopKpis = ()=>{
+  const _renderTopKpis = (metrics)=>{
+    const spiValue = Number(metrics?.spi || 0);
+    const ppcValue = Number(metrics?.ppc || 0);
+    const delayedValue = Number(metrics?.delayedCount || 0);
+    const advanceValue = Number(metrics?.totalPct || 0);
     kpisEl.innerHTML = [
-      _kpi("SPI (cronograma)", `${spi.toFixed(2)}`, spi >= 1 ? "teal" : "red"),
-      _kpi("Aderência", `${ppc.toFixed(0)}%`, ppc >= 80 ? "teal" : "red"),
-      _kpi("Atividades atrasadas", `${delayedCount}`, delayedCount > 0 ? "red" : "dark"),
-      _kpi("Avanço físico", `${totalPct}%`, totalPct >= 60 ? "teal" : "red")
+      _kpi("SPI (cronograma)", `${spiValue.toFixed(2)}`, spiValue >= 1 ? "teal" : "amber", "vs. baseline"),
+      _kpi("Aderência", `${ppcValue.toFixed(0)}%`, ppcValue >= 80 ? "teal" : "red", "prazo planejado"),
+      _kpi("Atividades atrasadas", `${delayedValue}`, delayedValue > 0 ? "red" : "dark", "pendências críticas"),
+      _kpi("Avanço físico", `${advanceValue}%`, advanceValue >= 60 ? "teal" : "red", "medido no plano")
     ].join("");
   };
-  _renderTopKpis();
   bodyEl.innerHTML = rows.length ? rows.map(r=>{
     const planShare = totalPlan ? ((r.plan / totalPlan) * 100) : 0;
     const measuredShare = totalPlan ? ((r.measured / totalPlan) * 100) : 0;
@@ -28970,22 +29025,23 @@ function renderDashboardView(){
     return !!measured;
   }).length;
   const critPct = critRows.length ? ((critDone / critRows.length) * 100) : 0;
-  const measuredCount = blocks.reduce((acc,b)=>acc + (typeof isMeasuredBlock==="function" ? (isMeasuredBlock(b) ? 1 : 0) : ((b?.measured || b?.realStart || b?.realEnd) ? 1 : 0)), 0);
-  const delayedCount = blocks.reduce((acc,b)=>{
+  measuredCount = blocks.reduce((acc,b)=>acc + (typeof isMeasuredBlock==="function" ? (isMeasuredBlock(b) ? 1 : 0) : ((b?.measured || b?.realStart || b?.realEnd) ? 1 : 0)), 0);
+  delayedCount = blocks.reduce((acc,b)=>{
     const measured = !!(typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b?.measured || b?.realStart || b?.realEnd));
     if(measured) return acc;
     const end = parseISO(b?.endDateISO || b?.endISO);
     return acc + (end && end < today ? 1 : 0);
   }, 0);
-  const runningCount = blocks.reduce((acc,b)=>{
+  runningCount = blocks.reduce((acc,b)=>{
     const measured = !!(typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b?.measured || b?.realStart || b?.realEnd));
     if(measured) return acc;
     const s = parseISO(b?.startDateISO || b?.startISO);
     const e = parseISO(b?.endDateISO || b?.endISO);
     return acc + (s && e && s <= today && today <= e ? 1 : 0);
   }, 0);
-  const futureCount = Math.max(0, blocks.length - measuredCount - delayedCount - runningCount);
-  const plannedCount = Math.max(0, blocks.length - measuredCount);
+  futureCount = Math.max(0, blocks.length - measuredCount - delayedCount - runningCount);
+  plannedCount = Math.max(0, blocks.length - measuredCount);
+  _renderTopKpis({ spi, ppc, delayedCount, totalPct });
   const _kpi = (title, value, tone, hint)=>{
     const dot = tone==="red" ? "#D50032" : (tone==="teal" ? "#0F766E" : "#5F666A");
     const border = tone==="red" ? "rgba(213,0,50,.20)" : (tone==="teal" ? "rgba(15,118,110,.20)" : "rgba(15,23,42,.12)");
@@ -29022,12 +29078,13 @@ function renderDashboardView(){
   }).join("") : `<div style="font-size:12px; color:var(--muted);">Sem grupos para detalhar.</div>`;
   }catch(e){
     console.warn("[DASH_EXEC] indicadores fail", e);
-    execIndicatorsEl.innerHTML = `
-      <div class="kpi"><span class="k">SPI (cronograma)</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">Aderência</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">Atividades atrasadas</span><span class="v">—</span></div>
-      <div class="kpi"><span class="k">Avanço físico</span><span class="v">—</span></div>
-    `;
+    kpisEl.innerHTML = [
+      _kpi("SPI (cronograma)", "—", "dark"),
+      _kpi("Aderência", "—", "dark"),
+      _kpi("Atividades atrasadas", "—", "dark"),
+      _kpi("Avanço físico", "—", "dark")
+    ].join("");
+    execIndicatorsEl.innerHTML = "";
     execAlertsEl.style.display = "none";
     execAlertsEl.innerHTML = "";
   }
@@ -29044,7 +29101,10 @@ function renderDashboardView(){
   pushRange(baselineBlocks, "baselineStartISO", "baselineEndISO");
   pushRange(operationalBlocks, "startDateISO", "endDateISO");
   if(!allDates.length){
-    execMonthPlanBarsEl.innerHTML = `<div style="font-size:12px; color:var(--muted);">Sem dados para meses previstos.</div>`;
+    const emptyDashboardChart = `<div style="padding:18px; border:1px dashed rgba(95,102,106,.35); border-radius:14px; color:#5F666A; font-size:12px; background:#fff;">Sem calendário no planejamento atual para montar os gráficos.</div>`;
+    execMonthPlanBarsEl.innerHTML = emptyDashboardChart;
+    execWorkChartBodyEl.innerHTML = emptyDashboardChart;
+    if(chartEl) chartEl.innerHTML = emptyDashboardChart;
     if(bodyMonthEl) bodyMonthEl.innerHTML = `<tr><td colspan="7" style="padding:16px; color:var(--muted);">Sem dados mensais para comparação.</td></tr>`;
     return;
   }
@@ -29131,6 +29191,7 @@ function renderDashboardView(){
     </tr>
   `;}).join("") : `<tr><td colspan="8" style="padding:16px; color:var(--muted);">Sem dados mensais por grupo.</td></tr>`;
 
+  const hasBaselineForDashboard = Array.isArray(baselineBlocks) && baselineBlocks.length > 0;
   const monthlySeries = Array.from(monthTotals.values()).map(p=>{
     const ms = parseISO(`${p.key}-01`);
     const me = ms ? endOfMonth(ms) : null;
@@ -29148,6 +29209,9 @@ function renderDashboardView(){
           realizado += overlapDays(b?.startDateISO || b?.startISO, b?.endDateISO || b?.endISO, ms, me);
         }
       });
+    }
+    if(!hasBaselineForDashboard && projetado > 0){
+      previsto = projetado;
     }
     return { key:p.key, previsto, projetado, realizado };
   });
@@ -29384,7 +29448,7 @@ function renderDashboardView(){
     </section>
     <section style="border:1px solid rgba(15,23,42,.10); border-radius:12px; background:#fff; padding:10px 12px;">
       <div style="font-size:12px; font-weight:900; color:#0f172a; margin-bottom:6px;">Tendência SPI (mensal)</div>
-      <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Meta: SPI ≥ 1,00</div>
+      <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Meta: SPI = 1,00</div>
       ${spiRows || `<div style="font-size:12px; color:var(--muted);">Sem dados.</div>`}
     </section>
   `;
@@ -29647,11 +29711,11 @@ function __APP_BOOT__(){
   // O renderAll inicial travava o navegador quando havia estado legado/corrompido ou malha grande.
   // A tela inicial leve é a Visão Geral; o render pesado só roda quando o usuário abrir Acompanhamento/Linha.
   try{
-    setView("project");
-    console.info("[FIX_IDENTIDADE_V1_12_BOOT_SAFE]", { ok:true, skippedHeavyInitialRender:true, initialView:"project" });
+    setView("dashboard");
+    console.info("[FIX_IDENTIDADE_V1_12_BOOT_SAFE]", { ok:true, skippedHeavyInitialRender:true, initialView:"dashboard" });
   }catch(e){
-    console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] setView project failed", e);
-    try{ renderProjectSetupView(); }catch(e2){ console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] renderProjectSetupView failed", e2); }
+    console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] setView dashboard failed", e);
+    try{ renderDashboardView(); }catch(e2){ console.error("[FIX_IDENTIDADE_V1_12_BOOT_SAFE] renderDashboardView failed", e2); }
   }
 }
 
@@ -30658,10 +30722,10 @@ if(U.inpRI) U.inpRI.value = (e.RI || "");
       if(k===KEY){ console.warn('[QPDBG][LS removeItem]', KEY); }
       return _rem(k);
     };
-    console.log('✅ QPDBG.hookSave instalado. Agora clique em Salvar Linha Base.');
+    console.log('? QPDBG.hookSave instalado. Agora clique em Salvar Linha Base.');
   };
 
-  console.log('✅ QPDBG instalado. Use: QPDBG.baselineLS(), QPDBG.sample(0), QPDBG.hookSave()');
+  console.log('? QPDBG instalado. Use: QPDBG.baselineLS(), QPDBG.sample(0), QPDBG.hookSave()');
 })();
 </script>
 
@@ -30746,7 +30810,7 @@ if(U.inpRI) U.inpRI.value = (e.RI || "");
       }
     };
     window.applyMSPImport.__qpdbg_wrapped = true;
-    console.log("✅ QPDBG: applyMSPImport wrapped with perf+audit. Use QPDBG.auditImport().");
+    console.log("? QPDBG: applyMSPImport wrapped with perf+audit. Use QPDBG.auditImport().");
   }
 })();
 </script>
@@ -33167,7 +33231,7 @@ a,
       const hits = q ? list.filter(c=> norm(c.name).includes(q)) : list;
       let html = "";
       if(q && !exact){
-        html += '<div class="it" data-create="1" style="font-weight:700;">➕ Inserir &quot;'+esc(input.value.trim())+'&quot;</div>';
+        html += '<div class="it" data-create="1" style="font-weight:700;">? Inserir &quot;'+esc(input.value.trim())+'&quot;</div>';
       }
       if(!hits.length){
         html += '<div class="it muted">Nenhuma encontrada</div>';
@@ -34089,7 +34153,7 @@ function applyMSPImport(parsed){
       locations: state.locations.length,
       blocks: baseBlocks.length,
       deps: state.deps.length,
-      range: (state.calendar.startDateISO||"?") + "→" + (state.calendar.endDateISO||"?")
+      range: (state.calendar.startDateISO||"?") + "?" + (state.calendar.endDateISO||"?")
     };
   }catch(e){}
 
@@ -34257,12 +34321,12 @@ function applyMSPImport(parsed){
         if(window.__MSP_IMPORT && typeof window.__MSP_IMPORT.parseTSV==="function"){
           const parsed = window.__MSP_IMPORT.parseTSV(txt,{serviceLevel:svcLevel, locationLevel:locLevel, debugSvcPred:!!(chkDbgSvc&&chkDbgSvc.checked)});
           window.__MSP_IMPORT.last = parsed;
-          log("Validado ✅ linhas="+parsed.rows.length+" serviços="+parsed.services.length+" pavs="+parsed.locations.length);
+          log("Validado ? linhas="+parsed.rows.length+" serviços="+parsed.services.length+" pavs="+parsed.locations.length);
         }else{
           log("Parser MSP não encontrado (window.__MSP_IMPORT.parseTSV). Use a tela Importar MSP (Nova).");
         }
       }catch(err){
-        log("ERRO ❌\n"+(err && err.stack ? err.stack : String(err)));
+        log("ERRO ?\n"+(err && err.stack ? err.stack : String(err)));
       }
     });
 
@@ -34272,10 +34336,10 @@ function applyMSPImport(parsed){
         if(!parsed){ log("Valide primeiro."); return; }
         if(typeof window.applyMSPImport!=="function"){ log("applyMSPImport() ausente."); return; }
         window.applyMSPImport(parsed);
-        log("Aplicado ✅");
+        log("Aplicado ?");
         hide();
       }catch(err){
-        log("ERRO ❌\n"+(err && err.stack ? err.stack : String(err)));
+        log("ERRO ?\n"+(err && err.stack ? err.stack : String(err)));
       }
     });
 
@@ -35868,7 +35932,7 @@ setChip();
       card.innerHTML=`<div class="k">Serviço</div><div class="v">${safeHTML(list[0].svcName)}</div>
         <div class="k" style="margin-top:6px;">Pavimentos</div><div class="v">${list.length}</div>
         <div class="k" style="margin-top:6px;">Equipes (mín.)</div><div class="v">${teams}</div>
-        <div class="k" style="margin-top:6px;">Janela</div><div class="hint">${safeHTML(dateMin)} → ${safeHTML(dateMax)}</div>`;
+        <div class="k" style="margin-top:6px;">Janela</div><div class="hint">${safeHTML(dateMin)} ? ${safeHTML(dateMax)}</div>`;
       elSvcSummary.appendChild(card);
     }
 
@@ -36115,7 +36179,7 @@ setChip();
       }catch(_){}
 
 
-      setStatus(`REBUILD TOTAL aplicado ✅ serviços=${state.services.length} pavs=${state.locations.length} ciclos=${state.cycles.length} blocks=${_getActivePlanBlocks().length} deps=${state.dependencies.length}. Backup salvo (PLANNUS_BACKUP_BEFORE_MSP_IMPORT).`);
+      setStatus(`REBUILD TOTAL aplicado ? serviços=${state.services.length} pavs=${state.locations.length} ciclos=${state.cycles.length} blocks=${_getActivePlanBlocks().length} deps=${state.dependencies.length}. Backup salvo (PLANNUS_BACKUP_BEFORE_MSP_IMPORT).`);
       try{ renderAll(); }catch(_){}
       try{ setView("planner"); }catch(_){}
     }catch(err){
@@ -36266,9 +36330,9 @@ log("installed.");
     window.__AUDIT_STRUCT_OK__ = !!report.ok;
 
     if(report.ok){
-      console.log("✅ [AUDIT_STRUCT][PASS]", report);
+      console.log("? [AUDIT_STRUCT][PASS]", report);
     }else{
-      console.error("⛔ [AUDIT_STRUCT][FAIL]", report);
+      console.error("? [AUDIT_STRUCT][FAIL]", report);
       try{
         // Block UI interactions to prevent exporting broken state
         document.documentElement.classList.add("auditBlocked");
@@ -36542,13 +36606,13 @@ log("installed.");
         r.layout.find(x=>x.id==="2").startDay === 4 &&
         r.layout.find(x=>x.id==="2").endDay === 6;
 
-      console.log("✅ [PRED_ENGINE][SELFTEST]", ok ? "PASS" : "FAIL", r);
+      console.log("? [PRED_ENGINE][SELFTEST]", ok ? "PASS" : "FAIL", r);
       return ok;
     }
   };
 
   window.PredEngine = PredEngine;
-  console.log("✅ [PRED_ENGINE][v1] installed. Use: PredEngine.selfTest(), PredEngine.solveFromPlannus({tasks})");
+  console.log("? [PRED_ENGINE][v1] installed. Use: PredEngine.selfTest(), PredEngine.solveFromPlannus({tasks})");
 })();
 
 
@@ -36910,7 +36974,7 @@ log("installed.");
     }
   }, true);
 
-  _log("✅ DEPDBG instalado. Use: DEPDBG.snapshot(), DEPDBG.printDepsFor('srv_x'), DEPDBG.printCriticalFor('srv_x','p3100')");
+  _log("? DEPDBG instalado. Use: DEPDBG.snapshot(), DEPDBG.printDepsFor('srv_x'), DEPDBG.printCriticalFor('srv_x','p3100')");
 })();
 
 // [REL][CRIT_WIN] fallback estável para período, baseado no plano ativo
@@ -37811,7 +37875,7 @@ if(typeof window.$$ === "undefined"){
         const rule = (currentEvalMode==='month')
           ? (cell.status==='PREV MÊS' ? 'PF termina no mês analisado' : cell.status==='PREV_MES_ATR' ? 'Plano termina no mês, mas piorou contra a LB' : cell.status==='ATRASANDO' ? 'LB cruza o mês e PF termina fora do mês analisado' : cell.status==='ATRASADO' ? 'BF venceu antes do mês e sem RF' : cell.status==='OPER' ? 'RI existe e RF ainda não existe' : cell.status==='MED_MES' ? 'RF termina no mês analisado' : 'Regra mensal')
           : 'Regra diária';
-        const html = `<div style="font-weight:700;margin-bottom:4px">${cell.sname}</div>\n          <div><b>Pav:</b> ${cell.lname}</div>\n          <div><b>Status:</b> ${st}</div>\n          <div style="margin-top:6px;opacity:.9"><b>LB:</b> ${_fmt(cell.bs)} → ${_fmt(cell.bf)}</div>\n          <div style="opacity:.9"><b>Plano:</b> ${_fmt(cell.ps)} → ${_fmt(cell.pf)}</div>\n          <div style="opacity:.9"><b>Real:</b> ${_fmt(cell.rs)} → ${_fmt(cell.rf)}</div>\n          <div style="opacity:.85;margin-top:4px"><b>Regra:</b> ${rule}</div>`;
+        const html = `<div style="font-weight:700;margin-bottom:4px">${cell.sname}</div>\n          <div><b>Pav:</b> ${cell.lname}</div>\n          <div><b>Status:</b> ${st}</div>\n          <div style="margin-top:6px;opacity:.9"><b>LB:</b> ${_fmt(cell.bs)} ? ${_fmt(cell.bf)}</div>\n          <div style="opacity:.9"><b>Plano:</b> ${_fmt(cell.ps)} ? ${_fmt(cell.pf)}</div>\n          <div style="opacity:.9"><b>Real:</b> ${_fmt(cell.rs)} ? ${_fmt(cell.rf)}</div>\n          <div style="opacity:.85;margin-top:4px"><b>Regra:</b> ${rule}</div>`;
         tip.innerHTML = html;
         tip.style.left = Math.min(mx+14, W-340)+"px";
         tip.style.top = Math.min(my+14, H-140)+"px";
@@ -37881,7 +37945,7 @@ if(typeof window.$$ === "undefined"){
           <option value="month">Mês</option>
           <option value="day">Dia</option>
         </select>
-        <button id="diagZoomOut" type="button">−</button>
+        <button id="diagZoomOut" type="button">-</button>
         <button id="diagZoomIn" type="button">+</button>
         <button id="diagExportPng" type="button">Exportar PNG</button>
         <button id="diagClose" type="button">Fechar</button>
@@ -38804,7 +38868,7 @@ if(typeof window.$$ === "undefined"){
       locations: state.locations.length,
       blocks: baseBlocks.length,
       deps: state.deps.length,
-      range: (state.calendar.startDateISO||"?") + "→" + (state.calendar.endDateISO||"?")
+      range: (state.calendar.startDateISO||"?") + "?" + (state.calendar.endDateISO||"?")
     };
   }catch(e){}
 
@@ -41654,7 +41718,7 @@ function readJsonLocalStorage(key){
           color:#667085!important;
         }
         #plannusObrasGate .pln-obraInfo:before{
-          content:"◷"!important;
+          content:"?"!important;
           margin-right:7px!important;
           color:#667085!important;
         }
@@ -42410,6 +42474,16 @@ html body.withSideNav:not(.plannerGridFullscreen) button.primary{background:var(
   html body.withSideNav:not(.plannerGridFullscreen) > header{height:52px!important;min-height:52px!important;padding:0 12px!important;}
   html body.withSideNav:not(.plannerGridFullscreen) > main{padding:20px 14px 34px!important;}
 }
+</style>
+<style id="PLANNUS_NAV_PLANNING_DISTINCT">
+html body.withSideNav #sideNav .navSec.navSecPlanning{margin-top:18px!important;padding-top:12px!important;border-top:1px solid rgba(239,23,53,.20)!important;}
+html body.withSideNav #sideNav .navSec.navSecPlanning .navSecTitle{color:#ffb4bf!important;letter-spacing:.12em!important;}
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem{background:rgba(255,255,255,.03)!important;border-color:rgba(239,23,53,.10)!important;}
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem:hover{background:rgba(239,23,53,.10)!important;}
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem .ic{background:rgba(239,23,53,.12)!important;}
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem.active,
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem.primary,
+html body.withSideNav #sideNav .navSec.navSecPlanning .navItem.is-active{background:rgba(239,23,53,.18)!important;border-color:rgba(239,23,53,.34)!important;}
 </style>
 <script id="PLANNUS_MENU_SCROLL_FIX_V20">
 (function(){
@@ -43265,23 +43339,6 @@ main:has(#viewEAP[style*="block"]){
 #viewProject .projectSetupHero > div:first-child{
   min-width:0 !important;
 }
-#viewPav > section.card > h2::before,
-#viewGuidedPlan > section.card > .cardHead::before,
-#viewGuidedApply > section.card > .planningApplyToolbar::before,
-#viewService > section.card > .cardHead::before,
-#viewBaseline > section.card > .cardHead::before,
-#viewDashboard > section.card > .cardHead::before{
-  content:"WORKSPACE";
-  position:absolute;
-  top:22px;
-  left:26px;
-  font-size:12px;
-  line-height:1;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-  font-weight:900;
-  color:#344052;
-}
 #viewProject .projectSetupHeroKicker{
   position:static !important;
   display:block !important;
@@ -44077,8 +44134,346 @@ html body.withSideNav:not(.plannerGridFullscreen) #viewPlanner .plannerShell{
   width:100% !important;
   max-width:none !important;
 }
+
+/* FIX_DASHBOARD_REPORTS_V1: dashboard mais enxuto e relatório dentro do shell oficial. */
+html body.withSideNav:not(.plannerGridFullscreen) #viewDashboard{
+  width:100% !important;
+  max-width:none !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #viewDashboard > section.card{
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #dashKpis{
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(170px, 1fr)) !important;
+  gap:12px !important;
+  margin:0 0 18px !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #dashKpis .plnDashKpiCard{
+  min-height:104px !important;
+  border:1px solid rgba(16,24,32,.12) !important;
+  border-radius:16px !important;
+  background:#fff !important;
+  padding:18px 20px !important;
+  box-shadow:0 8px 22px rgba(15,23,42,.045) !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) .plnDashKpiTop{
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  color:#101820 !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.035em !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) .plnDashKpiTop i{
+  font-style:normal !important;
+  font-size:15px !important;
+  line-height:1 !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) .plnDashKpiValue{
+  margin-top:18px !important;
+  font-size:30px !important;
+  line-height:1 !important;
+  font-weight:500 !important;
+  letter-spacing:-.03em !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) .plnDashKpiHint{
+  margin-top:8px !important;
+  color:#475569 !important;
+  font-size:12px !important;
+  font-weight:400 !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) .dashExecMainGrid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:16px !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #dashExecWorkChart,
+html body.withSideNav:not(.plannerGridFullscreen) #dashExecMonthPlanBars{
+  width:100% !important;
+  border-radius:18px !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.04) !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #dashExecWorkChart{
+  min-height:460px !important;
+}
+html body.withSideNav:not(.plannerGridFullscreen) #dashExecMonthPlanBars{
+  min-height:160px !important;
+}
+html body.withSideNav.reportsActiveView #modalRelatorioOverlay{
+  box-sizing:border-box !important;
+  margin-left:var(--pln-v20-nav-w, var(--pln-v21-nav-w, 64px)) !important;
+  width:calc(100% - var(--pln-v20-nav-w, var(--pln-v21-nav-w, 64px))) !important;
+  min-height:calc(100vh - var(--pln-v20-header-h, 58px)) !important;
+  padding:28px !important;
+  background:linear-gradient(135deg,#fff 0%,#f6f7f8 54%,#f2f4f7 100%) !important;
+}
+html body.withSideNav.reportsActiveView #modalRelatorioOverlay .modal{
+  width:min(1288px, 100%) !important;
+  max-width:1288px !important;
+  margin:0 auto !important;
+  border-radius:18px !important;
+  background:#fff !important;
+  box-shadow:0 10px 28px rgba(15,23,42,.04) !important;
+}
+
+@media (max-width:1100px){
+  html body.withSideNav:not(.plannerGridFullscreen) #dashKpis{
+    grid-template-columns:repeat(4, minmax(150px, 1fr)) !important;
+  }
+  html body.withSideNav:not(.plannerGridFullscreen) .dashExecMainGrid{
+    grid-template-columns:1fr !important;
+  }
+}
 </style>
 
+<style id="PLANNUS_SIDE_NAV_CONTRACT_V24_STYLE">
+  html body.withSideNav #sideNav{
+    background: #0b1118 !important;
+    border-right: 1px solid rgba(255,255,255,.08) !important;
+    overflow-x: hidden !important;
+  }
+  html body.withSideNav #sideNav .sideNav-inner,
+  html body.withSideNav #sideNav .sideNav-content{
+    background: transparent !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav{
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav::-webkit-scrollbar,
+  html body.withSideNav.navCollapsed #sideNav .navScroll::-webkit-scrollbar{ width:0 !important; height:0 !important; display:none !important; }
+  html body.withSideNav.navCollapsed #sideNav .navScroll{
+    width:100% !important;
+    height:calc(100vh - 64px) !important;
+    min-height:calc(100vh - 64px) !important;
+    max-height:calc(100vh - 64px) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    scrollbar-width:none !important;
+    -ms-overflow-style:none !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav .nav-link,
+  html body.withSideNav.navCollapsed #sideNav .sidebar-btn,
+  html body.withSideNav.navCollapsed #sideNav button,
+  html body.withSideNav.navCollapsed #sideNav a{
+    justify-content:center !important;
+    padding-inline:0 !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav .nav-link .nav-text,
+  html body.withSideNav.navCollapsed #sideNav .sidebar-btn .label,
+  html body.withSideNav.navCollapsed #sideNav .sidebar-btn .text,
+  html body.withSideNav.navCollapsed #sideNav .nav-label,
+  html body.withSideNav.navCollapsed #sideNav .sideNav-label,
+  html body.withSideNav.navCollapsed #sideNav .sideNav-title,
+  html body.withSideNav.navCollapsed #sideNav .menu-text,
+  html body.withSideNav.navCollapsed #sideNav .navSecTitle,
+  html body.withSideNav.navCollapsed #sideNav .navItem .txt,
+  html body.withSideNav.navCollapsed #sideNav .navItem .lbl,
+  html body.withSideNav.navCollapsed #sideNav .navItem .k{
+    display:none !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav .nav-link,
+  html body.withSideNav.navCollapsed #sideNav .sidebar-btn,
+  html body.withSideNav.navCollapsed #sideNav button,
+  html body.withSideNav.navCollapsed #sideNav a{
+    position:relative !important;
+    color:transparent !important;
+    font-size:0 !important;
+    line-height:0 !important;
+    text-shadow:none !important;
+    overflow:hidden !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav .navItem > :not(.ic):not(.ico):not(.icon){
+    display:none !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav .navItem .ic,
+  html body.withSideNav.navCollapsed #sideNav .navItem .ico,
+  html body.withSideNav.navCollapsed #sideNav .navItem .icon,
+  html body.withSideNav.navCollapsed #sideNav .navItem svg{
+    color:#eef3f8 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+  }
+  html body.withSideNav.navCollapsed #sideNav [data-nav-label]:hover::after{
+    content: attr(data-nav-label);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #101828;
+    border: 1px solid rgba(15,23,42,.14);
+    box-shadow: 0 12px 30px rgba(15,23,42,.16);
+    white-space: nowrap;
+    font: 700 12px/1.1 Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    z-index: 99999;
+    pointer-events: none;
+  }
+  html body.withSideNav.navCollapsed #sideNav [data-nav-label]:hover::before{
+    content: '';
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent #ffffff transparent transparent;
+    filter: drop-shadow(-1px 0 0 rgba(15,23,42,.14));
+    z-index: 100000;
+    pointer-events: none;
+  }
+  html body.withSideNav #topHeader{
+    margin-left: 0 !important;
+  }
+  html body.withSideNav.navCollapsed #topHeader,
+  html body.withSideNav.navCollapsed .app-shell,
+  html body.withSideNav.navCollapsed main,
+  html body.withSideNav.navCollapsed .main-content,
+  html body.withSideNav.navCollapsed .content,
+  html body.withSideNav.navCollapsed .page,
+  html body.withSideNav.navCollapsed .app-main{
+    margin-left: 64px !important;
+  }
+</style>
+<script id="PLANNUS_SIDE_NAV_CONTRACT_V24_SCRIPT">
+(function(){
+  try{
+    const labels = new Map([
+      ['btnViewProject','Visão geral'],
+      ['btnViewPav','Pavimentos'],
+      ['btnViewGuided','Biblioteca EAP'],
+      ['btnOpenEapApplyNav','Planejamento'],
+      ['btnViewService','Pacotes'],
+      ['btnViewPlanner','Acompanhamento'],
+      ['btnViewDashboard','Dashboard'],
+      ['btnViewConfig','Parâmetros'],
+      ['btnExportHTML','Salvar Online'],
+      ['btnExportPlannerPDF','Linha de balanço'],
+      ['btnRelResumo','Operacional'],
+      ['btnRelDiagrama','Diagrama'],
+      ['btnViewBaseline','Linha de base'],
+      ['btnClearMeasuresLS','Limpar medições'],
+      ['btnClearLocsLS','Limpar pavimentos'],
+      ['btnClearAllLS','Reset LS'],
+      ['btnPlanViewMode','Visual: Diário'],
+      ['btnReset','Reset modelo']
+    ]);
+    labels.forEach((label,id)=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.setAttribute('data-nav-label', label);
+      if(!el.hasAttribute('aria-label')) el.setAttribute('aria-label', label);
+      if(!el.title) el.title = label;
+    });
+  }catch(err){}
+})();
+</script>
+<script id="PLANNUS_SIDE_NAV_CONTRACT_V25_SCRIPT">
+(function(){
+  try{
+    const root = document.getElementById('sideNav');
+    if(!root) return;
+    const textSel = '.navSecTitle,.navItem .txt,.navItem .lbl,.navItem .k,.sideNav-title,.sideNav-label,.menu-text,.sidebar-btn .label,.sidebar-btn .text,.nav-link .nav-text';
+    const itemSel = '.navItem, button.navItem, a.navItem, .sidebar-btn, .nav-link';
+    const icoSel  = '.ic,.ico,.icon';
+    const sc = ()=>root.querySelector('.navScroll');
+    const apply = ()=>{
+      const collapsed = document.body.classList.contains('navCollapsed');
+      root.querySelectorAll(textSel).forEach(el=>{
+        if(collapsed){
+          if(!el.dataset.plnPrevDisplay) el.dataset.plnPrevDisplay = el.style.display || '';
+          el.style.display = 'none';
+          el.setAttribute('aria-hidden','true');
+        }else{
+          el.style.display = el.dataset.plnPrevDisplay || '';
+          el.removeAttribute('aria-hidden');
+        }
+      });
+      root.querySelectorAll(itemSel).forEach(el=>{
+        if(collapsed){
+          el.style.width='42px';
+          el.style.minWidth='42px';
+          el.style.height='42px';
+          el.style.minHeight='42px';
+          el.style.padding='0';
+          el.style.justifyContent='center';
+          el.style.color='transparent';
+          el.style.fontSize='0';
+          el.style.lineHeight='0';
+          el.style.overflow='hidden';
+        }else{
+          el.style.width='';
+          el.style.minWidth='';
+          el.style.height='';
+          el.style.minHeight='';
+          el.style.padding='';
+          el.style.justifyContent='';
+          el.style.color='';
+          el.style.fontSize='';
+          el.style.lineHeight='';
+          el.style.overflow='';
+        }
+      });
+      root.querySelectorAll(icoSel).forEach(el=>{
+        if(collapsed){
+          el.style.width='34px';
+          el.style.height='34px';
+          el.style.color='#eef3f8';
+          el.style.opacity='1';
+          el.style.visibility='visible';
+        }else{
+          el.style.width='';
+          el.style.height='';
+          el.style.color='';
+          el.style.opacity='';
+          el.style.visibility='';
+        }
+      });
+      const scroll = sc();
+      if(scroll){
+        if(collapsed){
+          scroll.style.width='100%';
+          scroll.style.height='calc(100vh - 64px)';
+          scroll.style.minHeight='calc(100vh - 64px)';
+          scroll.style.maxHeight='calc(100vh - 64px)';
+          scroll.style.overflowY='auto';
+          scroll.style.overflowX='hidden';
+          scroll.style.scrollbarWidth='none';
+          scroll.style.msOverflowStyle='none';
+        }else{
+          scroll.style.width='';
+          scroll.style.height='';
+          scroll.style.minHeight='';
+          scroll.style.maxHeight='';
+          scroll.style.overflowY='';
+          scroll.style.overflowX='';
+          scroll.style.scrollbarWidth='';
+          scroll.style.msOverflowStyle='';
+        }
+      }
+    };
+    const schedule = ()=>window.requestAnimationFrame(apply);
+    schedule();
+    new MutationObserver(schedule).observe(document.body,{attributes:true,attributeFilter:['class']});
+    window.addEventListener('load', schedule, { once:true });
+  }catch(err){}
+})();
+</script>
 </body>
 </html>
+
 
