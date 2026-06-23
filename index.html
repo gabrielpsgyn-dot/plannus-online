@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
@@ -5499,6 +5499,144 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 }
 </style>
 
+<style id="planner-collapsed-width-fix">
+html body.withSideNav.navCollapsed{
+  --sideW:56px !important;
+  --sideWc:56px !important;
+  --pln-v14-sidebar-closed:56px !important;
+  --pln-v14-nav-w:56px !important;
+  --pln-v20-nav-w:56px !important;
+  --pln-v21-nav-w:56px !important;
+  --pln-v22-nav-w:56px !important;
+}
+html body.withSideNav.navCollapsed:not(.plannerGridFullscreen) > header,
+html body.withSideNav.navCollapsed:not(.plannerGridFullscreen) > main{
+  margin-left:56px !important;
+  width:calc(100% - 56px) !important;
+  max-width:calc(100% - 56px) !important;
+}
+html body.withSideNav.navCollapsed.plannerGridFullscreen #viewPlanner .plannerWrap{
+  left:56px !important;
+}
+html body.withSideNav.navCollapsed.plannerGridFullscreen #viewPlanner .plannerWrap,
+html body.withSideNav.navCollapsed.plannerGridFullscreen #viewPlanner .topHeader{
+  width:calc(100vw - 56px) !important;
+  max-width:calc(100vw - 56px) !important;
+}
+</style>
+
+<style id="PLANNUS_MEDIUM_TERM_V1">
+.mediumTermPage{background:#fff;border:1px solid #dbe3ee;border-radius:18px;overflow:hidden;box-shadow:0 18px 44px rgba(15,23,42,.05);}
+.mediumTermPage .cardHead{padding:26px 30px 20px;border-bottom:1px solid #e5eaf1;background:linear-gradient(180deg,#fff,#fbfcfd);}
+.mediumTermBody{padding:18px 20px 22px;background:#f7f8fa;}
+.mediumTermSource{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:9px 12px;border:1px solid #dbe3ee;border-radius:12px;background:#fff;color:#475569;font-size:11px;}
+.mediumTermSource strong{color:#0f172a;font-weight:800;}
+.mediumTermSource .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;margin:0 2px;}
+.mediumTermFilters{display:grid;grid-template-columns:150px 130px minmax(150px,1fr) minmax(140px,1fr) minmax(170px,1fr);gap:10px;margin-bottom:14px;}
+.mediumTermFilters label{display:flex;flex-direction:column;gap:5px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#64748b;}
+.mediumTermFilters input,.mediumTermFilters select{height:38px;border:1px solid #dbe3ee;border-radius:11px;background:#fff;padding:0 11px;font-size:12px;color:#0f172a;letter-spacing:0;text-transform:none;font-weight:500;}
+.mediumTermKpis{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;margin-bottom:14px;}
+.mediumTermKpi{min-height:78px;border:1px solid #dbe3ee;border-radius:12px;background:#fff;padding:13px 14px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;box-shadow:0 10px 24px rgba(15,23,42,.04);}
+.mediumTermKpiIcon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#fff1f2;color:#e11d48;font-weight:900;font-size:17px;}
+.mediumTermKpi.ok .mediumTermKpiIcon{background:#ecfdf5;color:#059669;}
+.mediumTermKpi.warn .mediumTermKpiIcon{background:#fff7ed;color:#f97316;}
+.mediumTermKpi.critical .mediumTermKpiIcon{background:#fff1f2;color:#e11d48;}
+.mediumTermKpi .k{font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#64748b;}
+.mediumTermKpi .v{margin-top:4px;font-size:22px;line-height:1;font-weight:800;color:#0f172a;}
+.mediumTermLayout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start;}
+.mediumTermStages{display:grid;gap:0;border:1px solid #dbe3ee;border-radius:16px;background:#fff;overflow:hidden;}
+.mediumTermStage{display:grid;grid-template-columns:110px minmax(0,1fr) 230px;border-bottom:1px solid #e5eaf1;min-height:140px;align-items:stretch;}
+.mediumTermStage:last-child{border-bottom:0;}
+.mediumTermStageHead{padding:14px 12px;border-right:1px solid #e5eaf1;background:#fbfcfd;display:flex;flex-direction:column;gap:8px;align-items:flex-start;justify-content:center;}
+.mediumTermStageTitle{font-size:14px;font-weight:900;color:#0f172a;}
+.mediumTermStageRange{font-size:11px;color:#475569;font-weight:800;border:1px solid #e5eaf1;border-radius:999px;padding:5px 8px;background:#fff;}
+.mediumTermStageCount{font-size:11px;font-weight:800;color:#64748b;}
+.mediumTermCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;padding:12px;align-content:start;align-items:start;}
+.mediumTermFocus{border-left:1px solid #e5eaf1;background:#fff8e6;padding:12px 14px;color:#475569;font-size:12px;min-height:100%;}
+.mediumTermFocusTitle{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#0f172a;margin-bottom:8px;}
+.mediumTermFocus ol{margin:0;padding-left:18px;display:grid;gap:6px;}
+.mediumTermRestrictionList{display:grid;gap:8px;margin-top:8px;}
+.mediumTermRestrictionItem{border:1px solid rgba(15,23,42,.08);border-radius:10px;background:#fff;padding:8px 9px;color:#334155;font-size:11px;line-height:1.35;}
+.mediumTermRestrictionItem strong{display:block;color:#0f172a;font-size:11px;font-weight:900;margin-bottom:2px;}
+.mediumTermRestrictionCatalog{display:grid;gap:14px;}
+.mediumTermRestrictionCatalogHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border:1px solid #dbe3ee;border-radius:16px;background:#fff;padding:14px 16px;box-shadow:0 10px 24px rgba(15,23,42,.04);}
+.mediumTermRestrictionCatalogTitle{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#0f172a;}
+.mediumTermRestrictionCatalogHint{margin-top:5px;font-size:12px;color:#64748b;line-height:1.45;max-width:880px;}
+.mediumTermRestrictionCatalogBadge{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:#0f172a;border:1px solid #dbe3ee;border-radius:999px;padding:6px 10px;background:#f8fafc;white-space:nowrap;}
+.mediumTermRestrictionCatalogGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.mediumTermRestrictionCatalogPanel{border:1px solid #dbe3ee;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 12px 28px rgba(15,23,42,.04);}
+.mediumTermRestrictionCatalogPanelHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:14px 15px;border-bottom:1px solid #e5eaf1;background:#fbfcfd;}
+.mediumTermRestrictionCatalogPanelTitle{font-size:13px;font-weight:900;color:#0f172a;}
+.mediumTermRestrictionCatalogPanelHint{margin-top:4px;font-size:12px;color:#64748b;line-height:1.4;}
+.mediumTermRestrictionCatalogMount{padding:12px;}
+.mediumTermRestrictionBoard{display:grid;gap:12px;}
+.mediumTermRestrictionBoardHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.mediumTermRestrictionBoardTitle{font-size:15px;font-weight:900;color:#0f172a;}
+.mediumTermRestrictionBoardHint{margin-top:4px;font-size:12px;color:#64748b;line-height:1.4;max-width:760px;}
+.mediumTermRestrictionBoardBadge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#0f172a;border:1px solid #dbe3ee;border-radius:999px;padding:5px 9px;background:#f8fafc;white-space:nowrap;align-self:flex-start;}
+.mediumTermRestrictionBoardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.mediumTermRestrictionStage{border:1px solid #e5eaf1;border-radius:14px;background:#fbfcfd;overflow:hidden;display:grid;gap:0;min-height:100%;}
+.mediumTermRestrictionStage.locked{opacity:.78;}
+.mediumTermRestrictionStageHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 12px 10px;border-bottom:1px solid #e5eaf1;background:#fff;}
+.mediumTermRestrictionStageTitle{font-size:13px;font-weight:900;color:#0f172a;}
+.mediumTermRestrictionStageSub{margin-top:4px;font-size:11px;font-weight:700;color:#64748b;line-height:1.35;}
+.mediumTermRestrictionStageActions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;}
+.mediumTermRestrictionStageBody{padding:12px;display:grid;gap:10px;}
+.mediumTermStageSetup{border:1px solid #dbe3ee;border-radius:16px;background:#fff;margin-bottom:14px;padding:14px;display:grid;gap:10px;}
+.mediumTermStageSetupHead{display:flex;justify-content:space-between;gap:10px;align-items:center;}
+.mediumTermStageSetupTitle{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#0f172a;}
+.mediumTermStageSetupHint{font-size:12px;color:#64748b;}
+.mediumTermStageSetupGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.mediumTermStageRule{border:1px solid #e5eaf1;border-radius:12px;background:#fbfcfd;padding:10px;}
+.mediumTermStageRule label{display:grid;gap:6px;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#64748b;}
+.mediumTermStageRule textarea{min-height:72px;resize:vertical;border:1px solid #dbe3ee;border-radius:10px;padding:8px;font-size:12px;line-height:1.35;color:#0f172a;background:#fff;font-weight:500;letter-spacing:0;text-transform:none;}
+.mediumTermModeTabs{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;}
+.mediumTermModeTabs .btn{height:38px;border-radius:12px;}
+.mediumTermModeTabs .btn.primary{background:#0f172a;color:#fff;border-color:#0f172a;}
+.mediumTermScreen[hidden]{display:none!important;}
+.mediumTermRestrictionsScreen{border:1px solid #dbe3ee;border-radius:16px;background:#fff;padding:16px;box-shadow:0 10px 24px rgba(15,23,42,.04);}
+.mediumTermStageRuleTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.mediumTermStageDone{display:flex!important;grid-template-columns:none!important;align-items:center;gap:7px;font-size:10px!important;color:#0f172a!important;white-space:nowrap;}
+.mediumTermStageDone input{width:14px;height:14px;accent-color:#e11d48;}
+.mediumTermRestrictionItem{display:grid;gap:10px;border:1px solid rgba(15,23,42,.08);border-radius:14px;background:#fff;padding:11px;}
+.mediumTermRestrictionItemGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.mediumTermRestrictionItem .field{display:grid;gap:5px;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#64748b;}
+.mediumTermRestrictionItem .field input,.mediumTermRestrictionItem .field select{height:34px;border:1px solid #dbe3ee;border-radius:10px;padding:0 9px;font-size:12px;color:#0f172a;background:#fff;letter-spacing:0;text-transform:none;font-weight:500;}
+.mediumTermRestrictionActionsSection{border-top:1px dashed #dbe3ee;padding-top:10px;display:grid;gap:8px;}
+.mediumTermRestrictionActionHead{display:flex;justify-content:space-between;gap:10px;align-items:center;}
+.mediumTermRestrictionActionTitle{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#0f172a;}
+.mediumTermRestrictionActionList{display:grid;gap:8px;}
+.mediumTermRestrictionActionItem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,180px) minmax(110px,140px) auto;gap:8px;align-items:end;border:1px solid #edf2f7;border-radius:12px;padding:8px;background:#fbfcfd;}
+.mediumTermRestrictionActionItem .field{display:grid;gap:4px;}
+.mediumTermRestrictionActionEmpty{font-size:12px;color:#64748b;padding:4px 0 0;}
+.mediumTermRestrictionActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+.mediumTermPackage{border:1px solid #dbe3ee;border-radius:12px;background:#fff;padding:12px 13px;cursor:pointer;text-align:left;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;min-height:112px;height:auto;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;}
+.mediumTermPackage:hover{transform:translateY(-1px);border-color:rgba(225,29,72,.35);box-shadow:0 14px 28px rgba(15,23,42,.07);}
+.mediumTermPackage.active{border-color:#fb7185;box-shadow:inset 3px 0 0 #e11d48;background:#fffafa;}
+.mediumTermPackage.good{border-color:#bbf7d0;background:#fbfffd;}
+.mediumTermPackage.warn{border-color:#fed7aa;background:#fffaf3;}
+.mediumTermPackage.critical{border-color:#fecdd3;background:#fffafa;}
+.mediumTermPackageTitle{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mediumTermPackageSub{font-size:11px;color:#475569;display:grid;gap:4px;line-height:1.28;}
+.mediumTermPackageScore{margin-top:9px;display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:800;color:#0f172a;}
+.mediumTermMeta{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:#475569;}
+.mediumTermChip{border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:4px 7px;background:#f8fafc;font-weight:700;}
+.mediumTermChip.critical{color:#be123c;background:#fff1f2;border-color:#fecdd3;}
+.mediumTermEmpty{padding:16px;color:#64748b;font-size:13px;align-self:center;}
+.mediumTermPanel{position:sticky;top:88px;border:1px solid #dbe3ee;border-radius:16px;background:#fff;padding:16px;box-shadow:0 18px 42px rgba(15,23,42,.06);}
+.mediumTermPanel .eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:#e11d48;margin-bottom:8px;}
+.mediumTermPanel h3{margin:0 0 8px;font-size:21px;line-height:1.1;color:#0f172a;}
+.mediumTermPanelGrid{display:grid;gap:8px;margin-top:12px;}
+.mediumTermPanelItem{border:1px solid rgba(15,23,42,.08);border-radius:13px;padding:10px 12px;background:#fbfcfd;}
+.mediumTermPanelItem .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#64748b;}
+.mediumTermPanelItem .v{margin-top:4px;font-size:13px;font-weight:800;color:#0f172a;}
+.mediumTermProgress{height:7px;border-radius:999px;background:#e5e7eb;overflow:hidden;margin-top:6px;}
+.mediumTermProgress span{display:block;height:100%;background:#16a34a;border-radius:999px;}
+.mediumTermPanel .btn{width:100%;margin-top:14px;justify-content:center;}
+html body.withSideNav #sideNav #btnViewService{display:flex!important;visibility:visible!important;}
+@media(max-width:1250px){.mediumTermFilters{grid-template-columns:repeat(3,minmax(0,1fr));}.mediumTermKpis{grid-template-columns:repeat(3,minmax(0,1fr));}.mediumTermLayout{grid-template-columns:1fr;}.mediumTermPanel{position:static;}.mediumTermStage{grid-template-columns:105px minmax(0,1fr);}.mediumTermFocus{display:none;}.mediumTermStageSetupGrid{grid-template-columns:1fr 1fr;}.mediumTermRestrictionBoardGrid,.mediumTermRestrictionCatalogGrid{grid-template-columns:1fr;}.mediumTermRestrictionItemGrid,.mediumTermRestrictionActionItem{grid-template-columns:1fr 1fr;}.mediumTermRestrictionStageHead,.mediumTermRestrictionBoardHead,.mediumTermRestrictionCatalogHead{flex-direction:column;align-items:stretch;}}
+@media(max-width:760px){.mediumTermFilters{grid-template-columns:1fr;}.mediumTermKpis{grid-template-columns:1fr 1fr;}.mediumTermStage{grid-template-columns:1fr;}.mediumTermStageHead{border-right:0;border-bottom:1px solid #e5eaf1;}.mediumTermCards{grid-template-columns:1fr;}.mediumTermRestrictionItemGrid,.mediumTermRestrictionActionItem{grid-template-columns:1fr;}.mediumTermRestrictionStageActions{justify-content:flex-start;}}
+</style>
 </head>
 
 <body class="withSideNav">
@@ -5604,6 +5742,8 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 <div class="navSecTitle">Navegação principal</div>
 <button class="navItem" id="btnViewPlanner" data-click="btnViewPlanner" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M6 15l4-4 3 2 5-6"/></svg></span><span class="txt">Acompanhamento</span><span class="k">?</span></button>
 <button class="navItem" id="btnViewDashboard" data-click="btnViewDashboard" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6"/><path d="M10 19V10"/><path d="M16 19V4"/><path d="M22 19H2"/></svg></span><span class="txt">Dashboard</span><span class="k">?</span></button>
+<button class="navItem" id="btnViewMediumTerm" data-click="btnViewMediumTerm" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h10"/><path d="M17 16l3 3 3-5"/></svg></span><span class="txt">Médio Prazo</span><span class="k">?</span></button>
+<button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Pacotes / Serviços</span><span class="k">?</span></button>
       </div>
 
       <div class="navSec">
@@ -5621,7 +5761,6 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
         <button class="navItem" id="btnViewPav" data-click="btnViewPav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></svg></span><span class="txt">Pavimentos</span><span class="k">?</span></button>
         <button class="navItem" id="btnViewGuided" data-click="btnViewGuided" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 4v16"/><path d="M12 4v16"/></svg></span><span class="txt">Biblioteca EAP</span><span class="k">?</span></button>
         <button class="navItem" id="btnOpenEapApplyNav" data-click="btnOpenEapApplyNav" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h10"/><path d="M11 6l6 6-6 6"/><path d="M19 5v14"/></svg></span><span class="txt">Planejamento</span><span class="k">?</span></button>
-        <button class="navItem" id="btnViewService" data-click="btnViewService" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 1 0 3 3l2 2-2 2"/><path d="M4 20l6-6"/><path d="M6 18l-2 2"/><path d="M8 16l-2-2"/></svg></span><span class="txt">Pacotes</span><span class="k">?</span></button>
         <button class="navItem" id="btnViewConfig" data-click="btnViewConfig" type="button"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h8"/><path d="M16 7h4"/><circle cx="14" cy="7" r="2"/><path d="M4 12h4"/><path d="M12 12h8"/><circle cx="8" cy="12" r="2"/><path d="M4 17h12"/><circle cx="18" cy="17" r="2"/></svg></span><span class="txt">Parâmetros</span><span class="k">?</span></button>
       </div>
     </div>
@@ -5809,8 +5948,9 @@ window.DEBUG = window.DEBUG || { RENDER_SKIP:false, ENGINE:false, MSP:false };
     if(!window.Actions.btnViewProject) window.Actions.btnViewProject = ()=>{ try{ if(typeof setView==="function") return setView("project"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewProject"); };
     if(!window.Actions.btnViewPlanner) window.Actions.btnViewPlanner = ()=>{ try{ if(typeof setView==="function") return setView("planner"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewPlanner"); };
     if(!window.Actions.btnViewDashboard) window.Actions.btnViewDashboard = ()=>{ try{ if(typeof setView==="function") return setView("dashboard"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewDashboard"); };
+    if(!window.Actions.btnViewMediumTerm) window.Actions.btnViewMediumTerm = ()=>{ try{ if(typeof setView==="function") return setView("mediumterm"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewMediumTerm"); };
     if(!window.Actions.btnViewPav) window.Actions.btnViewPav = ()=>{ try{ if(typeof setView==="function") return setView("pav"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewPav"); };
-    if(!window.Actions.btnViewService) window.Actions.btnViewService = ()=>{ try{ if(typeof openGuidedServicesEditor==="function") return openGuidedServicesEditor(); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewService"); };
+    if(!window.Actions.btnViewService) window.Actions.btnViewService = ()=>{ try{ if(typeof setView==="function") return setView("service"); if(typeof openGuidedServicesEditor==="function") return openGuidedServicesEditor(); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewService"); };
     if(!window.Actions.btnViewBaseline) window.Actions.btnViewBaseline = ()=>{ try{ if(typeof setView==="function") return setView("baseline"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnViewBaseline"); };
     if(!window.Actions.btnOpenEapApplyNav) window.Actions.btnOpenEapApplyNav = ()=>{ try{ if(typeof setView==="function") return setView("guidedapply"); }catch(_){ } console.warn("[ACTION_MISSING_IMPL] btnOpenEapApplyNav"); };
     if(!window.Actions.btnViewProjectPath) window.Actions.btnViewProjectPath = ()=>{ try{ if(typeof setView==="function") return setView("guided"); }catch(_){ } console.warn("[ACTION_DISABLED] btnViewProjectPath"); };
@@ -6130,7 +6270,7 @@ document.addEventListener("click", function(ev){
           <option value="12">12 meses</option>
         </select>
       </div>
-      <button class="btn primary" id="btnPlannerVisualModeBar" type="button" title="Alternar entre LOB e Serviços x Dias">Visual: LOB</button>
+        <button class="btn primary" id="btnPlannerVisualModeBar" type="button" title="Alternar entre LOB e Serviços x Dias">Visual: LOB</button>
       <button class="btn" id="btnPlannerServiceFilterAdd" type="button">Adicionar</button>
       <button class="btn" id="btnPlannerServiceFilterClear" type="button">Limpar filtro</button>
       <button class="btn" id="btnPlannerAutoUpdateBar" type="button" title="Ativar ou desativar atualização automática do acompanhamento">Auto: Off</button>
@@ -6773,7 +6913,7 @@ document.addEventListener("click", function(ev){
     <section class="card" style="grid-column:1 / -1;">
       <div class="cardHead" style="justify-content:space-between; align-items:center;">
         <div>
-          <div class="title plnPageTitle packageScreenTitle">Tela de Pacotes</div>
+          <div class="title plnPageTitle packageScreenTitle">Pacotes / Serviços</div>
           <div class="sub plnPageSubtitle packageScreenSubtitle">Catálogo oficial para pacotes, serviços, equipes e subserviços.</div>
         </div>
         <div class="actions" style="margin-left:auto;">
@@ -6821,6 +6961,74 @@ document.addEventListener("click", function(ev){
           <button class="btn primary" id="btnBaselineSaveView" type="button">Salvar nova versão</button>
           <button class="btn danger" id="btnBaselineClearView" type="button">Limpar linha base</button>
         </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="viewMediumTerm" style="display:none;">
+    <section class="card mediumTermPage" style="grid-column:1 / -1;">
+      <div class="cardHead">
+        <div>
+          <div class="title plnPageTitle">Médio Prazo</div>
+          <div class="sub plnPageSubtitle">Remoção de restrições para serviços que entrarão na Linha de Balanço.</div>
+        </div>
+        <div class="actions" style="margin-left:auto; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="btnMediumTermCompanyView" type="button">Padrões da empresa</button>
+          <button class="btn" id="btnMediumTermWorkView" type="button">Restrições da obra</button>
+        </div>
+      </div>
+      <div class="mediumTermBody">
+        <div class="mediumTermScreen" id="mediumTermBoardScreen">
+          <div class="mediumTermSource" id="mediumTermSourceBar"></div>
+          <div class="mediumTermFilters">
+            <label>Data de referência <input id="mediumTermRefDate" type="date" /></label>
+            <label>Horizonte <select id="mediumTermHorizon"><option value="90">90 dias</option><option value="120">120 dias</option><option value="150" selected>150 dias</option></select></label>
+            <label>Responsável <input id="mediumTermOwnerFilter" placeholder="Responsável" /></label>
+            <label>Tipo de restrição <select id="mediumTermTypeFilter"><option value="">Todos</option><option>Projeto</option><option>Frente</option><option>Material</option><option>Equipe</option><option>Equipamento</option><option>Contrato</option><option>Segurança</option><option>Produtividade</option><option>Logística</option><option>Qualidade</option></select></label>
+            <label>Serviço <input id="mediumTermSearch" placeholder="Buscar serviço ou código" /></label>
+          </div>
+          <div class="mediumTermKpis" id="mediumTermKpis"></div>
+          <div class="mediumTermLayout">
+            <div class="mediumTermStages" id="mediumTermStages"></div>
+            <aside class="mediumTermPanel" id="mediumTermPanel"></aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="viewMediumTermCompany" style="display:none;">
+    <section class="card mediumTermPage" style="grid-column:1 / -1;">
+      <div class="cardHead">
+        <div>
+          <div class="title plnPageTitle">Restrições padrão</div>
+          <div class="sub plnPageSubtitle">Cadastro da empresa para reutilizar padrões de etapas, ações e responsáveis.</div>
+        </div>
+        <div class="actions" style="margin-left:auto; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="btnMediumTermCompanyBack" type="button">Voltar ao Médio Prazo</button>
+          <button class="btn primary" id="btnMediumTermCompanyToWork" type="button">Abrir restrições da obra</button>
+        </div>
+      </div>
+      <div style="padding:14px;">
+        <div id="mediumTermCompanyBoardMount"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="viewMediumTermWork" style="display:none;">
+    <section class="card mediumTermPage" style="grid-column:1 / -1;">
+      <div class="cardHead">
+        <div>
+          <div class="title plnPageTitle">Restrições da obra</div>
+          <div class="sub plnPageSubtitle">Cadastro operacional da obra, com responsável, período, ações e acompanhamento por etapa.</div>
+        </div>
+        <div class="actions" style="margin-left:auto; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="btnMediumTermWorkBack" type="button">Voltar ao Médio Prazo</button>
+          <button class="btn primary" id="btnMediumTermWorkToCompany" type="button">Abrir padrões da empresa</button>
+        </div>
+      </div>
+      <div style="padding:14px;">
+        <div id="mediumTermWorkBoardMount"></div>
       </div>
     </section>
   </div>
@@ -7116,7 +7324,7 @@ document.addEventListener("click", function(ev){
       </details>
 
       <div style="display:flex; gap:8px; justify-content:flex-end;">
-        <button class="btn danger" id="btnClearSvcDeps">Limpar predecessoras deste servico</button>
+        <button class="btn danger" id="btnClearSvcDeps">Limpar predecessoras deste serviço</button>
         <button class="btn primary" id="btnRegenFromModal">Regerar plano</button>
       </div>
     </div>
@@ -7434,7 +7642,7 @@ document.addEventListener("click", function(ev){
     }
     if(sub){
       sub.textContent = isBoletim
-        ? "Atividades previstas no mes selecionado (agrupadas por servico)"
+        ? "Atividades previstas no mes selecionado (agrupadas por serviço)"
         : (isPrazo
           ? "Comparativo de prazo entre linha de base e plano projetado"
           : (isMed ? "Consolidação das medições realizadas por semana e por mês." : "Matriz Pavimento x Servico com status por celula"));
@@ -7759,7 +7967,7 @@ document.addEventListener("click", function(ev){
     if(!popup){
       setBtn("Falha ao abrir", false);
       setTimeout(function(){ setBtn("Exportar boletim", false); }, 1400);
-      alert("Nao foi possivel abrir a janela de exportacao.");
+      alert("Não foi possivel abrir a janela de exportação.");
       return;
     }
     popup.document.open();
@@ -7791,7 +7999,9 @@ document.addEventListener("click", function(ev){
       .page{ padding:0; }
       .tableWrap, .kpi, .stamp{ break-inside:avoid; }
     }
-  </style>
+</style>
+
+
 </head>
 <body>
   <div class="page">
@@ -7896,7 +8106,7 @@ document.addEventListener("click", function(ev){
       }
       const styles = Array.from(document.head.querySelectorAll("style,link[rel='stylesheet']")).map(el=>el.outerHTML).join("\n");
       const projectName = String(state?.project?.name || document.querySelector(".brandLine strong")?.textContent || "Projeto atual").trim();
-      const title = `Linha de Balanço • ${projectName}`;
+      const title = `Linha de balanço • ${projectName}`;
       const printHtml = `<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -8452,7 +8662,7 @@ function updateTodayBadge(){
 }
 
 
-/** ===== Estado inicial (3 servicos, 4 pavimentos) ===== */
+/** ===== Estado inicial (3 serviços, 4 pavimentos) ===== */
 function defaultState(){
   return {
     calendar:{ startDateISO:"2026-02-24", endDateISO:"2026-03-14", workdays:[1,2,3,4,5], holidays:[] },
@@ -10106,7 +10316,7 @@ function _resolveDependencyPathPredLocationWithOffset(runtimeState, predSvc, suc
 }
 function normalizeDependencyRule(raw){
   const explicitRelationCode = String(raw?.relationCode ?? raw?.rawType ?? raw?.linkCode ?? "").trim().toUpperCase();
-  const type = _depTypeNorm(raw?.type || raw?.tipoLigacao || explicitRelationCode || "FS");
+  const type = _depTypeNorm(raw?.type || raw?.tipoLigação || explicitRelationCode || "FS");
   const locationOffsetRaw = (raw?.locationOffset ?? raw?.locOffset ?? raw?.offsetPavements ?? raw?.offset);
   const dep = {
     id: String(raw?.id||"").trim(),
@@ -10652,7 +10862,7 @@ function _syncCycleTeamsFromEvidence(cycle, blocksInput){
   }catch(_){}
 }
 
-/** ===== Geracao de blocos (ciclo + equipes + deps) ===== */
+/** ===== Geração de blocos (ciclo + equipes + deps) ===== */
 function generateBlocks(){
   const deps=getEffectiveDependencies();
   const topo=validateDependencyGraphActivities(deps, state);
@@ -10885,7 +11095,7 @@ const svcMap=new Map(state.services.map(s=>[s.id,s]));
       log(`[BLOCK] svc=${svcName} loc=${block.label} team=${block.teamId} ${block.startDateISO}..${block.endDateISO} dur=${duration}`);
     }
 
-    // bloco global do servico (para deps globais, se usar)
+    // bloco global do serviço (para deps globais, se usar)
     const svcBlocks=blocks.filter(b=>b.serviceId===svcId);
     if(svcBlocks.length){
       let minS=svcBlocks[0].startDateISO, maxE=svcBlocks[0].endDateISO;
@@ -11395,7 +11605,7 @@ function generateBlocksRespectingEdits(){
 
       // sanidade: se RF < startISO, ajusta por duration (não mexe em lockedReal)
       if(!isLockedReal && endISO && startISO && String(endISO) < String(startISO)){
-        log(`[REAL] WARN RF < start (svc=${svcName} loc=${locMap.get(locId)?.name||locId}) RF=${endISO} start=${startISO} -> ajustando por duracao`);
+        log(`[REAL] WARN RF < start (svc=${svcName} loc=${locMap.get(locId)?.name||locId}) RF=${endISO} start=${startISO} -> ajustando por duração`);
         const startFinal=BR.parseISO(startISO);
         const endFinal=BR.addWorkdays(startFinal, duration-1, workdaysSet, holidaysSet);
         endISO=BR.iso(endFinal);
@@ -11430,7 +11640,7 @@ function generateBlocksRespectingEdits(){
       log(`[BLOCK] svc=${svcName} loc=${block.label} team=${block.teamId} ${block.startDateISO}..${block.endDateISO} dur=${duration}${(RI&&RF)?" [REAL]":""}`);
     }
 
-    // bloco global do servico
+    // bloco global do serviço
     const svcBlocks=blocks.filter(b=>b.serviceId===svcId);
     if(svcBlocks.length){
       let minS=svcBlocks[0].startDateISO, maxE=svcBlocks[0].endDateISO;
@@ -12011,7 +12221,7 @@ const GUIDED_EAP_TEMPLATES = Object.freeze({
   }
 });
 const GUIDED_MACRO_GROUPS = Object.freeze({
-  vedacao_interna:{
+  vedação_interna:{
     label:"Vedação interna",
     services:["ALVENARIA INTERNA","CHAPISCO","REBOCO INTERNO","REVESTIMENTO PAREDE","PINTURA"]
   },
@@ -12848,9 +13058,10 @@ function _guidedClearAllServicePredecessors(){
   });
   return changed;
 }
-function _guidedRemoveServiceFromEap(serviceId){
+function _guidedRemoveServiceFromEap(serviceId, options){
   const sid = String(serviceId || "").trim();
   if(!sid) return false;
+  const shouldPersist = !(options && options.persist === false);
   let removedName = "";
   let removed = false;
   _guidedUpdateServicesDraft(arr=>{
@@ -12881,6 +13092,9 @@ function _guidedRemoveServiceFromEap(serviceId){
   });
   if(removed){
     try{ toast(`Serviço removido da EAP: ${removedName}`); }catch(_){}
+    if(shouldPersist){
+      try{ _persistGuidedEapServicesToApi("guided_remove_service"); }catch(_){}
+    }
   }
   return removed;
 }
@@ -12999,28 +13213,7 @@ function _bindGuidedServiceEditorUI(){
     const idx = items.findIndex(x=>String(x.key || x.id || "").trim() === key);
     if(idx < 0) return;
     if(action==="remove"){
-      const removed = items[idx];
-      const removedId = String(removed?.id || removed?.key || "").trim();
-      if(removedId){
-        for(const svc of items){
-          const sid = String(svc?.id || svc?.key || "").trim();
-          if(!sid || sid === removedId) continue;
-          const preds = Array.isArray(svc.predecessors) ? svc.predecessors.slice() : [];
-          const filtered = preds.filter(link=>String(link?.fromServiceId || "").trim() !== removedId);
-          if(filtered.length !== preds.length){
-            svc.predecessors = filtered;
-            const primary = filtered[0] || null;
-            svc.predecessorServiceId = String(primary?.fromServiceId || "").trim();
-            svc.dependencyType = String(primary?.type || "FS");
-            svc.lagDays = Math.max(0, Number(primary?.lagDays || 0) || 0);
-            svc.locationOffsetAbove = Math.max(0, Number(primary?.locationOffsetAbove || 0) || 0);
-            svc.expansionMode = String(primary?.expansionMode || "per_location");
-            svc.matchMode = String(primary?.matchMode || "same_location");
-          }
-        }
-      }
-      items.splice(idx, 1);
-      _guidedUpdateServicesDraft(arr=>{ arr.splice(0, arr.length, ...items); return { focus:{ field:"name", scrollOnly:true } }; });
+      _guidedRemoveServiceFromEap(key);
       return;
     }
     if(action==="up" && idx > 0){
@@ -14031,7 +14224,10 @@ function _openGuidedRemoveServiceModal(){
     if(!sids.length) return;
     if(!confirm(`Remover ${sids.length} serviço(s) da EAP atual?\n\nOs vínculos desses serviços serão quebrados.`)) return;
     let removedCount = 0;
-    sids.forEach(sid=>{ if(_guidedRemoveServiceFromEap(sid)) removedCount += 1; });
+    sids.forEach(sid=>{ if(_guidedRemoveServiceFromEap(sid, { persist:false })) removedCount += 1; });
+    if(removedCount){
+      try{ _persistGuidedEapServicesToApi("guided_bulk_remove_service"); }catch(_){}
+    }
     try{ toast(`Serviços removidos da EAP: ${removedCount}`); }catch(_){}
     close();
     try{ renderGuidedPlanningView(); }catch(_){}
@@ -14046,6 +14242,10 @@ function _openGuidedRemoveServiceModal(){
     if(!confirm(`Remover TODOS os ${count} serviços da EAP atual?\n\nIsso limpa a EAP, mas não apaga o projeto.`)) return;
     try{
       _saveGuidedPlanDraft(Object.assign({}, draft, { services: [], selectedServiceId:"" }));
+      state.serviceBaseCatalog = [];
+      _syncServiceBaseCatalogToStateServicesWhenSafe();
+      try{ _markServiceCatalogMutation("guided_remove_all_services"); }catch(_){}
+      try{ saveServicesToStorage([], true); }catch(_){}
       state.ui = state.ui || {};
       state.ui.selectedServiceId = "";
     }catch(e){ console.warn(e); }
@@ -14405,7 +14605,7 @@ function renderGuidedApplyView(){
     const locTotal = Array.isArray(model?.locations) ? model.locations.length : 0;
     const locScoped = Array.isArray(filteredLocations) ? filteredLocations.length : 0;
     applySummary.innerHTML = [
-      `<span class="planningAssemblyChip">Servicos base: ${escapeHtml(String(Array.isArray(model?.services) ? model.services.length : 0))}</span>`,
+      `<span class="planningAssemblyChip">Serviços base: ${escapeHtml(String(Array.isArray(model?.services) ? model.services.length : 0))}</span>`,
       `<span class="planningAssemblyChip">Dependencias: ${escapeHtml(String(depCount))}</span>`,
       `<span class="planningAssemblyChip">Escopo: ${escapeHtml(scopeLabel)} (${escapeHtml(String(isFilteredApply ? locScoped : locTotal))} locais)</span>`,
       `<span class="planningAssemblyChip">Modo: ${escapeHtml(isReplaceMode ? "Substituir" : "Adicionar")}</span>`
@@ -14757,7 +14957,7 @@ function _planningExplicitSegments(items){
     const segId = String(seg?.id || "").trim().toLowerCase();
     const segName = String(seg?.name || "").trim().toLowerCase();
     if(segId === "principal") return false;
-    if(segName === "serviço completo" || segName === "servico completo") return false;
+    if(segName === "serviço completo" || segName === "serviço completo") return false;
     return true;
   });
 }
@@ -14987,7 +15187,7 @@ function _planningBuildPlanningPanelsHtml(cfg){
           <div class="planningAssemblyStructureCard"><div class="planningAssemblyStructureKicker">Obra</div><div class="planningAssemblyStructureValue">${escapeHtml(String((cfg && cfg.projectName) || "Obra atual"))}</div></div>
         </div>
       </div>
-      <div class="panelTitle" style="margin-top:14px;">Etapas do servico</div>
+      <div class="panelTitle" style="margin-top:14px;">Etapas do serviço</div>
       <div class="planningStageForm" style="grid-template-columns:minmax(260px,1fr) 80px 80px auto;">
         <label class="field"><span>Nome da etapa</span><input id="planningStageName" placeholder="Ex.: Bloco A / Trecho 01"></label>
         <label class="field"><span>Prazo</span><input id="planningStageDuration" type="number" min="1" value="${escapeHtml(String(cfg?.defaultDurationDays || 1))}"></label>
@@ -15000,7 +15200,7 @@ function _planningBuildPlanningPanelsHtml(cfg){
       </div>
       <div class="rowActions" style="margin-top:10px; justify-content:flex-end;">
         <button type="button" class="btn" id="btnPlanningClearSegments">Limpar etapas</button>
-        <button type="button" class="btn primary" id="btnPlanningSaveStages">Salvar alteracoes</button>
+        <button type="button" class="btn primary" id="btnPlanningSaveStages">Salvar alterações</button>
       </div>
     </div>`;
   const depHtml = `
@@ -15246,8 +15446,8 @@ function _planningSegmentNodes(model, assembly){
           durationDays:Number(svc?.durationDefault || svc?.durationDays || svc?.duration || 1) || 1
         }];
     if(rawSegments.length){
-      // Quando o servico foi quebrado em trechos, o fluxo mostra apenas os trechos.
-      // O bloco principal fica implicitamente representado pela EAP/base, nao como no restante do fluxo.
+      // Quando o serviço foi quebrado em trechos, o fluxo mostra apenas os trechos.
+      // O bloco principal fica implicitamente representado pela EAP/base, não como no restante do fluxo.
     }
     segments.forEach((seg, segIdx)=>{
       const segId = String(seg?.id || seg?.name || "principal").trim() || "principal";
@@ -15670,7 +15870,7 @@ function _buildPlanningStageFlowLayout(ctx){
     const border = isStage ? (planningToRgba(serviceColor, .24) || "rgba(16,24,32,.18)") : "rgba(16,24,32,.18)";
     return `<div class="guidedFlowBlock planningStageFlowBlock" data-guided-service-key="${escapeHtml(nodeId)}" data-guided-lane-id="${escapeHtml(String(n.laneId))}" data-guided-lane-rank="${escapeHtml(String(n.laneIndex))}" data-guided-lane="${escapeHtml(String(n.laneIndex + 1))}" data-planning-node-id="${escapeHtml(nodeId)}" data-planning-node-kind="${escapeHtml(isStage ? "trecho" : "base")}" data-planning-lane-id="${escapeHtml(String(n.laneId))}" data-planning-lane-rank="${escapeHtml(String(n.laneIndex))}" data-planning-depth="${escapeHtml(String(n.depth))}" title="${escapeHtml(sub ? `${label} - ${sub}` : label)}" style="--planning-accent:${escapeHtml(accent)}; --planning-fill:${escapeHtml(fill)}; border-color:${escapeHtml(border)}; position:absolute; left:${Math.round(n.left)}px; top:${Math.round(n.top)}px; width:${blockW}px; min-height:${blockH}px;">
         <button class="guidedFlowConnHandle in" type="button" draggable="true" title="Entrada" data-planning-node-point="in" data-planning-flow-link-point="in" data-planning-flow-service-key="${escapeHtml(nodeId)}" data-planning-node-id="${escapeHtml(nodeId)}"></button>
-        <button class="guidedFlowConnHandle out" type="button" draggable="true" title="Saida" data-planning-node-point="out" data-planning-flow-link-point="out" data-planning-flow-service-key="${escapeHtml(nodeId)}" data-planning-node-id="${escapeHtml(nodeId)}"></button>
+        <button class="guidedFlowConnHandle out" type="button" draggable="true" title="Saída" data-planning-node-point="out" data-planning-flow-link-point="out" data-planning-flow-service-key="${escapeHtml(nodeId)}" data-planning-node-id="${escapeHtml(nodeId)}"></button>
         <button class="guidedFlowClearBtn planningNodeClear" type="button" title="Limpar vinculos deste item" data-planning-node-clear="${escapeHtml(nodeId)}">×</button>
         <div class="guidedFlowBlockTop">
         <div class="name">${escapeHtml(label)}</div>
@@ -15688,7 +15888,7 @@ function _buildPlanningStageFlowLayout(ctx){
         <div class="guidedFlowHeader">
           <div>
             <div class="ttl">Fluxo operacional da EAP</div>
-            <div class="subttl">Mostra todos os servicos e trechos. Use a saida de um bloco e a entrada de outro para criar predecessoras do planejamento.</div>
+            <div class="subttl">Mostra todos os serviços e trechos. Use a saída de um bloco e a entrada de outro para criar predecessoras do planejamento.</div>
           </div>
           <div class="guidedSectionActions" style="margin:0;">
             <div class="guidedPill">${positioned.length} no(s)</div>
@@ -15775,7 +15975,7 @@ function renderPlanningAssemblyView(model, locations){
   const phaseCountRoot = document.getElementById("planningPhaseCount");
   const phases = Array.isArray(assembly.phases) ? assembly.phases : [];
   if(!services.length){
-    segRoot.innerHTML = `<div class="planningAssemblyPanel">Nenhum servico cadastrado na EAP.</div>`;
+    segRoot.innerHTML = `<div class="planningAssemblyPanel">Nenhum serviço cadastrado na EAP.</div>`;
     depRoot.innerHTML = "";
     if(phaseBaseInfoRoot) phaseBaseInfoRoot.textContent = "Nenhuma fase carregada.";
     if(phaseSelectRoot) phaseSelectRoot.innerHTML = `<option value="">Nenhuma fase</option>`;
@@ -16039,7 +16239,7 @@ function renderPlanningAssemblyView(model, locations){
       <div>${escapeHtml(String(d?.lag || 0))}</div>
       <div><button type="button" class="btn mini danger" data-planning-remove-dep="${escapeHtml(String(idx))}">Remover</button></div>
     </div>`;
-  }).join("") : `<div class="planningAssemblyRow" style="grid-template-columns:1fr;"><div>Nenhum vinculo entre trechos deste servico.</div></div>`;
+  }).join("") : `<div class="planningAssemblyRow" style="grid-template-columns:1fr;"><div>Nenhum vinculo entre trechos deste serviço.</div></div>`;
 
   const globalRows = globalDeps.length ? globalDeps.map(d=>{
     const predId = String(d?.predServiceId || d?.predecessorServiceId || "").trim();
@@ -16050,22 +16250,22 @@ function renderPlanningAssemblyView(model, locations){
       <div>${escapeHtml(String(d?.type || "FS"))}</div>
       <div>EAP</div>
     </div>`;
-  }).join("") : `<div class="planningAssemblyRow" style="grid-template-columns:1fr;"><div>Nenhuma predecessora global para este servico.</div></div>`;
+  }).join("") : `<div class="planningAssemblyRow" style="grid-template-columns:1fr;"><div>Nenhuma predecessora global para este serviço.</div></div>`;
 
   const flowModel = _buildPlanningStageFlowLayout({ nodes, deps, baseDeps, assembly, services, nodeById });
   const planningFlow = flowModel.html;
   const planningSearchBox = `
     <div class="guidedFlowToolHeader">
       <div class="guidedFlowSearchBox">
-        <div><label>Localizar servico</label><input type="text" data-planning-flow-service-filter placeholder="Digite o servico para destacar"></div>
+        <div><label>Localizar serviço</label><input type="text" data-planning-flow-service-filter placeholder="Digite o serviço para destacar"></div>
         <div class="guidedFlowSearchServiceBox" data-planning-flow-filter-service-box>
           <button class="guidedFlowConnHandle in" type="button" draggable="true" title="Entrada" aria-label="Entrada" data-planning-flow-link-point="in" data-planning-node-point="in"></button>
-          <button class="guidedFlowConnHandle out" type="button" draggable="true" title="Saida" aria-label="Saida" data-planning-flow-link-point="out" data-planning-node-point="out"></button>
+          <button class="guidedFlowConnHandle out" type="button" draggable="true" title="Saída" aria-label="Saída" data-planning-flow-link-point="out" data-planning-node-point="out"></button>
           <div class="miniName">Servico filtrado</div>
           <div class="miniMeta">Digite para selecionar</div>
         </div>
         <div class="guidedFlowSearchResults" data-planning-flow-search-results></div>
-        <div class="guidedFlowSearchOverlap" data-planning-flow-overlap-info>Sobreposicao: -</div>
+        <div class="guidedFlowSearchOverlap" data-planning-flow-overlap-info>Sobreposição: -</div>
       </div>
     </div>`;
 
@@ -16126,7 +16326,7 @@ function renderPlanningAssemblyView(model, locations){
       results.innerHTML = q
         ? (hits.length
             ? hits.slice(0, 6).map(hit=>`<button type="button" class="guidedFlowSearchResult" data-planning-flow-find-node="${escapeHtml(hit.key)}" data-planning-flow-find-node-name="${escapeHtml(hit.name)}" title="${escapeHtml(hit.name)}">${escapeHtml(hit.name)}${hit.sub ? ` · ${escapeHtml(hit.sub)}` : ""}</button>`).join("")
-            : `<span style="font-size:10px;color:#64748b;">Nenhum servico encontrado</span>`)
+            : `<span style="font-size:10px;color:#64748b;">Nenhum serviço encontrado</span>`)
         : `<span style="font-size:10px;color:#64748b;">Digite para destacar no fluxo</span>`;
     }
     const serviceBox = depRoot.querySelector("[data-planning-flow-filter-service-box]");
@@ -16141,7 +16341,7 @@ function renderPlanningAssemblyView(model, locations){
           <div class="miniName">${escapeHtml(selected.name || "Servico")}</div>
           <div class="miniMeta">Use os pontos para vincular${escapeHtml(subLabel)}</div>`; 
       }else{
-        serviceBox.innerHTML = `<div class="miniName">Servico filtrado</div><div class="miniMeta">${q ? "Nenhum servico encontrado" : "Digite para selecionar"}</div>`;
+        serviceBox.innerHTML = `<div class="miniName">Servico filtrado</div><div class="miniMeta">${q ? "Nenhum serviço encontrado" : "Digite para selecionar"}</div>`;
       }
     }
     if(overlapInfo){
@@ -16154,11 +16354,11 @@ function renderPlanningAssemblyView(model, locations){
         });
         overlapInfo.classList.toggle("warn", overlapped.length > 0);
         overlapInfo.textContent = overlapped.length
-          ? `Sobreposicao: ${overlapped.length} servico(s) na mesma posicao`
-          : "Sobreposicao: nenhuma";
+          ? `Sobreposição: ${overlapped.length} serviço(s) na mesma posição`
+          : "Sobreposição: nenhuma";
       }else{
         overlapInfo.classList.remove("warn");
-        overlapInfo.textContent = "Sobreposicao: —";
+        overlapInfo.textContent = "Sobreposição: —";
       }
     }
   };
@@ -16704,7 +16904,7 @@ function renderPlanningAssemblyView(model, locations){
     const type = String(document.getElementById("planningDepType")?.value || "FS").trim() || "FS";
     const lag = Number(document.getElementById("planningDepLag")?.value || 0) || 0;
     if(!to || !from){ alert("Selecione o trecho sucessor e o predecessor."); return; }
-    if(to === from){ alert("Um trecho nao pode ser predecessor dele mesmo."); return; }
+    if(to === from){ alert("Um trecho não pode ser predecessor dele mesmo."); return; }
     assembly.deps = Array.isArray(assembly.deps) ? assembly.deps : [];
     const exists = assembly.deps.some(d=>String(d?.to || "") === to && String(d?.from || "") === from && String(d?.type || "FS") === type);
     if(!exists) assembly.deps.push({ to, from, type, lag });
@@ -17419,7 +17619,7 @@ function _applyGuidedPlanningModel(){
       window.__guidedApplyStartedAtMs = 0;
     }else{
       console.warn("[PLANNING_APPLY_TRANSACTION]", { event:"blocked_reentry", elapsedMs });
-      alert("A aplicacao da fase ativa ja esta em andamento. Aguarde finalizar.");
+      alert("A aplicação da fase ativa ja esta em andamento. Aguarde finalizar.");
       return false;
     }
   }
@@ -17432,7 +17632,7 @@ function _applyGuidedPlanningModel(){
     return _applyGuidedPlanningModelCore();
   }catch(e){
     console.error("[PLANNING_APPLY_TRANSACTION]", { event:"fatal_error", error:String(e && e.message || e) });
-    alert("Falha ao aplicar fase ativa. O planejamento nao foi finalizado. Verifique os dados da fase e tente novamente.");
+    alert("Falha ao aplicar fase ativa. O planejamento não foi finalizado. Verifique os dados da fase e tente novamente.");
     return false;
   }finally{
     window.__guidedApplyInFlight = false;
@@ -18612,7 +18812,7 @@ function renderHeaders(){
       elB.appendChild(nameB);
       elB.appendChild(depsB);
 
-      // Subcabecalho de equipes (T1..TN) também na BASE quando o serviço tem N equipes
+      // Subcabeçalho de equipes (T1..TN) também na BASE quando o serviço tem N equipes
       const teamsRowB=document.createElement("div");
       teamsRowB.className="teamsRow";
       for(let ti=0; ti<blTeams; ti++){
@@ -18652,7 +18852,7 @@ function renderHeaders(){
     el.appendChild(name);
     el.appendChild(depsChip);
     
-    // Subcabecalho de equipes (T1..TN) para dar leitura visual do "lane" e evitar confusão
+    // Subcabeçalho de equipes (T1..TN) para dar leitura visual do "lane" e evitar confusão
     const teamsRow=document.createElement("div");
     teamsRow.className="teamsRow";
     for(let ti=0; ti<teams; ti++){
@@ -19992,7 +20192,7 @@ for(const svc of services){
       }
     }catch(_){}
 
-    // RI/RF frequentemente ficam no mapa de edições (por chave servico+pavimento), não diretamente no bloco.
+    // RI/RF frequentemente ficam no mapa de edições (por chave serviço+pavimento), não diretamente no bloco.
     try{
       if(typeof _getBlockEditsMap === "function" && typeof makeKey === "function"){
         const map = _getBlockEditsMap() || {};
@@ -20078,7 +20278,7 @@ for(const svc of services){
     if(direct) return String(direct).trim();
     const s1 = b.svc;
     if(s1) return String(s1).trim();
-    const name = (b.svcName || b.serviceName || b.servico || b.service || b.svc || "").toString().trim().toUpperCase();
+    const name = (b.svcName || b.serviceName || b.serviço || b.service || b.svc || "").toString().trim().toUpperCase();
     if(!name) return null;
     return svcNameToId.get(name) || null;
   }
@@ -21420,6 +21620,33 @@ function _getCyclePlanEvidenceBranches(cycle, locIds){
 
 function _plannerUseLobMatrix(){
   return String(state?.ui?.plannerVisualMode || "lob").trim().toLowerCase() !== "matrix";
+}
+function _forcePlannerVisualModeRender(){
+  try{ savePlannerPrefsToStorage(); }catch(_){ }
+  try{
+    const gridOuter = document.getElementById("gridOuter");
+    const plannerRailBody = document.getElementById("plannerRailBody");
+    if(gridOuter){
+      gridOuter.scrollLeft = 0;
+      gridOuter.scrollTop = 0;
+    }
+    if(plannerRailBody) plannerRailBody.scrollTop = 0;
+  }catch(_){ }
+  try{
+    if(typeof __dirty === "object" && __dirty){
+      __dirty.headers = true;
+      __dirty.dates = true;
+      __dirty.legend = true;
+      __dirty.blocks = true;
+      __dirty.today = true;
+    }
+  }catch(_){ }
+  try{
+    if(typeof renderAll === "function") renderAll();
+    else if(typeof scheduleRenderAll === "function") scheduleRenderAll();
+  }catch(_){
+    try{ if(typeof scheduleRenderAll === "function") scheduleRenderAll(); }catch(__){ }
+  }
 }
 function _plannerDayWidth(){
   const lobZoom = Math.max(0.4, Math.min(3, Number(state?.ui?.lobZoom || 1)));
@@ -24060,7 +24287,7 @@ function _seedServiceDepFromFields(serviceId){
 }
 
 function validateNewEdge(predId, succId, type, lagDays, scope, matchMode, locationOffset){
-  if(predId===succId) return {ok:false, msg:"Predecessora nao pode ser o proprio servico."};
+  if(predId===succId) return {ok:false, msg:"Predecessora não pode ser o próprio serviço."};
   const depNorm = normalizeDependencyRule({ predServiceId:predId, succServiceId:succId, type, lagDays, locationOffset, scope, matchMode });
   const mm = depNorm.matchMode;
   const sc = depNorm.scope;
@@ -24069,7 +24296,7 @@ function validateNewEdge(predId, succId, type, lagDays, scope, matchMode, locati
     const cur = normalizeDependencyRule(d);
     return cur.predServiceId===predId && cur.succServiceId===succId && cur.scope===sc && cur.matchMode===mm && Math.max(0, Number(cur.locationOffset||0))===off;
   });
-  if(exists) return {ok:false, msg:"Ja existe uma dependencia com esse predecessor/escopo/modo para este servico."};
+  if(exists) return {ok:false, msg:"Já existe uma dependência com esse predecessor/escopo/modo para este serviço."};
 
   const tmp=[...state.dependencies, depNorm];
   const saved=state.dependencies;
@@ -24583,7 +24810,7 @@ __bindOn("btnClearSvcDeps", "click", ()=>{
     state.depsOverrides = (state.depsOverrides && typeof state.depsOverrides==="object") ? state.depsOverrides : {};
     state.depsOverrides[modalSuccId] = "none"; // disable auto EAP for this succ
     _ensureActivityGraphRuleLinks();
-    log(`[DEP] limpas predecessoras manuais do servico: ${(state.services.find(s=>s.id===modalSuccId)?.name||modalSuccId)} (removidas ${before-state.dependencies.length})`);
+    log(`[DEP] limpas predecessoras manuais do serviço: ${(state.services.find(s=>s.id===modalSuccId)?.name||modalSuccId)} (removidas ${before-state.dependencies.length})`);
     try{ saveDepsToStorage(); }catch(e){}
     try{ saveDepsOverridesToStorage(); }catch(e){}
   }
@@ -24639,7 +24866,7 @@ __bindOn("btnResetEAP", "click", ()=>{
     state.dependencies = state.dependencies.filter(d=>d.succServiceId!==modalSuccId);
     if(state.depsOverrides && typeof state.depsOverrides==="object") delete state.depsOverrides[modalSuccId];
     _ensureActivityGraphRuleLinks();
-    log(`[DEP] reset EAP (removeu deps manuais) do servico: ${(state.services.find(s=>s.id===modalSuccId)?.name||modalSuccId)} (removidas ${before-state.dependencies.length})`);
+    log(`[DEP] reset EAP (removeu deps manuais) do serviço: ${(state.services.find(s=>s.id===modalSuccId)?.name||modalSuccId)} (removidas ${before-state.dependencies.length})`);
     try{ saveDepsToStorage(); }catch(e){}
     try{ saveDepsOverridesToStorage(); }catch(e){}
   }
@@ -24793,7 +25020,7 @@ function _normalizePackageSubservices(list){
     id: String(sub?.id || sub?.key || `sub_${idx+1}`).trim(),
     name: String(sub?.name || sub?.nome || "").trim(),
     object: String(sub?.object || sub?.objeto || sub?.target || "").trim(),
-    durationDefault: Math.max(1, Number(sub?.durationDefault || sub?.duration || sub?.duracaoDias || 5) || 5)
+    durationDefault: Math.max(1, Number(sub?.durationDefault || sub?.duration || sub?.duraçãoDias || 5) || 5)
   })).filter(sub=>sub.name || sub.object);
 }
 function _serviceNumber(value, fallback = 0){
@@ -24818,7 +25045,7 @@ function _buildTeamBaseText(professionals, helpers, teams){
   return people.length ? `${people.join(" + ")} · ${teamCount} equipe${teamCount === 1 ? "" : "s"}` : `${teamCount} equipe${teamCount === 1 ? "" : "s"}`;
 }
 function _normalizeServiceCatalogItem(svc, idx){
-  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subserviços || []);
   const productivityValue = Math.max(0, _serviceNumber(svc?.productivityValue ?? svc?.productivityQty ?? svc?.produtividadeValor ?? 0));
   const productivityUnit = _normalizeProductivityUnit(svc?.productivityUnit || svc?.productivityUnity || svc?.produtividadeUnidade || "");
   const teamProfessionals = Math.max(0, Math.round(_serviceNumber(svc?.teamProfessionals ?? svc?.professionals ?? svc?.oficiais ?? 0)));
@@ -24926,7 +25153,7 @@ function _isOperationalPlanningServiceRecord(svc){
   ));
 }
 function _stripServiceBaseRecord(svc, idx){
-  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const subservices = _normalizePackageSubservices(svc?.subservices || svc?.subserviços || []);
   const productivityValue = Math.max(0, _serviceNumber(svc?.productivityValue ?? svc?.productivityQty ?? svc?.produtividadeValor ?? 0));
   const productivityUnit = _normalizeProductivityUnit(svc?.productivityUnit || svc?.productivityUnity || svc?.produtividadeUnidade || "");
   const teamProfessionals = Math.max(0, Math.round(_serviceNumber(svc?.teamProfessionals ?? svc?.professionals ?? svc?.oficiais ?? 0)));
@@ -24988,7 +25215,7 @@ function _getServiceBaseCatalogForStorage(sourceList){
   const baseFromExplicit = explicit
     ? _dedupeServiceBaseCatalog(explicit.filter(s=>!_isOperationalPlanningServiceRecord(s)).map(_stripServiceBaseRecord).filter(s=>s.id && s.name))
     : [];
-  if(baseFromExplicit.length) return baseFromExplicit;
+  if(explicit) return baseFromExplicit;
   const baseFromCatalog = _dedupeServiceBaseCatalog((Array.isArray(state?.serviceBaseCatalog) ? state.serviceBaseCatalog : [])
     .map(_stripServiceBaseRecord)
     .filter(s=>s.id && s.name));
@@ -25039,6 +25266,40 @@ function _syncServiceBaseCatalogToStateServicesWhenSafe(){
       .map(x=>Object.assign({}, x));
   }
 }
+function _persistGuidedEapServicesToApi(reason){
+  try{
+    const draft = _readGuidedPlanDraftSafe();
+    const catalog = _buildServiceBaseFromGuidedDraftForUi(draft);
+    state.serviceBaseCatalog = catalog.map(x=>Object.assign({}, x));
+    _syncServiceBaseCatalogToStateServicesWhenSafe();
+    try{ _markServiceCatalogMutation(reason || "guided_eap_services_changed"); }catch(_){}
+    return Promise.resolve(saveServicesToStorage(catalog, true))
+      .then(out=>{
+        console.log("[PLANNUS_EAP_API]", {
+          event:"guided_eap_services_saved",
+          reason:String(reason || ""),
+          count:catalog.length,
+          ok:!!out?.ok
+        });
+        return out;
+      })
+      .catch(e=>{
+        console.warn("[PLANNUS_EAP_API]", {
+          event:"guided_eap_services_save_failed",
+          reason:String(reason || ""),
+          error:String(e && e.message || e)
+        });
+        return { ok:false, error:String(e && e.message || e) };
+      });
+  }catch(e){
+    console.warn("[PLANNUS_EAP_API]", {
+      event:"guided_eap_services_persist_exception",
+      reason:String(reason || ""),
+      error:String(e && e.message || e)
+    });
+    return Promise.resolve({ ok:false, error:String(e && e.message || e) });
+  }
+}
 async function saveServicesToStorage(sourceList, forceImmediate = false){
   try{
     const requestSeq = Number(__serviceCatalogMutationSeq || 0) || 0;
@@ -25054,7 +25315,7 @@ async function saveServicesToStorage(sourceList, forceImmediate = false){
     const persist = async ()=>{
       try{
         if(requestSeq !== (Number(__serviceCatalogMutationSeq || 0) || 0)){
-          console.log("[EAP] saveServicesToStorage ignorado por mutacao mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
+          console.log("[EAP] saveServicesToStorage ignorado por mutação mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
           return { ok:false, skipped:true, stale:true };
         }
         const repo = _serviceRepoApi();
@@ -25064,7 +25325,7 @@ async function saveServicesToStorage(sourceList, forceImmediate = false){
         }
         const { res, data } = await repo.saveServicesCatalog(arr);
         if(requestSeq !== (Number(__serviceCatalogMutationSeq || 0) || 0)){
-          console.log("[EAP] saveServicesToStorage resposta ignorada por mutacao mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
+          console.log("[EAP] saveServicesToStorage resposta ignorada por mutação mais nova", { requestSeq, currentSeq: Number(__serviceCatalogMutationSeq || 0) || 0 });
           return { ok:false, skipped:true, stale:true, res, data };
         }
         if(res.ok && data?.ok !== false){
@@ -25513,7 +25774,7 @@ Deseja ajustar o INÍCIO do calendário automaticamente?`;
       state.calendar.startDateISO = minStart;
       inStart.value = minStart;
       buildCalendarDays();
-      log(`[CAL] inicio ajustado (com confirmacao) para ${minStart}.`);
+      log(`[CAL] inicio ajustado (com confirmação) para ${minStart}.`);
       // regera com calendário expandido
       try{
         const regenResult = recomputePlanningState({ label:"GEN_RESTART", renderMode:"none", allowAutoExtend:false });
@@ -25548,7 +25809,7 @@ Deseja ajustar o INÍCIO do calendário automaticamente?`;
       state.calendar.endDateISO = maxEnd;
       inEnd.value = maxEnd;
       buildCalendarDays();
-      log(`[CAL] fim ajustado (com confirmacao) para ${maxEnd}.`);
+      log(`[CAL] fim ajustado (com confirmação) para ${maxEnd}.`);
       // regera com calendário expandido
       try{
         const regenResult = recomputePlanningState({ label:"GEN_REEND", renderMode:"none", allowAutoExtend:false });
@@ -25722,14 +25983,12 @@ __bindOn("btnPlannerGridFullscreen", "click", ()=>{
 __bindOn("btnPlannerVisualMode", "click", ()=>{
   state.ui = state.ui || {};
   state.ui.plannerVisualMode = _plannerUseLobMatrix() ? "matrix" : "lob";
-  try{ savePlannerPrefsToStorage(); }catch(_){}
-  scheduleRenderAll();
+  _forcePlannerVisualModeRender();
 });
 __bindOn("btnPlannerVisualModeBar", "click", ()=>{
   state.ui = state.ui || {};
   state.ui.plannerVisualMode = _plannerUseLobMatrix() ? "matrix" : "lob";
-  try{ savePlannerPrefsToStorage(); }catch(_){}
-  scheduleRenderAll();
+  _forcePlannerVisualModeRender();
 });
 __bindOn("btnColWDown", "click", ()=>{
   state.ui = state.ui || {};
@@ -25790,11 +26049,11 @@ document.addEventListener("keydown", (ev)=>{
     scheduleRenderAll();
   }
 });
-__bindOn("btnExportHTMLTop","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
-__bindOn("btnPlannerSaveOnlineHeader","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
+__bindOn("btnExportHTMLTop","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online não encontrada."); } }catch(e){ console.warn(e);} });
+__bindOn("btnPlannerSaveOnlineHeader","click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online não encontrada."); } }catch(e){ console.warn(e);} });
 __bindOn("btnExportPlannerPDFTop","click", ()=>{ try{ exportPlannerPDFNow(); }catch(e){ console.warn(e);} });
 // [MIGRATED_TO_ACTIONS] btnBaselineSave
-__bindOn("btnExportHTML", "click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online nao encontrada."); } }catch(e){ console.warn(e);} });
+__bindOn("btnExportHTML", "click", ()=>{ try{ if(typeof window.__plannusSaveOnlineNow==="function"){ window.__plannusSaveOnlineNow(); } else { console.warn("[PLANNUS_SAVE] funcao de salvar online não encontrada."); } }catch(e){ console.warn(e);} });
 __bindOn("btnExportPlannerPDF", "click", ()=>{ try{ exportPlannerPDFNow(); }catch(e){ console.warn(e);} });
 __bindOn("btnSaveHTMLReload","click", ()=>{ try{ __saveHTMLThenReload(); }catch(e){ console.warn(e);} });
 __bindOn("btnSaveHTMLExit","click", ()=>{ try{ __saveHTMLThenExit(); }catch(e){ console.warn(e);} });
@@ -26020,7 +26279,7 @@ try{
 
 __bindOn("btnClearDeps", "click", ()=>{
   state.dependencies=[];
-  log("[DEP] dependencias manuais zeradas (padrao EAP passa a valer).");
+  log("[DEP] dependências manuais zeradas (padrao EAP passa a valer).");
   scheduleRenderAll();
 __eapPostApplyRerender__();
 });
@@ -26056,6 +26315,9 @@ const viewPlannerEl = document.getElementById("viewPlanner");
 const viewGuidedPlanEl = document.getElementById("viewGuidedPlan");
 const viewPavEl = document.getElementById("viewPav");
 const viewServiceEl = document.getElementById("viewService");
+const viewMediumTermEl = document.getElementById("viewMediumTerm");
+const viewMediumTermCompanyEl = document.getElementById("viewMediumTermCompany");
+const viewMediumTermWorkEl = document.getElementById("viewMediumTermWork");
 const viewDashboardEl = document.getElementById("viewDashboard");
 const viewBaselineEl = document.getElementById("viewBaseline");
 const viewProjectPathEl = document.getElementById("viewProjectPath");
@@ -26068,6 +26330,7 @@ const btnViewPlanner = document.getElementById("btnViewPlanner");
 const btnViewGuided = document.getElementById("btnViewGuided");
 const btnViewPav = document.getElementById("btnViewPav");
 const btnViewService = document.getElementById("btnViewService");
+const btnViewMediumTerm = document.getElementById("btnViewMediumTerm");
 const btnViewDashboard = document.getElementById("btnViewDashboard");
 const btnViewBaseline = document.getElementById("btnViewBaseline");
 const btnViewProjectPath = document.getElementById("btnViewProjectPath");
@@ -26090,6 +26353,9 @@ function setView(name){
   const isGuidedApply = name==="guidedapply";
   const isPav = name==="pav";
   const isService = name==="service";
+  const isMediumTerm = name==="mediumterm";
+  const isMediumTermCompany = name==="mediumtermcompany";
+  const isMediumTermWork = name==="mediumtermwork";
   const isDashboard = name==="dashboard";
   const isProjectPath = name==="projectpath";
   const isBaseline = name==="baseline";
@@ -26097,15 +26363,18 @@ function setView(name){
   const isReports = name==="relatorio";
   const isEap = name==="eap";
   const isMSPImport = name==="mspimport";
-  const isPlanner = !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports && !isEap && !isMSPImport;
+  const isPlanner = !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isMediumTerm && !isMediumTermCompany && !isMediumTermWork && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports && !isEap && !isMSPImport;
   try{ closeAllOverlays(); }catch(_){ }
 
   if(viewProjectEl) viewProjectEl.style.display = isProject ? "block" : "none";
-  viewPlannerEl.style.display = (isProject || isGuided || isGuidedApply || isPav || isService || isDashboard || isBaseline || isProjectPath || isCfg || isReports || isEap || isMSPImport) ? "none" : "block";
+  viewPlannerEl.style.display = (isProject || isGuided || isGuidedApply || isPav || isService || isMediumTerm || isMediumTermCompany || isMediumTermWork || isDashboard || isBaseline || isProjectPath || isCfg || isReports || isEap || isMSPImport) ? "none" : "block";
   if(viewGuidedPlanEl) viewGuidedPlanEl.style.display = isGuided ? "block" : "none";
   if(viewGuidedApplyEl) viewGuidedApplyEl.style.display = isGuidedApply ? "block" : "none";
   viewPavEl.style.display = isPav ? "block" : "none";
   if(viewServiceEl) viewServiceEl.style.display = isService ? "block" : "none";
+  if(viewMediumTermEl) viewMediumTermEl.style.display = isMediumTerm ? "block" : "none";
+  if(viewMediumTermCompanyEl) viewMediumTermCompanyEl.style.display = isMediumTermCompany ? "block" : "none";
+  if(viewMediumTermWorkEl) viewMediumTermWorkEl.style.display = isMediumTermWork ? "block" : "none";
   if(viewDashboardEl) viewDashboardEl.style.display = isDashboard ? "block" : "none";
   if(viewBaselineEl) viewBaselineEl.style.display = isBaseline ? "block" : "none";
   if(viewProjectPathEl) viewProjectPathEl.style.display = isProjectPath ? "block" : "none";
@@ -26116,12 +26385,13 @@ function setView(name){
 
   // active buttons (legacy hidden buttons, but also used by side nav dispatch)
   if(btnViewProject) btnViewProject.classList.toggle("primary", isProject);
-  btnViewPlanner.classList.toggle("primary", !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports);
+  btnViewPlanner.classList.toggle("primary", !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isMediumTerm && !isMediumTermCompany && !isMediumTermWork && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports);
   const guidedAnchor = String(state?.ui?.guidedAnchor || "").trim().toLowerCase();
   if(btnViewGuided) btnViewGuided.classList.toggle("primary", isGuided && guidedAnchor!=="services");
   if(btnOpenEapApplyNav) btnOpenEapApplyNav.classList.toggle("primary", isGuidedApply);
   btnViewPav.classList.toggle("primary", isPav);
   if(btnViewService) btnViewService.classList.toggle("primary", isService);
+  if(btnViewMediumTerm) btnViewMediumTerm.classList.toggle("primary", isMediumTerm);
   if(btnViewDashboard) btnViewDashboard.classList.toggle("primary", isDashboard);
   if(btnViewBaseline) btnViewBaseline.classList.toggle("primary", isBaseline);
   if(btnViewProjectPath) btnViewProjectPath.classList.toggle("primary", isProjectPath);
@@ -26129,11 +26399,12 @@ function setView(name){
   try{
     const navTargets = [
       [btnViewProject, isProject],
-      [btnViewPlanner, !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports],
+      [btnViewPlanner, !isProject && !isGuided && !isGuidedApply && !isPav && !isService && !isMediumTerm && !isDashboard && !isBaseline && !isProjectPath && !isCfg && !isReports],
       [btnViewGuided, isGuided && guidedAnchor!=="services"],
       [btnOpenEapApplyNav, isGuidedApply],
       [btnViewPav, isPav],
       [btnViewService, isService],
+      [btnViewMediumTerm, isMediumTerm],
       [btnViewDashboard, isDashboard],
       [btnViewBaseline, isBaseline],
       [btnViewProjectPath, isProjectPath],
@@ -26171,6 +26442,12 @@ function setView(name){
         try{ renderServiceCatalogView(); }catch(e){ console.warn("[SERVICE_VIEW] render fail", e); }
       }
     }catch(e){ console.warn("[SERVICE_VIEW] reload fail", e); }
+  }else if(isMediumTerm){
+    try{ renderMediumTermView(); }catch(e){ console.warn("[MEDIUM_TERM_VIEW] render fail", e); }
+  }else if(isMediumTermCompany){
+    try{ renderMediumTermCompanyView(); }catch(e){ console.warn("[MEDIUM_TERM_COMPANY_VIEW] render fail", e); }
+  }else if(isMediumTermWork){
+    try{ renderMediumTermWorkView(); }catch(e){ console.warn("[MEDIUM_TERM_WORK_VIEW] render fail", e); }
   }else if(isDashboard){
     try{ renderDashboardView(); }catch(e){ console.warn("[DASHBOARD_VIEW] render fail", e); }
   }else if(isBaseline){
@@ -26223,6 +26500,7 @@ document.getElementById("btnOpenEapApplyNav")?.addEventListener("click", (ev)=>{
 });
 btnViewPav.addEventListener("click", ()=>setView("pav"));
 btnViewService?.addEventListener("click", ()=>setView("service"));
+btnViewMediumTerm?.addEventListener("click", ()=>setView("mediumterm"));
 btnViewDashboard?.addEventListener("click", ()=>setView("dashboard"));
 btnViewBaseline?.addEventListener("click", ()=>setView("baseline"));
 btnViewProjectPath?.addEventListener("click", ()=>setView("projectpath"));
@@ -26452,12 +26730,12 @@ function renderServiceCatalogView(){
   state.ui = state.ui || {};
   if(selectedId) state.ui.selectedServiceId = selectedId;
   const getSubservicesCount = (svc)=>{
-    const nested = Array.isArray(svc?.subservices) ? svc.subservices : (Array.isArray(svc?.subservicos) ? svc.subservicos : []);
+    const nested = Array.isArray(svc?.subservices) ? svc.subservices : (Array.isArray(svc?.subserviços) ? svc.subserviços : []);
     if(nested.length) return nested.length;
     const raw = Number(svc?.subservicesCount ?? svc?.subservicesTotal ?? 0);
     return Number.isFinite(raw) ? Math.max(0, raw) : 0;
   };
-  const getSubservices = (svc)=>_normalizePackageSubservices(svc?.subservices || svc?.subservicos || []);
+  const getSubservices = (svc)=>_normalizePackageSubservices(svc?.subservices || svc?.subserviços || []);
   const productivityUnits = ["m²/dia", "m³/dia", "m/dia", "un/dia", "pacote/dia"];
   const renderProductivityUnitOptions = (selected)=>{
     const current = _normalizeProductivityUnit(selected);
@@ -26484,7 +26762,7 @@ function renderServiceCatalogView(){
     return raw === true || raw === 1 || String(raw).toLowerCase() === "sim" || String(raw).toLowerCase() === "true";
   };
   const getClassificationText = (svc)=>{
-    const txt = String(svc?.classification || svc?.classificacao || svc?.classificationLabel || "").trim();
+    const txt = String(svc?.classification || svc?.classificação || svc?.classificationLabel || "").trim();
     return txt || "—";
   };
   const totalSubservices = services.reduce((acc,svc)=>acc + getSubservicesCount(svc), 0);
@@ -26787,7 +27065,7 @@ function renderServiceCatalogView(){
             <div class="field"><label>Oficiais</label><input id="serviceCatalogTeamProfessionals" class="mono" type="number" min="0" step="1" value="0" /></div>
             <div class="field"><label>Ajudantes</label><input id="serviceCatalogTeamHelpers" class="mono" type="number" min="0" step="1" value="0" /></div>
             <div class="field"><label>Duração</label><input id="serviceCatalogDuration" class="mono" type="number" min="1" step="1" value="5" /></div>
-            <div class="field"><label>Crítico</label><select id="serviceCatalogStrategic"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+            <div class="field"><label>Crítico</label><select id="serviceCatalogStrategic"><option value="não">Não</option><option value="sim">Sim</option></select></div>
           </div>
           <div class="packageAddFooter">
             <button class="btn" type="button" data-package-add-close>Cancelar</button>
@@ -26869,7 +27147,7 @@ function renderServiceCatalogView(){
       if(teamProfessionalsEl) teamProfessionalsEl.value = "0";
       if(teamHelpersEl) teamHelpersEl.value = "0";
       if(durationEl) durationEl.value = "5";
-      if(strategicEl) strategicEl.value = "nao";
+      if(strategicEl) strategicEl.value = "não";
       close();
     renderServiceCatalogView();
     try{ document.querySelector(`[data-service-catalog-key="${CSS.escape(id)}"] input[data-service-catalog-field="name"]`)?.focus(); }catch(_){}
@@ -27524,10 +27802,10 @@ function rebuildLocTable(){
     inG.type="checkbox";
     inG.checked=_isTipoLocationLineGroup(l.lineGroup);
     const lbG=document.createElement("span");
-    lbG.textContent = inG.checked ? "Tipo" : "Nao tipo";
+    lbG.textContent = inG.checked ? "Tipo" : "Não tipo";
     inG.addEventListener("change", ()=>{
       _setLocationTipoFlag(l, !!inG.checked);
-      lbG.textContent = inG.checked ? "Tipo" : "Nao tipo";
+      lbG.textContent = inG.checked ? "Tipo" : "Não tipo";
       if(typeof inPipe !== "undefined" && inPipe){
         inPipe.disabled = !inG.checked;
         inPipe.value = _locationPipelineKey(l);
@@ -28606,6 +28884,792 @@ function renderBaselineView(){
   }
 }
 
+function _mediumTermParseISO(iso){
+  const s = String(iso || "").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const d = new Date(s + "T00:00:00");
+  return Number.isFinite(d.getTime()) ? d : null;
+}
+function _mediumTermISO(d){
+  if(!(d instanceof Date) || !Number.isFinite(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function _mediumTermFmtBR(iso){
+  const s = String(iso || "").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "--";
+  return `${s.slice(8,10)}/${s.slice(5,7)}/${s.slice(0,4)}`;
+}
+function _mediumTermDaysBetween(aISO, bISO){
+  const a = _mediumTermParseISO(aISO);
+  const b = _mediumTermParseISO(bISO);
+  if(!a || !b) return null;
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+function _mediumTermStage(daysToStart){
+  const d = Number(daysToStart);
+  if(!Number.isFinite(d)) return { key:"unknown", title:"Sem data", range:"sem inicio previsto", order:9 };
+  if(d < 15) return { key:"stage5", title:"5a etapa", range:"menor que 14 dias", order:1 };
+  if(d <= 30) return { key:"stage4", title:"4a etapa", range:"15 a 30 dias", order:2 };
+  if(d <= 60) return { key:"stage3", title:"3a etapa", range:"31 a 60 dias", order:3 };
+  if(d <= 90) return { key:"stage2", title:"2a etapa", range:"61 a 90 dias", order:4 };
+  if(d <= 120) return { key:"stage1", title:"1a etapa", range:"91 a 120 dias", order:5 };
+  return { key:"backlog", title:"Backlog", range:"acima de 121 dias", order:6 };
+}
+function _mediumTermStageCatalog(){
+  return [
+    { key:"stage5", title:"5a etapa", range:"< 14 dias", focus:["Contratar rastreada", "Material no canteiro", "Equipe alocada"] },
+    { key:"stage4", title:"4a etapa", range:"15 a 30 dias", focus:["Liberação de projetos", "Aquisição de materiais", "Interface entre disciplinas"] },
+    { key:"stage3", title:"3a etapa", range:"31 a 60 dias", focus:["Negociação", "Planejamento de entregas", "Programação de equipe"] },
+    { key:"stage2", title:"2a etapa", range:"61 a 90 dias", focus:["Serviços futuros", "Responsáveis definidos", "Riscos principais"] },
+    { key:"stage1", title:"1a etapa", range:"91 a 120 dias", focus:["Antecipação", "Validar escopo", "Preparar compras"] },
+    { key:"backlog", title:"Backlog", range:"> 121 dias", focus:["Ainda distante", "Monitorar", "Sem ação imediata"] }
+  ];
+}
+function _mediumTermStageByKey(stageKey){
+  return _mediumTermStageCatalog().find(stage=>stage.key === stageKey) || null;
+}
+function _mediumTermStageCompletionMap(){
+  const st = window.state || {};
+  return st.mediumTermStageCompletion && typeof st.mediumTermStageCompletion === "object" ? st.mediumTermStageCompletion : {};
+}
+function _mediumTermIsStageCompleted(stageKey){
+  return _mediumTermStageCompletionMap()[stageKey] === true;
+}
+function _mediumTermSaveStageCompleted(stageKey, done){
+  const st = window.state || (window.state = {});
+  st.mediumTermStageCompletion = st.mediumTermStageCompletion && typeof st.mediumTermStageCompletion === "object" ? st.mediumTermStageCompletion : {};
+  st.mediumTermStageCompletion[stageKey] = done === true;
+  try{ if(typeof __touchUnsaved === "function") __touchUnsaved(); }catch(_){}
+}
+function _mediumTermEffectiveStage(stage){
+  if(!stage || !stage.key) return stage;
+  const order = _mediumTermStageCatalog().map(item=>String(item.key || "").trim()).filter(Boolean);
+  const idx = order.indexOf(stage.key);
+  if(idx < 0) return stage;
+  for(let i = 0; i < idx; i++){
+    const gateKey = order[i];
+    if(!_mediumTermIsStageCompleted(gateKey)){
+      const gateStage = _mediumTermStageByKey(gateKey) || stage;
+      return {
+        ...gateStage,
+        lockedFor: stage.key,
+        lockedForTitle: stage.title,
+        lockedByStage: gateKey
+      };
+    }
+  }
+  return stage;
+}
+function _restrictionCatalogStateKey(scope){
+  return String(scope || "").trim().toLowerCase() === "company"
+    ? "planningRestrictionStandards"
+    : "mediumTermStageRestrictions";
+}
+function _restrictionCatalogState(scope){
+  const st = window.state || {};
+  const key = _restrictionCatalogStateKey(scope);
+  return st[key] && typeof st[key] === "object" ? st[key] : {};
+}
+function _restrictionCatalogSetState(scope, next){
+  const st = window.state || (window.state = {});
+  const key = _restrictionCatalogStateKey(scope);
+  st[key] = next && typeof next === "object" ? next : {};
+  try{ if(typeof __touchUnsaved === "function") __touchUnsaved(); }catch(_){}
+}
+function _restrictionCatalogNormalizeAction(action, idx, scope, stageKey, itemId){
+  const raw = action && typeof action === "object" ? action : { title:String(action || "") };
+  const title = String(raw.title || raw.name || raw.label || raw.description || `Ação ${idx+1}`).trim();
+  const responsible = String(raw.responsible || raw.owner || raw.responsável || "").trim();
+  const notes = String(raw.notes || raw.obs || raw.detail || raw.description || "").trim();
+  const done = raw.done === true || String(raw.status || "").toLowerCase() === "done" || String(raw.status || "").toLowerCase() === "concluída" || String(raw.status || "").toLowerCase() === "resolvida";
+  return {
+    id: String(raw.id || raw.key || `${String(scope || "restriction").trim()}_${String(stageKey || "stage").trim()}_${String(itemId || "item").trim()}_action_${idx + 1}`).trim(),
+    title,
+    responsible,
+    notes,
+    done,
+    description: notes
+  };
+}
+function _restrictionCatalogNormalizeActions(actions, scope, stageKey, itemId){
+  const raw = Array.isArray(actions) ? actions : [];
+  return raw.map((action, idx)=>_restrictionCatalogNormalizeAction(action, idx, scope, stageKey, itemId)).filter(action=>action.title || action.responsible || action.notes || action.done);
+}
+function _restrictionCatalogDefaultAction(scope, stageKey, itemId, index){
+  return {
+    id:`${String(scope || "restriction").trim()}_${String(stageKey || "stage").trim()}_${String(itemId || "item").trim()}_action_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+    title:"",
+    responsible:"",
+    notes:"",
+    done:false,
+    description:""
+  };
+}
+function _restrictionCatalogNormalizeItem(item, stage, idx, scope){
+  const stageObj = typeof stage === "object" && stage ? stage : (_mediumTermStageByKey(String(stage || "")) || { key:String(stage || ""), title:String(stage || ""), range:String(stage || "") });
+  const raw = item && typeof item === "object" ? item : { title:String(item || "") };
+  const title = String(raw.title || raw.name || raw.label || raw.description || `Restrição ${idx+1}`).trim();
+  const responsible = String(raw.responsible || raw.owner || raw.responsável || "").trim();
+  const type = String(raw.type || raw.kind || raw.category || "Geral").trim() || "Geral";
+  const periodKey = String(raw.periodKey || raw.stageKey || stageObj.key || "").trim();
+  const periodLabel = String(raw.periodLabel || raw.period || stageObj.range || "").trim();
+  const alert = String(raw.alert || raw.note || raw.description || raw.desc || "").trim();
+  const notes = String(raw.notes || raw.obs || "").trim();
+  const done = raw.done === true || String(raw.status || "").toLowerCase() === "done" || String(raw.status || "").toLowerCase() === "concluída" || String(raw.status || "").toLowerCase() === "resolvida";
+  const critical = raw.critical === true || String(raw.priority || raw.severity || "").toLowerCase() === "alta" || String(raw.impact || "").toLowerCase() === "alto";
+  const source = String(raw.source || scope || "").trim() || (String(scope || "").trim().toLowerCase() === "company" ? "company" : "obra");
+  const actions = _restrictionCatalogNormalizeActions(raw.actions || raw.checklist || raw.todos, scope, periodKey, raw.id || raw.key || `${String(scope || "restriction").trim()}_${periodKey || "stage"}_${idx + 1}`);
+  return {
+    id: String(raw.id || raw.key || `${String(scope || "restriction").trim()}_${periodKey || "stage"}_${idx + 1}`).trim(),
+    title,
+    responsible,
+    type,
+    periodKey,
+    periodLabel,
+    alert,
+    notes,
+    critical,
+    done,
+    source,
+    actions,
+    description: alert || notes
+  };
+}
+function _restrictionCatalogItems(scope, stageKey, fallback){
+  const map = _restrictionCatalogState(scope);
+  const raw = Array.isArray(map[stageKey]) && map[stageKey].length ? map[stageKey] : (Array.isArray(fallback) ? fallback : []);
+  return raw.map((item, idx)=>_restrictionCatalogNormalizeItem(item, stageKey, idx, scope)).filter(item=>item.title);
+}
+function _restrictionCatalogWriteStage(scope, stageKey, items){
+  const st = window.state || (window.state = {});
+  const key = _restrictionCatalogStateKey(scope);
+  st[key] = st[key] && typeof st[key] === "object" ? st[key] : {};
+  st[key][stageKey] = Array.isArray(items)
+    ? items.map((item, idx)=>{
+        const normalized = _restrictionCatalogNormalizeItem(item, stageKey, idx, scope);
+        normalized.actions = _restrictionCatalogNormalizeActions(normalized.actions, scope, normalized.periodKey || stageKey, normalized.id);
+        return normalized;
+      }).filter(item=>item.title)
+    : [];
+  try{ if(typeof __touchUnsaved === "function") __touchUnsaved(); }catch(_){}
+}
+function _restrictionCatalogUpsert(scope, stageKey, item){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const normalized = _restrictionCatalogNormalizeItem(item, stageKey, current.length, scope);
+  const idx = current.findIndex(x=>String(x.id) === String(normalized.id));
+  if(idx >= 0) current[idx] = { ...current[idx], ...normalized };
+  else current.push(normalized);
+  _restrictionCatalogWriteStage(scope, stageKey, current);
+  return normalized;
+}
+function _restrictionCatalogRemove(scope, stageKey, itemId){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.filter(item=>String(item.id) !== String(itemId));
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogToggleDone(scope, stageKey, itemId, done){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.map(item=>String(item.id) === String(itemId) ? { ...item, done: done === true } : item);
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogDefaultItem(scope, stageKey, index){
+  const stage = _mediumTermStageByKey(String(stageKey || "")) || { key:String(stageKey || ""), title:String(stageKey || ""), range:String(stageKey || "") };
+  const isCompany = String(scope || "").trim().toLowerCase() === "company";
+  return {
+    id:`${isCompany ? "std" : "obra"}_${String(stageKey || "stage").trim()}_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+    title:"",
+    responsible:"",
+    type:"Geral",
+    periodKey:String(stage.key || "").trim(),
+    periodLabel:String(stage.range || "").trim(),
+    alert:"",
+    notes:"",
+    critical:false,
+    done:false,
+    source:isCompany ? "company" : "obra",
+    actions:[_restrictionCatalogDefaultAction(scope, stageKey, `${isCompany ? "std" : "obra"}_${String(stageKey || "stage").trim()}`, 0)],
+    description:""
+  };
+}
+function _restrictionCatalogUpdateItem(scope, stageKey, itemId, patch){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.map(item=>String(item.id) === String(itemId) ? { ...item, ...(patch && typeof patch === "object" ? patch : {}) } : item);
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogAddAction(scope, stageKey, itemId){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.map(item=>{
+    if(String(item.id) !== String(itemId)) return item;
+    const itemActions = Array.isArray(item.actions) ? item.actions.slice() : [];
+    itemActions.push(_restrictionCatalogDefaultAction(scope, stageKey, item.id, itemActions.length));
+    return { ...item, actions:itemActions };
+  });
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogUpdateAction(scope, stageKey, itemId, actionId, patch){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.map(item=>{
+    if(String(item.id) !== String(itemId)) return item;
+    const itemActions = _restrictionCatalogNormalizeActions(item.actions, scope, stageKey, item.id).map(action=>String(action.id) === String(actionId) ? { ...action, ...(patch && typeof patch === "object" ? patch : {}) } : action);
+    return { ...item, actions:itemActions };
+  });
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogRemoveAction(scope, stageKey, itemId, actionId){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  const next = current.map(item=>{
+    if(String(item.id) !== String(itemId)) return item;
+    const itemActions = _restrictionCatalogNormalizeActions(item.actions, scope, stageKey, item.id).filter(action=>String(action.id) !== String(actionId));
+    return { ...item, actions:itemActions };
+  });
+  _restrictionCatalogWriteStage(scope, stageKey, next);
+}
+function _restrictionCatalogMoveItem(scope, fromStageKey, itemId, toStageKey){
+  const currentFrom = _restrictionCatalogItems(scope, fromStageKey, []);
+  const item = currentFrom.find(row=>String(row.id) === String(itemId));
+  if(!item) return;
+  const nextFrom = currentFrom.filter(row=>String(row.id) !== String(itemId));
+  _restrictionCatalogWriteStage(scope, fromStageKey, nextFrom);
+  const currentTo = _restrictionCatalogItems(scope, toStageKey, []);
+  const stage = _mediumTermStageByKey(String(toStageKey || "")) || { key:String(toStageKey || ""), title:String(toStageKey || ""), range:String(toStageKey || "") };
+  currentTo.push({
+    ...item,
+    periodKey:String(stage.key || "").trim(),
+    periodLabel:String(stage.range || "").trim(),
+    source:String(scope || "").trim().toLowerCase() === "company" ? "company" : "obra",
+    actions:_restrictionCatalogNormalizeActions(item.actions, scope, toStageKey, item.id)
+  });
+  _restrictionCatalogWriteStage(scope, toStageKey, currentTo);
+}
+function _restrictionCatalogAddItem(scope, stageKey){
+  const current = _restrictionCatalogItems(scope, stageKey, []);
+  current.push(_restrictionCatalogDefaultItem(scope, stageKey, current.length));
+  _restrictionCatalogWriteStage(scope, stageKey, current);
+}
+function _restrictionCatalogRenderBoard(mountEl, scope, options){
+  const el = mountEl && mountEl.nodeType === 1 ? mountEl : null;
+  if(!el) return;
+  const isCompany = String(scope || "").trim().toLowerCase() === "company";
+  const title = isCompany ? "Padrões da empresa" : "Restrições da obra";
+  const hint = isCompany
+    ? "Cadastre as regras reutilizáveis da empresa. Elas servem como base na aplicação do planejamento."
+    : "Cadastre as restrições da obra, com responsável e periodo. A etapa seguinte não avança enquanto a atual não estiver concluída.";
+  const compact = options && typeof options === "object" && options.compact === true;
+  const stages = _mediumTermStageCatalog();
+  el.innerHTML = `
+    <div class="mediumTermRestrictionBoard">
+      ${compact ? "" : `
+      <div class="mediumTermRestrictionBoardHead">
+        <div>
+          <div class="mediumTermRestrictionBoardTitle">${escapeHtml(title)}</div>
+          <div class="mediumTermRestrictionBoardHint">${escapeHtml(hint)}</div>
+        </div>
+        <div class="mediumTermRestrictionBoardBadge">${escapeHtml(isCompany ? "Padrões globais" : "Registro da obra")}</div>
+      </div>`}
+      <div class="mediumTermRestrictionBoardGrid">
+        ${stages.map(stage=>{
+          const items = _restrictionCatalogItems(scope, stage.key, isCompany ? [] : stage.focus);
+          const effective = !isCompany ? _mediumTermEffectiveStage(stage) : stage;
+          const locked = !isCompany && effective && effective.key !== stage.key;
+          const lockText = locked ? `Bloqueada por ${escapeHtml(String(effective.lockedByStage || ""))}` : "";
+          return `
+            <section class="mediumTermRestrictionStage ${locked ? "locked" : ""}" data-restriction-stage="${escapeHtml(stage.key)}">
+              <div class="mediumTermRestrictionStageHead">
+                <div>
+                  <div class="mediumTermRestrictionStageTitle">${escapeHtml(stage.title)}</div>
+                  <div class="mediumTermRestrictionStageSub">${escapeHtml(stage.range)}${lockText ? ` • ${lockText}` : ""}</div>
+                </div>
+                <div class="mediumTermRestrictionStageActions">
+                  ${isCompany ? "" : `<label class="mediumTermDone"><input type="checkbox" data-restriction-stage-done="${escapeHtml(stage.key)}" ${_mediumTermIsStageCompleted(stage.key) ? "checked" : ""}> Etapa concluída</label>`}
+                  <button class="btn" type="button" data-restriction-add="${escapeHtml(stage.key)}">+ Restrição</button>
+                </div>
+              </div>
+              <div class="mediumTermRestrictionStageBody">
+                ${items.length ? items.map(item=>{
+                  const itemId = String(item.id || "");
+                  const periodOptions = stages.map(opt=>`<option value="${escapeHtml(opt.key)}"${String(item.periodKey || stage.key) === opt.key ? " selected" : ""}>${escapeHtml(opt.title)} • ${escapeHtml(opt.range)}</option>`).join("");
+                  const actions = Array.isArray(item.actions) ? item.actions : [];
+                  return `
+                    <div class="mediumTermRestrictionItem" data-restriction-item="${escapeHtml(itemId)}" data-restriction-stage="${escapeHtml(stage.key)}">
+                      <div class="mediumTermRestrictionItemGrid">
+                        <label class="field">
+                          <span>Restrição</span>
+                          <input data-restriction-field="title" value="${escapeHtml(item.title || "")}" placeholder="Ex.: Material no canteiro" />
+                        </label>
+                        <label class="field">
+                          <span>Tipo</span>
+                          <input data-restriction-field="type" value="${escapeHtml(item.type || "")}" placeholder="Ex.: Material" />
+                        </label>
+                        <label class="field">
+                          <span>Responsável</span>
+                          <input data-restriction-field="responsible" value="${escapeHtml(item.responsible || "")}" placeholder="Ex.: Engenheiro" />
+                        </label>
+                        <label class="field">
+                          <span>Período</span>
+                          <select data-restriction-period>${periodOptions}</select>
+                        </label>
+                        <label class="field">
+                          <span>Alerta</span>
+                          <input data-restriction-field="alert" value="${escapeHtml(item.alert || "")}" placeholder="Ex.: liberar antes do 10º dia" />
+                        </label>
+                        <label class="field">
+                          <span>Crítica</span>
+                          <select data-restriction-field="critical">
+                            <option value="false"${item.critical ? "" : " selected"}>Não</option>
+                            <option value="true"${item.critical ? " selected" : ""}>Sim</option>
+                          </select>
+                        </label>
+                        ${isCompany ? "" : `
+                          <label class="field">
+                            <span>Concluída</span>
+                            <select data-restriction-field="done">
+                              <option value="false"${item.done ? "" : " selected"}>Não</option>
+                              <option value="true"${item.done ? " selected" : ""}>Sim</option>
+                            </select>
+                          </label>
+                        `}
+                      </div>
+                      <div class="mediumTermRestrictionActionsSection">
+                        <div class="mediumTermRestrictionActionHead">
+                          <div class="mediumTermRestrictionActionTitle">Ações e responsáveis</div>
+                          <button class="btn" type="button" data-restriction-action-add="${escapeHtml(itemId)}">+ Ação</button>
+                        </div>
+                        <div class="mediumTermRestrictionActionList">
+                          ${actions.length ? actions.map(action=>`
+                            <div class="mediumTermRestrictionActionItem" data-restriction-action-item="${escapeHtml(action.id || "")}" data-restriction-item="${escapeHtml(itemId)}">
+                              <label class="field">
+                                <span>Ação</span>
+                                <input data-restriction-action-field="title" value="${escapeHtml(action.title || "")}" placeholder="Ex.: Conferir material" />
+                              </label>
+                              <label class="field">
+                                <span>Responsável</span>
+                                <input data-restriction-action-field="responsible" value="${escapeHtml(action.responsible || "")}" placeholder="Ex.: Mestre de obra" />
+                              </label>
+                              <label class="field">
+                                <span>Status</span>
+                                <select data-restriction-action-field="done">
+                                  <option value="false"${action.done ? "" : " selected"}>Pendente</option>
+                                  <option value="true"${action.done ? " selected" : ""}>Concluída</option>
+                                </select>
+                              </label>
+                              <button class="btn danger" type="button" data-restriction-action-remove="${escapeHtml(action.id || "")}">Excluir</button>
+                            </div>
+                          `).join("") : `<div class="mediumTermRestrictionActionEmpty">Nenhuma ação cadastrada para esta restrição.</div>`}
+                        </div>
+                      </div>
+                      <div class="mediumTermRestrictionActions">
+                        <button class="btn danger" type="button" data-restriction-remove="${escapeHtml(itemId)}">Excluir restrição</button>
+                      </div>
+                    </div>
+                  `;
+                }).join("") : `<div class="mediumTermRestrictionEmpty">Nenhuma restrição cadastrada nesta etapa.</div>`}
+              </div>
+            </section>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+  el.querySelectorAll("[data-restriction-add]").forEach(btn=>{
+    if(btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", ()=>{
+      _restrictionCatalogAddItem(scope, String(btn.getAttribute("data-restriction-add") || ""));
+      if(isCompany) renderGuidedApplyView();
+      else renderMediumTermView();
+    });
+  });
+  el.querySelectorAll("[data-restriction-remove]").forEach(btn=>{
+    if(btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", ()=>{
+      const itemId = String(btn.getAttribute("data-restriction-remove") || "");
+      const row = btn.closest("[data-restriction-item]");
+      const stageKey = String(row?.getAttribute("data-restriction-stage") || "");
+      _restrictionCatalogRemove(scope, stageKey, itemId);
+      if(isCompany) renderGuidedApplyView();
+      else renderMediumTermView();
+    });
+  });
+  el.querySelectorAll("[data-restriction-item]").forEach(row=>{
+    const stageKey = String(row.getAttribute("data-restriction-stage") || "");
+    const itemId = String(row.getAttribute("data-restriction-item") || "");
+    row.querySelectorAll("[data-restriction-field]").forEach(field=>{
+      if(field.dataset.bound) return;
+      field.dataset.bound = "1";
+      field.addEventListener("change", ()=>{
+        const patch = {};
+        const key = String(field.getAttribute("data-restriction-field") || "");
+        const value = String(field.value || "").trim();
+        if(key === "critical" || key === "done"){
+          patch[key] = value === "true";
+        }else{
+          patch[key] = value;
+          if(key === "title" && !patch[key]) patch[key] = "Restrição";
+        }
+        _restrictionCatalogUpdateItem(scope, stageKey, itemId, patch);
+        if(isCompany) renderGuidedApplyView();
+        else renderMediumTermView();
+      });
+    });
+    const periodSel = row.querySelector("[data-restriction-period]");
+    if(periodSel && !periodSel.dataset.bound){
+      periodSel.dataset.bound = "1";
+      periodSel.addEventListener("change", ()=>{
+        const nextStage = String(periodSel.value || "").trim();
+        if(nextStage && nextStage !== stageKey){
+          _restrictionCatalogMoveItem(scope, stageKey, itemId, nextStage);
+          if(isCompany) renderGuidedApplyView();
+          else renderMediumTermView();
+        }
+      });
+    }
+    row.querySelectorAll("[data-restriction-action-add]").forEach(btn=>{
+      if(btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", ()=>{
+        _restrictionCatalogAddAction(scope, stageKey, itemId);
+        if(isCompany) renderGuidedApplyView();
+        else renderMediumTermView();
+      });
+    });
+    row.querySelectorAll("[data-restriction-action-remove]").forEach(btn=>{
+      if(btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", ()=>{
+        const actionId = String(btn.getAttribute("data-restriction-action-remove") || "");
+        _restrictionCatalogRemoveAction(scope, stageKey, itemId, actionId);
+        if(isCompany) renderGuidedApplyView();
+        else renderMediumTermView();
+      });
+    });
+    row.querySelectorAll("[data-restriction-action-field]").forEach(field=>{
+      if(field.dataset.bound) return;
+      field.dataset.bound = "1";
+      field.addEventListener("change", ()=>{
+        const actionRow = field.closest("[data-restriction-action-item]");
+        const actionId = String(actionRow?.getAttribute("data-restriction-action-item") || "");
+        const patch = {};
+        const key = String(field.getAttribute("data-restriction-action-field") || "");
+        const value = String(field.value || "").trim();
+        if(key === "done") patch[key] = value === "true";
+        else patch[key] = value;
+        _restrictionCatalogUpdateAction(scope, stageKey, itemId, actionId, patch);
+        if(isCompany) renderGuidedApplyView();
+        else renderMediumTermView();
+      });
+    });
+  });
+  if(!isCompany){
+    el.querySelectorAll("[data-restriction-stage-done]").forEach(chk=>{
+      if(chk.dataset.bound) return;
+      chk.dataset.bound = "1";
+      chk.addEventListener("change", ()=>{
+        _mediumTermSaveStageCompleted(String(chk.getAttribute("data-restriction-stage-done") || ""), chk.checked === true);
+        renderMediumTermView();
+      });
+    });
+  }
+}
+function buildMediumTermPackages(refISOArg){
+  const st = window.state || {};
+  const refISO = String(refISOArg || st?.ui?.mediumTermRefISO || _mediumTermISO(new Date())).slice(0,10);
+  const resolved = (typeof getCanonicalPlannerBlocksForFollowUp === "function")
+    ? getCanonicalPlannerBlocksForFollowUp()
+    : { blocks: Array.isArray(st?.plan?.blocks) ? st.plan.blocks : [], source:"state.plan.blocks" };
+  const blocks = Array.isArray(resolved?.blocks) ? resolved.blocks : [];
+  const serviceMap = new Map((Array.isArray(st.serviceBaseCatalog) ? st.serviceBaseCatalog : []).concat(Array.isArray(st.services) ? st.services : []).map(s=>[String(s?.id||"").trim(), s]));
+  const locMap = new Map((Array.isArray(st.locations) ? st.locations : []).map(l=>[String(l?.id||"").trim(), l]));
+  const refs = st.mediumTermRestrictions && typeof st.mediumTermRestrictions === "object" ? st.mediumTermRestrictions : {};
+  const stageRestrictionsMap = st.mediumTermStageRestrictions && typeof st.mediumTermStageRestrictions === "object" ? st.mediumTermStageRestrictions : {};
+  const byService = new Map();
+  blocks.forEach((b, idx)=>{
+    const serviceId = String(b?.serviceId || b?.service || b?.id || "").trim();
+    const locationId = String(b?.locationId || b?.locId || b?.pavimentoId || "").trim();
+    const service = serviceMap.get(serviceId) || {};
+    const loc = locMap.get(locationId) || {};
+    const startRaw = String(
+      (typeof reportGetBlockStartISO === "function" ? reportGetBlockStartISO(b) : "") ||
+      b?.startDateISO ||
+      b?.startISO ||
+      b?.planStartISO ||
+      b?.plannedStartISO ||
+      b?.start ||
+      b?.plan?.startISO ||
+      b?.schedule?.startISO ||
+      b?.calendar?.startISO ||
+      b?.baselineStartISO ||
+      b?.baseStartISO ||
+      b?.inicioISO ||
+      b?.inicio ||
+      b?.dataInicioISO ||
+      ""
+    ).trim();
+    const startISO = startRaw.slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(startISO)) return;
+    const baselineStartISO = String(b?.baselineStartISO || b?.baseStartISO || "").slice(0,10);
+    const serviceName = String(b?.serviceName || b?.name || service?.name || serviceId || "Servico").trim();
+    const locationName = String(b?.locationName || b?.pavimento || loc?.name || locationId || "").trim();
+    const blockKey = String(b?.id || b?.key || `${serviceId}|${locationId}|${startISO}|${idx}`).trim();
+    const svcKey = serviceId || serviceName.toLowerCase();
+    if(!byService.has(svcKey)){
+      byService.set(svcKey, {
+        key:`svc_${svcKey}`,
+        serviceId,
+        serviceName,
+        title:serviceName,
+        code:String(service?.code || b?.serviceCode || "").trim(),
+        startISO,
+        baselineStartISO,
+        locations:[],
+        blocks:[],
+        restrictionsTotal:0,
+        restrictionsResolved:0,
+        restrictionsPending:0,
+        criticalType:"",
+        owner:"",
+        currentStage:"",
+        manual:false
+      });
+    }
+    const item = byService.get(svcKey);
+    if(_mediumTermParseISO(startISO) && (!_mediumTermParseISO(item.startISO) || _mediumTermParseISO(startISO) < _mediumTermParseISO(item.startISO))){
+      item.startISO = startISO;
+      item.baselineStartISO = baselineStartISO;
+    }
+    if(locationName && !item.locations.includes(locationName)) item.locations.push(locationName);
+    item.blocks.push({ key:blockKey, locationId, locationName, startISO, baselineStartISO, block:b });
+    const dateStage = _mediumTermStage(_mediumTermDaysBetween(refISO, startISO));
+    const stage = _mediumTermEffectiveStage(dateStage);
+    item.stageKey = stage.key;
+    item.stageTitle = stage.title;
+    const stageRestrictions = _restrictionCatalogItems("obra", stage.key, stage.focus);
+    const restriction = refs[blockKey] || refs[`${serviceId}|${locationId}`] || refs[svcKey] || {};
+    const restrictions = stageRestrictions.length ? stageRestrictions : (Array.isArray(restriction?.items) ? restriction.items : []);
+    const resolvedCount = restrictions.filter(r=>String(r?.status||"").toLowerCase()==="resolvida" || r?.done === true).length;
+    item.restrictionsTotal += restrictions.length;
+    item.restrictionsResolved += resolvedCount;
+    item.restrictionsPending += Math.max(0, restrictions.length - resolvedCount);
+    const critical = restrictions.find(r=>r?.critical || String(r?.impact||"").toLowerCase()==="alto" || String(r?.priority||"").toLowerCase()==="alta") || restrictions.find(r=>String(r?.status||"").toLowerCase()!=="resolvida") || null;
+    if(critical && !item.criticalType) item.criticalType = String(critical?.type || critical?.kind || "").trim() || "Pendente";
+    if(!item.owner) item.owner = String(restriction?.owner || restriction?.responsável || "").trim();
+    if(!item.currentStage) item.currentStage = String(restriction?.stage || restriction?.currentStage || stage.title || "").trim();
+    item.manual = item.manual || !!restriction?.manual;
+  });
+  return Array.from(byService.values()).map(item=>{
+    item.restrictionsPending = Math.max(0, item.restrictionsPending);
+    item.locationsPreview = item.locations.slice(0,4).join(", ");
+    item.locationCount = item.locations.length;
+    item.blockCount = item.blocks.length;
+    return item;
+  }).filter(p=>p.startISO);
+}
+function _mediumTermStatusClass(p){
+  if(Number(p.restrictionsPending || 0) > 0 && p.criticalType) return "critical";
+  if(Number(p.restrictionsPending || 0) > 0) return "warn";
+  if(Number(p.restrictionsTotal || 0) > 0 && Number(p.restrictionsPending || 0) === 0) return "good";
+  return "";
+}
+function _mediumTermStageRestrictions(stageKey, fallback){
+  const st = window.state || {};
+  const map = st.mediumTermStageRestrictions && typeof st.mediumTermStageRestrictions === "object" ? st.mediumTermStageRestrictions : {};
+  const raw = Array.isArray(map[stageKey]) && map[stageKey].length ? map[stageKey] : (Array.isArray(fallback) ? fallback : []);
+  return raw.map((item, idx)=>{
+    if(typeof item === "string") return { title:item.trim() || `Restrição ${idx+1}`, description:"" };
+    return {
+      title:String(item?.title || item?.name || item?.label || `Restrição ${idx+1}`).trim(),
+      description:String(item?.description || item?.desc || "").trim()
+    };
+  }).filter(item=>item.title);
+}
+function _mediumTermStageRestrictionValue(stageKey, fallback){
+  return _mediumTermStageRestrictions(stageKey, fallback).map(item=>item.description ? `${item.title} - ${item.description}` : item.title).join("\n");
+}
+function _mediumTermSaveStageRestrictions(stageKey, text){
+  const st = window.state || (window.state = {});
+  st.mediumTermStageRestrictions = st.mediumTermStageRestrictions && typeof st.mediumTermStageRestrictions === "object" ? st.mediumTermStageRestrictions : {};
+  const rows = String(text || "").split(/\n+/).map(line=>line.trim()).filter(Boolean).map(line=>{
+    const parts = line.split(/\s+-\s+/);
+    return { title:parts.shift() || line, description:parts.join(" - ") };
+  });
+  st.mediumTermStageRestrictions[stageKey] = rows;
+  try{ if(typeof __touchUnsaved === "function") __touchUnsaved(); }catch(_){}
+}
+function _bindMediumTermViewNavButtons(){
+  const pairs = [
+    ["btnMediumTermCompanyView","mediumtermcompany"],
+    ["btnMediumTermWorkView","mediumtermwork"]
+  ];
+  pairs.forEach(([id,target])=>{
+    const el = document.getElementById(id);
+    if(!el || el.dataset.mediumTermBound) return;
+    el.dataset.mediumTermBound = "1";
+    el.addEventListener("click", ()=>setView(target));
+  });
+}
+function renderMediumTermView(){
+  const st = window.state || {};
+  const root = document.getElementById("viewMediumTerm");
+  const sourceBar = document.getElementById("mediumTermSourceBar");
+  const kpis = document.getElementById("mediumTermKpis");
+  const stagesEl = document.getElementById("mediumTermStages");
+  const panel = document.getElementById("mediumTermPanel");
+  if(!root) return;
+  _bindMediumTermViewNavButtons();
+  const refInput = document.getElementById("mediumTermRefDate");
+  const horizonInput = document.getElementById("mediumTermHorizon");
+  const ownerInput = document.getElementById("mediumTermOwnerFilter");
+  const typeInput = document.getElementById("mediumTermTypeFilter");
+  const searchInput = document.getElementById("mediumTermSearch");
+  const ui = (window.state || (window.state = {})).ui || ((window.state || (window.state = {})).ui = {});
+  if(refInput && !refInput.value) refInput.value = _mediumTermISO(new Date());
+  const refISO = String(refInput?.value || _mediumTermISO(new Date())).slice(0,10);
+  st.ui = st.ui || {};
+  if(!st.ui.mediumTermRefISO || st.ui.mediumTermRefISO !== refISO) st.ui.mediumTermRefISO = refISO;
+  const horizon = Math.max(14, Number(horizonInput?.value || 150) || 150);
+  const ownerFilter = String(ownerInput?.value || "").trim().toLowerCase();
+  const typeFilter = String(typeInput?.value || "").trim().toLowerCase();
+  const search = String(searchInput?.value || "").trim().toLowerCase();
+  const activeVersionId = String(st?.operational?.activePlanningVersionId || st?.realization?.activePlanningVersionId || "").trim();
+  const activeVersion = (Array.isArray(st?.planningVersions) ? st.planningVersions : []).find(v=>String(v?.id||"").trim()===activeVersionId) || null;
+  const packages = buildMediumTermPackages(refISO).map(p=>{
+    const daysToStart = _mediumTermDaysBetween(refISO, p.startISO);
+    const antecipationDays = (p.baselineStartISO && _mediumTermDaysBetween(p.startISO, p.baselineStartISO) > 0) ? _mediumTermDaysBetween(p.startISO, p.baselineStartISO) : 0;
+    const dateStage = _mediumTermStage(daysToStart);
+    const stage = _mediumTermEffectiveStage(dateStage);
+    return { ...p, daysToStart, antecipationDays, dateStage, stage };
+  }).filter(p=>{
+    const inHorizon = Number.isFinite(Number(p.daysToStart)) && Number(p.daysToStart) <= horizon;
+    if(!inHorizon && !p.antecipationDays) return false;
+    const hay = `${p.title} ${p.code} ${p.serviceName}`.toLowerCase();
+    if(search && !hay.includes(search)) return false;
+    if(ownerFilter && !String(p.owner || "").toLowerCase().includes(ownerFilter)) return false;
+    if(typeFilter && !String(p.criticalType || "").toLowerCase().includes(typeFilter)) return false;
+    return true;
+  }).sort((a,b)=>(Number(a.daysToStart||0)-Number(b.daysToStart||0)) || a.title.localeCompare(b.title));
+  const pulled = packages.length;
+  const anticipated = packages.filter(p=>p.antecipationDays > 0).length;
+  const pending = packages.reduce((acc,p)=>acc+p.restrictionsPending,0);
+  const critical = packages.filter(p=>p.criticalType).length;
+  const released = packages.filter(p=>p.restrictionsTotal > 0 && p.restrictionsPending === 0).length;
+  const outOfStage = packages.filter(p=>p.currentStage && p.currentStage !== p.stage.title).length;
+  if(sourceBar) sourceBar.innerHTML = `
+    <span><strong>Fonte:</strong> Planejamento ativo <i class="dot"></i></span>
+    <span><strong>Versão aplicada:</strong> ${escapeHtml(activeVersion?.name || activeVersionId || "sem versão")}</span>
+    <span><strong>LOB base:</strong> ${escapeHtml(activeVersion?.originPhaseId || "plano atual")}</span>
+    <span><strong>Regra:</strong> somente serviços com início antecipado ou dentro do horizonte</span>
+  `;
+  const kpiList = [
+    ["Serviços no médio prazo", pulled, "", "▣"],
+    ["Serviços adiantados no início", anticipated, anticipated ? "warn" : "", "◎"],
+    ["Restrições pendentes", pending, pending ? "warn" : "", "△"],
+    ["Restrições críticas", critical, critical ? "critical" : "", "!"],
+    ["Serviços liberados", released, released ? "ok" : "", "✓"],
+    ["Fora da etapa prevista", outOfStage, outOfStage ? "warn" : "", "◷"]
+  ];
+  if(kpis) kpis.innerHTML = kpiList.map(([k,v,cls,icon])=>`<div class="mediumTermKpi ${cls}"><div class="mediumTermKpiIcon">${escapeHtml(icon)}</div><div><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(String(v))}</div></div></div>`).join("");
+  const stages = _mediumTermStageCatalog();
+  const selectedKey = String(st?.ui?.mediumTermSelectedKey || packages[0]?.key || "").trim();
+  if(!st.ui) st.ui = {};
+  st.ui.mediumTermSelectedKey = selectedKey;
+  if(stagesEl) stagesEl.innerHTML = stages.map(stage=>{
+    const items = packages.filter(p=>p.stage.key === stage.key);
+    return `<div class="mediumTermStage" data-medium-stage="${stage.key}">
+      <div class="mediumTermStageHead">
+        <div class="mediumTermStageTitle">${escapeHtml(stage.title)}</div>
+        <div class="mediumTermStageRange">${escapeHtml(stage.range)}</div>
+        <div class="mediumTermStageCount">${items.length} serviço(s)</div>
+      </div>
+      <div class="mediumTermCards">
+        ${items.length ? items.map(p=>`
+          <div class="mediumTermPackage ${_mediumTermStatusClass(p)} ${p.key===selectedKey ? "active" : ""}" role="button" tabindex="0" data-medium-package="${escapeHtml(p.key)}">
+            <div class="mediumTermPackageTitle">${escapeHtml(p.title)}</div>
+            <div class="mediumTermPackageSub">
+              <span>LOB: ${escapeHtml(_mediumTermFmtBR(p.startISO))}</span>
+              <span>${p.blockCount} bloco(s) planejado(s)</span>
+              <span>Etapa atual: ${escapeHtml(p.currentStage || "sem registro")}</span>
+            </div>
+            <div class="mediumTermPackageScore"><span>${p.antecipationDays ? `Adiantado +${p.antecipationDays}d` : `${p.daysToStart} dias`}</span><span>${p.restrictionsResolved}/${p.restrictionsTotal} restr.</span></div>
+          </div>
+        `).join("") : `<div class="mediumTermEmpty">Nenhum serviço nesta janela.</div>`}
+      </div>
+      <div class="mediumTermFocus"><div class="mediumTermFocusTitle">Restrições da etapa</div><div class="mediumTermRestrictionList">${_mediumTermStageRestrictions(stage.key, stage.focus).map(r=>`<div class="mediumTermRestrictionItem"><strong>${escapeHtml(r.title)}</strong>${r.description ? `<span>${escapeHtml(r.description)}</span>` : ""}</div>`).join("")}</div></div>
+    </div>`;
+  }).join("");
+  const selected = packages.find(p=>p.key===selectedKey) || packages[0] || null;
+  if(panel && selected){
+    const diff = selected.currentStage ? (selected.currentStage === selected.stage.title ? "dentro da etapa" : `${selected.currentStage} x ${selected.stage.title}`) : "sem etapa atual registrada";
+    const releasePct = selected.restrictionsTotal ? Math.round((selected.restrictionsResolved / selected.restrictionsTotal) * 100) : 0;
+    panel.innerHTML = `
+      <div class="eyebrow">Serviço selecionado</div>
+      <h3>${escapeHtml(selected.title)}</h3>
+      <div class="mediumTermMeta">
+        <span class="mediumTermChip">${selected.blockCount} bloco(s) no plano</span>
+      </div>
+      <div class="mediumTermPanelGrid">
+        <div class="mediumTermPanelItem"><div class="k">Início previsto na LOB</div><div class="v">${escapeHtml(_mediumTermFmtBR(selected.startISO))}</div></div>
+        <div class="mediumTermPanelItem"><div class="k">Etapa prevista</div><div class="v">${escapeHtml(selected.stage.title)} - ${escapeHtml(selected.stage.range)}</div></div>
+        <div class="mediumTermPanelItem"><div class="k">Blocos do serviço</div><div class="v">${escapeHtml(String(selected.blockCount || 0))} bloco(s) no planejamento</div></div>
+        <div class="mediumTermPanelItem"><div class="k">Diferença entre etapas</div><div class="v">${escapeHtml(diff)}</div></div>
+        <div class="mediumTermPanelItem"><div class="k">Restrição crítica principal</div><div class="v">${escapeHtml(selected.criticalType || "sem crítica cadastrada")}</div></div>
+        <div class="mediumTermPanelItem"><div class="k">Liberação do serviço</div><div class="v">${releasePct}% - ${selected.restrictionsResolved} de ${selected.restrictionsTotal}</div><div class="mediumTermProgress"><span style="width:${Math.max(0, Math.min(100, releasePct))}%"></span></div></div>
+      </div>
+      <button class="btn primary" type="button" disabled>Abrir restrições do serviço</button>
+    `;
+  }else if(panel){
+    panel.innerHTML = `<div class="eyebrow">Sem serviço</div><h3>Nenhum serviço elegível</h3><div class="mediumTermPanelItem"><div class="v">Ajuste o horizonte ou aplique um planejamento com datas de início.</div></div>`;
+  }
+  if(stagesEl) stagesEl.querySelectorAll("[data-medium-package]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      state.ui = state.ui || {};
+      state.ui.mediumTermSelectedKey = String(btn.getAttribute("data-medium-package") || "").trim();
+      renderMediumTermView();
+    });
+  });
+  [refInput,horizonInput,ownerInput,typeInput,searchInput].forEach(el=>{
+    if(el && !el.dataset.mediumTermBound){
+      el.dataset.mediumTermBound = "1";
+      el.addEventListener("input", ()=>renderMediumTermView());
+      el.addEventListener("change", ()=>renderMediumTermView());
+    }
+  });
+}
+function _renderMediumTermRestrictionScreen(rootId, scope, backView, nextView){
+  const root = document.getElementById(rootId);
+  if(!root) return;
+  const mountId = rootId === "viewMediumTermCompany" ? "mediumTermCompanyBoardMount" : "mediumTermWorkBoardMount";
+  const mount = document.getElementById(mountId);
+  if(mount) _restrictionCatalogRenderBoard(mount, scope, { editable:true, compact:true });
+  const backBtn = root.querySelector(rootId === "viewMediumTermCompany" ? "#btnMediumTermCompanyBack" : "#btnMediumTermWorkBack");
+  const nextBtn = root.querySelector(rootId === "viewMediumTermCompany" ? "#btnMediumTermCompanyToWork" : "#btnMediumTermWorkToCompany");
+  if(backBtn && !backBtn.dataset.mediumTermBound){
+    backBtn.dataset.mediumTermBound = "1";
+    backBtn.addEventListener("click", ()=>setView(backView));
+  }
+  if(nextBtn && !nextBtn.dataset.mediumTermBound){
+    nextBtn.dataset.mediumTermBound = "1";
+    nextBtn.addEventListener("click", ()=>setView(nextView));
+  }
+}
+function renderMediumTermCompanyView(){
+  _renderMediumTermRestrictionScreen("viewMediumTermCompany", "company", "mediumterm", "mediumtermwork");
+}
+function renderMediumTermWorkView(){
+  _renderMediumTermRestrictionScreen("viewMediumTermWork", "obra", "mediumterm", "mediumtermcompany");
+}
+window.PLANNUS_AUDIT_MEDIUM_TERM = function(){
+  const packages = buildMediumTermPackages(String(window.state?.ui?.mediumTermRefISO || _mediumTermISO(new Date())).slice(0,10));
+  return {
+    source:"planning-active-by-service",
+    planServices: packages.length,
+    totalBlocks: packages.reduce((acc,p)=>acc + Number(p.blockCount || 0), 0),
+    activePlanningVersionId: String(window.state?.operational?.activePlanningVersionId || window.state?.realization?.activePlanningVersionId || "").trim() || null,
+    sample: packages.slice(0,5).map(p=>({ key:p.key, title:p.title, startISO:p.startISO, serviceId:p.serviceId, blocks:p.blockCount }))
+  };
+};
 function renderDashboardView(){
   state.ui = (state.ui && typeof state.ui==="object") ? state.ui : {};
   const dashModeRaw = String(state.ui.dashboardMode || "exec").trim().toLowerCase();
@@ -28778,7 +29842,7 @@ function renderDashboardView(){
   const weightBaseBlocks = Array.isArray(baselineBlocks) && baselineBlocks.length ? baselineBlocks : blocks;
   const baseDurBySvcLoc = new Map();
   weightBaseBlocks.forEach(b=>{
-    const sidRaw = String(b?.serviceId || "").trim() || "sem_servico";
+    const sidRaw = String(b?.serviceId || "").trim() || "sem_serviço";
     const sid = rootServiceIdOf(b, sidRaw) || sidRaw;
     const lid = String(b?.locationId || "").trim();
     const k = `${sid}||${lid}`;
@@ -28791,7 +29855,7 @@ function renderDashboardView(){
 
   // 1) Peso planejado por grupo (sempre em cima do peso da obra)
   weightBaseBlocks.forEach(b=>{
-    const sidRaw = String(b?.serviceId || "").trim() || "sem_servico";
+    const sidRaw = String(b?.serviceId || "").trim() || "sem_serviço";
     const sid = rootServiceIdOf(b, sidRaw) || sidRaw;
     const grp = groupOf(sid, b);
     const dur = durOf(b);
@@ -28807,7 +29871,7 @@ function renderDashboardView(){
   blocks.forEach(b=>{
     const measured = !!(typeof isMeasuredBlock==="function" ? isMeasuredBlock(b) : (b?.measured || b?.realStart || b?.realEnd));
     if(!measured) return;
-    const sidRaw = String(b?.serviceId || "").trim() || "sem_servico";
+    const sidRaw = String(b?.serviceId || "").trim() || "sem_serviço";
     const sid = rootServiceIdOf(b, sidRaw) || sidRaw;
     const lid = String(b?.locationId || "").trim();
     const grp = groupOf(sid, b);
@@ -29009,7 +30073,7 @@ function renderDashboardView(){
   }catch(_){}
   const critDone = critRows.filter(r=>{
     const measured = blocks.find(pb=>{
-      const sName = String(r?.servico || "").trim().toLowerCase();
+      const sName = String(r?.serviço || "").trim().toLowerCase();
       const lName = String(r?.pavimento || "").trim().toLowerCase();
       const svcLabel = (typeof reportServiceNameFromBlock === "function")
         ? reportServiceNameFromBlock(pb)
@@ -29705,9 +30769,9 @@ function __APP_BOOT__(){
   buildCalendarDays();
   applyCssVars();
   log("App iniciado. Use o fluxo único: Pavimentos -> EAP -> Montar planejamento -> Acompanhamento.");
-  log("Dica: clique no nome de um servico (cabecalho) para adicionar multiplas predecessoras.");
+  log("Dica: clique no nome de um serviço (cabeçalho) para adicionar multiplas predecessoras.");
   // FIX_IDENTIDADE_V1_12_BOOT_SAFE:
-  // Não renderizar a Linha de Balanço pesada no boot.
+  // Não renderizar a Linha de balanço pesada no boot.
   // O renderAll inicial travava o navegador quando havia estado legado/corrompido ou malha grande.
   // A tela inicial leve é a Visão Geral; o render pesado só roda quando o usuário abrir Acompanhamento/Linha.
   try{
@@ -30396,7 +31460,7 @@ if(U.inpRI) U.inpRI.value = (e.RI || "");
       const _ri = (U.inpRI && U.inpRI.value ? String(U.inpRI.value).trim() : "");
       const _rf = (U.inpRF && U.inpRF.value ? String(U.inpRF.value).trim() : "");
       if(_ri && _rf && String(_rf) < String(_ri)){
-        if(U.inpRF) U.inpRF.value = _ri; // normaliza para nao ficar invalido
+        if(U.inpRF) U.inpRF.value = _ri; // normaliza para não ficar invalido
         e.RF = _ri;
         edits[k] = Object.assign({}, e);
         saveEdits(edits);
@@ -34510,7 +35574,7 @@ function applyMSPImport(parsed){
       .toLowerCase()
       .replace(/[^a-z0-9]+/g,"_")
       .replace(/^_+|_+$/g,"");
-    return s || "servico";
+    return s || "serviço";
   }
   window._slugifyName = _slugifyName;
   function _nextServiceOrder(){
@@ -35786,7 +36850,7 @@ setChip();
 
     // Build cycles from preview recs: per service, locationsInOrder in encounter order.
     // Aqui precisamos respeitar o mesmo motor de equipes do import principal,
-    // para o PLANO nao nascer colapsado em T1 enquanto a BASE aparece separada.
+    // para o PLANO não nascer colapsado em T1 enquanto a BASE aparece separada.
     const svcToLocs=new Map(); // serviceId -> [locId...]
     const svcDurations=new Map(); // serviceId -> [durDays]
     const syntheticLocations = (locOrder||[]).map((l, idx)=>_normalizeLocationRecord({
@@ -36006,7 +37070,7 @@ setChip();
         const loose=parseLooseRows(rows);
         if(loose.length){
           // synthesize rows in the canonical order:
-          // [nivel, edt, nome, duracao, inicio, termino, id, predecessoras]
+          // [nivel, edt, nome, duração, inicio, termino, id, predecessoras]
           _rows = loose.map(o=>[
             String(o.level||""),
             String(o.wbs||""),
@@ -37001,13 +38065,13 @@ if(typeof window.buildCriticalRowsForWindow !== "function"){
         return String(hit?.name || id || "—").trim();
       };
       const rows = blocks.filter(inRange).map(b=>({
-        servico: svcName(b?.serviceId),
+        serviço: svcName(b?.serviceId),
         pavimento: locName(b?.locationId),
         equipe: String(b?.teamId || b?.team || "T1"),
         empresa: "—",
         inicio: String(b?.startISO || b?.startDateISO || "").slice(0,10),
         termino: String(b?.endISO || b?.endDateISO || "").slice(0,10),
-        duracao: (()=>{ try{
+        duração: (()=>{ try{
           const s = new Date(String(b?.startISO || b?.startDateISO || "").slice(0,10));
           const e = new Date(String(b?.endISO || b?.endDateISO || "").slice(0,10));
           const d = Math.round((e - s)/86400000)+1;
@@ -37067,7 +38131,7 @@ if(typeof window.buildCriticalRowsForWindow !== "function"){
     const out = Object.assign({}, r);
 
     // normaliza strings
-    out.servico   = _s(out.servico || out.service || out.srv || out.nomeServico || out.nome || out.taskName);
+    out.serviço   = _s(out.serviço || out.service || out.srv || out.nomeServico || out.nome || out.taskName);
     out.pavimento = _s(out.pavimento || out.location || out.loc || out.unidade || out.pav || out.floor);
     out.equipe    = _s(out.equipe || out.team || out.eq || out.eqName);
     out.empresa   = _s(out.empresa || out.company || out.vendor || out.emp);
@@ -38102,8 +39166,8 @@ if(typeof window.$$ === "undefined"){
     finish: ['término','termino','finish','end'],
     predecessors: ['predecessoras','predecessors','pred','predecessor'],
     wbs: ['edt','wbs','eap'],
-    duration: ['duração','duracao','duration'],
-    constraintDate: ['data da restrição','data da restricao','restrição','restricao','constraint date','data restricao']
+    duration: ['duração','duração','duration'],
+    constraintDate: ['data da restrição','data da restrição','restrição','restrição','constraint date','data restrição']
   };
 
   function norm(s){
@@ -39520,8 +40584,8 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
   }
   function statePreset(stateKey, fallback){
     const byState = {
-      [SYNC_STATES.ONLINE_SYNCED]: { text: "Online · salvo", kind:"ok", dot:"#22c55e", hint:"Conexao ativa e ultima gravacao online confirmada." },
-      [SYNC_STATES.ONLINE_DIRTY]: { text: "Online · alteracoes pendentes", kind:"warn", dot:"#f59e0b", hint:"Conexao ativa; existem alteracoes ainda nao enviadas ao online." },
+      [SYNC_STATES.ONLINE_SYNCED]: { text: "Online · salvo", kind:"ok", dot:"#22c55e", hint:"Conexao ativa e ultima gravação online confirmada." },
+      [SYNC_STATES.ONLINE_DIRTY]: { text: "Online · alterações pendentes", kind:"warn", dot:"#f59e0b", hint:"Conexao ativa; existem alterações ainda não enviadas ao online." },
       [SYNC_STATES.SAVING]: { text: "Salvando online...", kind:"saving", dot:"#38bdf8", hint:"Salvando no banco online neste momento." },
       [SYNC_STATES.OFFLINE]: { text: "Offline · backup local ativo", kind:"error", dot:"#ef4444", hint:"Sem conexao com a API; operando com backup local." },
       [SYNC_STATES.SAVE_ERROR]: { text: "Erro ao salvar online", kind:"error", dot:"#ef4444", hint:"Erro de API/rede ao salvar. Dados locais foram preservados." },
@@ -39591,10 +40655,10 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       return j(url, opts);
     },
     async listServices(){
-      return this.request(`${API_BASE}/api/servicos`);
+      return this.request(`${API_BASE}/api/serviços`);
     },
     async saveServicesCatalog(payload){
-      return this.request(`${API_BASE}/api/servicos`, {
+      return this.request(`${API_BASE}/api/serviços`, {
         method: "POST",
         headers: { "Content-Type":"application/json" },
         body: JSON.stringify({ services: Array.isArray(payload) ? payload : [] })
@@ -39685,7 +40749,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       const meta = readMeta();
       if(!meta?.obraId) return;
       if(ONLINE_PANEL_CTX.syncState === SYNC_STATES.CONFLICT) return;
-      if(navigator.onLine) setStatus("Online · alteracoes pendentes", "warn", SYNC_STATES.ONLINE_DIRTY);
+      if(navigator.onLine) setStatus("Online · alterações pendentes", "warn", SYNC_STATES.ONLINE_DIRTY);
       else setStatus("Offline · backup local ativo", "error", SYNC_STATES.OFFLINE);
     };
     document.addEventListener("input", markDirty, true);
@@ -39727,7 +40791,7 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
     if(!stateWrite.ok){
       console.warn("[LOCAL_STORAGE_QUOTA]", { event:"state_backup_not_saved", obraId:id, key:stateKey });
       if(indexWrite.ok){
-        setStatus("Salvo online. Backup local parcial nao foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+        setStatus("Salvo online. Backup local parcial não foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
       }
     }
   }
@@ -40806,7 +41870,7 @@ function readJsonLocalStorage(key){
           lastError: "Sem conexao/API indisponivel"
         });
         if(!localWrite.ok && localWrite.quotaExceeded){
-          setStatus("Offline. Backup local nao atualizado por limite do navegador.", "warn", SYNC_STATES.OFFLINE);
+          setStatus("Offline. Backup local não atualizado por limite do navegador.", "warn", SYNC_STATES.OFFLINE);
           return;
         }
         notifyStatus(ONLINE_MESSAGES.OFFLINE_LOCAL, "error", SYNC_STATES.OFFLINE, ONLINE_MESSAGES.OFFLINE_LOCAL);
@@ -40842,7 +41906,7 @@ function readJsonLocalStorage(key){
           });
           setStatus(`${ONLINE_MESSAGES.SAVE_OK} Revision ${revisionNova}.`, "ok", SYNC_STATES.ONLINE_SYNCED);
           if(!localWrite.ok && localWrite.quotaExceeded){
-            setStatus("Salvo online. Backup local parcial nao foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+            setStatus("Salvo online. Backup local parcial não foi atualizado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
           }
           console.log("[PLANNUS_SYNC]", { ok:true, obraId: ctx.obraId, revisionDepois: revisionNova, pendingOnlineSave:false, conflict:false, at: now() });
           ONLINE_PANEL_CTX.lastPingOk = true;
@@ -41029,10 +42093,10 @@ function readJsonLocalStorage(key){
       });
       setStatus(`Obra ${id} aberta (fonte: online).`, "ok", SYNC_STATES.ONLINE_SYNCED);
       if(typeof appWrite !== "undefined" && !appWrite.ok && appWrite.quotaExceeded){
-        setStatus("Obra aberta online. Cache local completo nao foi salvo por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+        setStatus("Obra aberta online. Cache local completo não foi salvo por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
       }
       if(backup.quotaExceeded){
-        setStatus("Obra carregada online. Backup local anterior nao foi criado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
+        setStatus("Obra carregada online. Backup local anterior não foi criado por limite do navegador.", "warn", SYNC_STATES.ONLINE_SYNCED);
       }
       console.log("[ONLINE_STATE_HYDRATION]", { event:"open_online_source", obraId:id, source:"online", revision:Number(data?.revision ?? data?.obra?.revision ?? 0) || 0 });
       showObraLoadSummaryPopup({
@@ -41885,7 +42949,7 @@ function readJsonLocalStorage(key){
     document.body.appendChild(wrap);
     q("#plnRefreshObras")?.addEventListener("click", ()=>window.PlannusOnlineActions?.listObras?.());
     q("#plnCreateObra")?.addEventListener("click", async ()=>{
-      setStatus("Abrindo criacao de obra...");
+      setStatus("Abrindo criação de obra...");
       const modal = q("#plnCreateObraModal");
       const inNome = q("#plnCreateNome");
       const inCodigo = q("#plnCreateCodigo");
@@ -41894,7 +42958,7 @@ function readJsonLocalStorage(key){
         return;
       }
       const nome = String(prompt("Nome da obra:") || "").trim();
-      if(!nome){ setStatus("Criacao cancelada."); return; }
+      if(!nome){ setStatus("Criação cancelada."); return; }
       const codigo = String(prompt("Codigo da obra (opcional):") || "").trim();
       await window.PlannusOnlineActions?.createObra?.(nome, codigo);
     });
@@ -42523,6 +43587,11 @@ html body.withSideNav #sideNav .navSec.navSecPlanning .navItem.is-active{backgro
     try{ localStorage.setItem(KEY, collapsed ? "1" : "0"); }catch(_){ }
     setTimeout(normalizeScroller, 0);
     setTimeout(normalizeScroller, 80);
+    setTimeout(function(){
+      try{ if(window.scheduleRenderAll) window.scheduleRenderAll(); }catch(_){}
+      try{ if(window.renderAll) window.renderAll(); }catch(_){}
+      try{ window.dispatchEvent(new Event('resize')); }catch(_){}
+    }, 120);
   }
   function read(){
     try{
@@ -44339,14 +45408,25 @@ html body.withSideNav.reportsActiveView #modalRelatorioOverlay .modal{
   html body.withSideNav #topHeader{
     margin-left: 0 !important;
   }
-  html body.withSideNav.navCollapsed #topHeader,
+  html body.withSideNav:not(.plannerGridFullscreen) > main > #viewMediumTerm,
+  html body.withSideNav:not(.plannerGridFullscreen) > main > #viewMediumTermCompany,
+  html body.withSideNav:not(.plannerGridFullscreen) > main > #viewMediumTermWork{
+    width: calc(100% - 24px) !important;
+    max-width: min(1760px, calc(100vw - 96px)) !important;
+    margin: 0 auto !important;
+  }
+  html body.withSideNav:not(.plannerGridFullscreen):not(.navCollapsed) > main > #viewMediumTerm,
+  html body.withSideNav:not(.plannerGridFullscreen):not(.navCollapsed) > main > #viewMediumTermCompany,
+  html body.withSideNav:not(.plannerGridFullscreen):not(.navCollapsed) > main > #viewMediumTermWork{
+    max-width: min(1760px, calc(100vw - 252px)) !important;
+  }
   html body.withSideNav.navCollapsed .app-shell,
   html body.withSideNav.navCollapsed main,
   html body.withSideNav.navCollapsed .main-content,
   html body.withSideNav.navCollapsed .content,
   html body.withSideNav.navCollapsed .page,
   html body.withSideNav.navCollapsed .app-main{
-    margin-left: 64px !important;
+    margin-left: 56px !important;
   }
 </style>
 <script id="PLANNUS_SIDE_NAV_CONTRACT_V24_SCRIPT">
@@ -44357,7 +45437,7 @@ html body.withSideNav.reportsActiveView #modalRelatorioOverlay .modal{
       ['btnViewPav','Pavimentos'],
       ['btnViewGuided','Biblioteca EAP'],
       ['btnOpenEapApplyNav','Planejamento'],
-      ['btnViewService','Pacotes'],
+      ['btnViewService','Pacotes / Serviços'],
       ['btnViewPlanner','Acompanhamento'],
       ['btnViewDashboard','Dashboard'],
       ['btnViewConfig','Parâmetros'],
@@ -44475,5 +45555,7 @@ html body.withSideNav.reportsActiveView #modalRelatorioOverlay .modal{
 </script>
 </body>
 </html>
+
+
 
 
