@@ -1930,6 +1930,24 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
   color:#64748b;
   font-size:12px;
 }
+.planningPhaseEmptyState{
+  padding:14px 16px;
+  border:1px solid rgba(148,163,184,.28);
+  border-radius:16px;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+  box-shadow:0 8px 20px rgba(15,23,42,.04);
+}
+.planningPhaseEmptyStateTitle{
+  font-size:14px;
+  font-weight:900;
+  color:#0f172a;
+}
+.planningPhaseEmptyStateText{
+  margin-top:6px;
+  color:#475569;
+  font-size:12px;
+  line-height:1.45;
+}
 .planningApplyShell .guidedSection:first-child{
   margin-top:0 !important;
 }
@@ -2385,7 +2403,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 }
 .guidedServiceAdvanced summary::-webkit-details-marker{display:none;}
 .guidedServiceAdvanced summary::before{
-  content:"?";
+  content:"▸";
   font-size:10px;
   color:#64748b;
   transition:transform .15s ease;
@@ -2409,7 +2427,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 }
 .guidedServiceStageBox summary::-webkit-details-marker{display:none;}
 .guidedServiceStageBox summary::before{
-  content:"?";
+  content:"▸";
   font-size:10px;
   color:#64748b;
   transition:transform .15s ease;
@@ -2567,6 +2585,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
   background:rgba(255,255,255,.98);
   box-shadow:0 8px 18px rgba(16,24,32,.06);
 }
+.guidedFlowSearchBox > div{min-width:0;}
 .guidedFlowSearchBox label{
   font-size:9px;
   font-weight:900;
@@ -2611,6 +2630,7 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 .guidedFlowSearchServiceBox{
   position:relative;
   min-height:54px;
+  height:100%;
   border-radius:13px;
   border:1px solid rgba(228,231,232,.95);
   background:linear-gradient(180deg,#ffffff 0%,#f7f7f7 100%);
@@ -5366,10 +5386,10 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 #viewGuidedPlan .guidedFlowToolHeader{margin-top:12px !important;}
 #viewGuided .guidedFlowSearchBox,
 #viewGuidedApply .guidedFlowSearchBox,
-#viewGuidedPlan .guidedFlowSearchBox{display:grid !important; grid-template-columns:minmax(300px,1fr) minmax(260px,340px) !important; gap:12px !important; align-items:start !important; padding:14px 16px !important; border:1px solid #dce5f0 !important; border-radius:20px !important; background:linear-gradient(90deg, rgba(239,23,53,.06) 0 4px, transparent 4px), #fff !important; box-shadow:0 10px 28px rgba(16,24,40,.04) !important;}
+#viewGuidedPlan .guidedFlowSearchBox{display:grid !important; grid-template-columns:minmax(320px,1.25fr) minmax(250px,.95fr) !important; gap:12px !important; align-items:stretch !important; padding:14px 16px !important; border:1px solid #dce5f0 !important; border-radius:20px !important; background:linear-gradient(90deg, rgba(239,23,53,.06) 0 4px, transparent 4px), #fff !important; box-shadow:0 10px 28px rgba(16,24,40,.04) !important;}
 #viewGuided .guidedFlowSearchBox label, #viewGuidedApply .guidedFlowSearchBox label, #viewGuidedPlan .guidedFlowSearchBox label{display:block !important; margin-bottom:6px !important; font-size:12px !important; font-weight:900 !important; text-transform:uppercase !important; letter-spacing:.06em !important; color:#475467 !important;}
 #viewGuided .guidedFlowSearchBox input, #viewGuidedApply .guidedFlowSearchBox input, #viewGuidedPlan .guidedFlowSearchBox input{height:44px !important; border-radius:14px !important; border:1px solid #d8e2ee !important; box-shadow:0 0 0 3px rgba(239,23,53,.06) !important;}
-#viewGuided .guidedFlowSearchServiceBox, #viewGuidedApply .guidedFlowSearchServiceBox, #viewGuidedPlan .guidedFlowSearchServiceBox{min-height:84px !important; border-radius:18px !important; border:1px solid #dce5f0 !important; background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%) !important; padding:12px 14px !important;}
+#viewGuided .guidedFlowSearchServiceBox, #viewGuidedApply .guidedFlowSearchServiceBox, #viewGuidedPlan .guidedFlowSearchServiceBox{min-height:84px !important; height:100% !important; border-radius:18px !important; border:1px solid #dce5f0 !important; background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%) !important; padding:12px 14px !important;}
 #viewGuided .guidedFlowSearchResults, #viewGuidedApply .guidedFlowSearchResults, #viewGuidedPlan .guidedFlowSearchResults{grid-column:1 / -1 !important; display:flex !important; flex-wrap:wrap !important; gap:8px !important;}
 #viewGuided .guidedFlowSearchOverlap, #viewGuidedApply .guidedFlowSearchOverlap, #viewGuidedPlan .guidedFlowSearchOverlap{grid-column:1 / -1 !important; margin-top:0 !important; font-size:12px !important; color:#667085 !important;}
 #viewGuided .guidedFlowRailWrap, #viewGuidedApply .guidedFlowRailWrap, #viewGuidedPlan .guidedFlowRailWrap{padding:18px !important; border:1px solid #dbe4f0 !important; border-radius:24px !important; background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important; box-shadow:0 14px 30px rgba(16,24,40,.06) !important;}
@@ -5401,11 +5421,11 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 #viewGuided .guidedFlowSearchBox,
 #viewGuidedApply .guidedFlowSearchBox,
 #viewGuidedPlan .guidedFlowSearchBox{
-  grid-template-columns:minmax(280px,1fr) minmax(220px,300px) !important;
+  grid-template-columns:minmax(320px,1.25fr) minmax(250px,.95fr) !important;
   gap:10px !important;
   padding:10px 12px !important;
   border-radius:18px !important;
-  align-items:start !important;
+  align-items:stretch !important;
 }
 
 #viewGuided .guidedFlowSearchBox label,
@@ -5428,7 +5448,7 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 #viewGuidedApply .guidedFlowSearchServiceBox,
 #viewGuidedPlan .guidedFlowSearchServiceBox{
   min-height:58px !important;
-  height:auto !important;
+  height:100% !important;
   padding:10px 12px !important;
   border-radius:16px !important;
 }
@@ -6304,10 +6324,9 @@ document.addEventListener("click", function(ev){
 
   <div id="viewGuidedPlan" style="display:none;">
     <section class="card" style="grid-column:1 / -1;">
-      <div class="cardHead">
+          <div class="cardHead">
         <div>
           <div class="title plnPageTitle">EAP</div>
-              <div class="sub plnPageSubtitle">Monte e salve a biblioteca de serviços.</div>
         </div>
         <div class="actions guidedActions">
           <button class="btn" id="btnGuidedReset" type="button">Limpar questionário</button>
@@ -6321,7 +6340,6 @@ document.addEventListener("click", function(ev){
           <div class="guidedSectionTitle">
             <div>
               <div class="ttl">Biblioteca de EAP</div>
-              <div class="subttl">Escolha um modelo e veja os salvos na mesma área.</div>
             </div>
               <div class="guidedSectionActions">
                 <button class="btn" id="btnGuidedUseTemplate" type="button">Usar modelo</button>
@@ -6334,7 +6352,6 @@ document.addEventListener("click", function(ev){
               <div class="guidedTag" id="guidedTemplateOriginTag">Padrão</div>
             </div>
             <div class="label" style="margin-top:12px;">Modelos salvos</div>
-            <div class="hint">Excluir remove só o modelo, sem apagar o projeto.</div>
             <div id="guidedLibraryPanel" class="guidedLibraryGrid"></div>
           </div>
 
@@ -6342,7 +6359,6 @@ document.addEventListener("click", function(ev){
             <div class="guidedSectionTitle">
               <div>
               <div class="ttl">Serviços</div>
-          <div class="subttl">Cadastre os serviços da biblioteca.</div>
               </div>
               <div class="guidedSectionActions primary">
                 <button class="btn" id="btnGuidedNewTemplate" type="button">Nova EAP</button>
@@ -6357,7 +6373,6 @@ document.addEventListener("click", function(ev){
               <input id="guidedTemplateLabel" placeholder="Ex.: Residencial vertical padrão" />
             </div>
 
-            <div class="hint" style="margin-top:12px;">Selecione um modelo, ajuste os serviços e salve. A aplicação acontece em outra tela.</div>
             <details class="guidedAdvancedActions">
               <summary>Ações avançadas</summary>
               <div class="row">
@@ -6372,17 +6387,15 @@ document.addEventListener("click", function(ev){
         <div class="guidedSection guidedServiceSection">
           <div class="guidedSectionTitle">
             <div>
-              <div class="ttl">3. Predecessoras da EAP</div>
-              <div class="subttl">Os serviços são cadastrados na tela própria. Aqui você só organiza predecessoras e regras do modelo.</div>
+              <div class="ttl">Predecessoras da EAP</div>
             </div>
             <div class="guidedSectionActions">
               <button class="btn" id="btnGuidedExportEapPdf" type="button">PDF EAP</button>
-              <button class="btn" id="btnOpenServiceCatalog" type="button">Abrir cadastro de serviços</button>
+              <button class="btn" id="btnOpenServiceCatalog" type="button">Pacotes / Serviços</button>
               <button class="btn danger" id="btnGuidedRemoveSvcFromEap" type="button">Remover serviço</button>
               <button class="btn danger" id="btnGuidedClearAllPreds" type="button">Limpar predecessoras</button>
             </div>
           </div>
-            <div class="guidedServiceToolbarHint">Cadastre os serviços na biblioteca. Depois volte para esta tela para amarrar predecessoras e ordem operacional.</div>
           <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
             <button class="btn" id="btnGuidedAddService" type="button">Adicionar serviço</button>
           </div>
@@ -6415,7 +6428,15 @@ document.addEventListener("click", function(ev){
               <div class="guidedPill" id="planningPhaseCount">1 fase</div>
             </div>
           </div>
-          <div class="planningPhaseEditor">
+          <div id="planningPhaseEmptyState" class="planningPhaseEmptyState" hidden>
+            <div class="planningPhaseEmptyStateTitle">Nenhuma fase criada para esta obra.</div>
+            <div class="planningPhaseEmptyStateText">Crie uma nova fase baseada na EAP atual ou continue sem fase para seguir com o planejamento.</div>
+            <div class="rowActions" style="margin-top:10px; justify-content:flex-start; gap:8px; flex-wrap:wrap;">
+              <button class="btn primary" id="btnPlanningCreatePhaseEmpty" type="button">Criar nova fase</button>
+              <button class="btn" id="btnPlanningContinueWithoutPhase" type="button">Continuar sem fase</button>
+            </div>
+          </div>
+          <div class="planningPhaseEditor" id="planningPhaseEditor">
             <label class="field" style="margin:0; min-width:260px; flex:1 1 280px;">
               <span>Fase ativa</span>
               <select id="planningPhaseSelect"></select>
@@ -9852,7 +9873,6 @@ initTestLog();
 loadProjectDatesFromStorage();
 try{ if(typeof ensureCalendarStateContract === "function") ensureCalendarStateContract(state, { source:"boot_after_project_dates" }); }catch(_){}
 loadCompaniesFromStorage();
-loadServicesFromStorage();
 loadDepsFromStorage();
 loadDepsOverridesFromStorage();
 ensureCyclesForServices();
@@ -12531,7 +12551,7 @@ function _normalizeGuidedService(raw, idx, prevId){
   const src = raw && typeof raw === "object" ? raw : {};
   const name = String(src.name || src.label || `SERVIÇO ${idx}`).trim() || `SERVIÇO ${idx}`;
   const code = String(src.code || src.eapCode || src.eap || "").trim() || `EAP.${String(idx).padStart(2, "0")}`;
-  const keySeed = String(src.key || src.id || code || name || `svc_${idx}`).trim();
+  const keySeed = String(src.key || src.id || src.stableKey || src.uid || `svc_${idx}`).trim();
   const key = _sanitizeGuidedTemplateKey(keySeed);
   const predecessorRaw = Object.prototype.hasOwnProperty.call(src, "predecessorServiceId")
     ? src.predecessorServiceId
@@ -12713,37 +12733,59 @@ function _guidedDefaultDraft(templateKey){
     specialAreas: String(d.specialAreas || "SS1\nÁTICO").trim(),
     flowRailCount: Math.max(3, Number(d.flowRailCount || 5) || 5),
     services: _guidedCloneServices(_guidedServiceCatalogSeed(template)),
+    deletedServiceIds: [],
     ui: { guidedMode:"edit" }
   };
 }
 function _guidedServiceCatalogSeed(template){
   try{
+    const templateServices = Array.isArray(template?.services) ? template.services : [];
+    if(templateServices.length){
+      return _guidedCloneServices(templateServices);
+    }
     const baseCatalog = _getServiceBaseCatalogForStorage();
     if(Array.isArray(baseCatalog) && baseCatalog.length){
-      return baseCatalog.slice().sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||"")));
+      return _guidedCloneServices(baseCatalog.slice().sort((a,b)=>(Number(a.order||0)-Number(b.order||0)) || String(a.name||"").localeCompare(String(b.name||""))));
     }
   }catch(_){}
-  return _guidedCloneServices(template?.services || []);
+  return [];
 }
 function _normalizeGuidedDraft(draft, opts){
   const src = draft && typeof draft === "object" ? draft : {};
+  const templateKey = String(src.templateKey || "residencial_vertical_padrao").trim() || "residencial_vertical_padrao";
+  const library = _readGuidedEapLibrary();
+  const hasBuiltinTemplate = !!GUIDED_EAP_TEMPLATES[templateKey];
+  const hasCustomTemplate = !!library[templateKey];
+  const hasTemplateMatch = hasBuiltinTemplate || hasCustomTemplate;
   const template = opts && opts.allowBuiltinOnly
-    ? _guidedBuiltinTemplateByKey(src.templateKey || "residencial_vertical_padrao")
-    : _guidedTemplateByKey(src.templateKey || "residencial_vertical_padrao");
-  const base = _guidedDefaultDraft(template?.key || "residencial_vertical_padrao");
-  const templateServices = _guidedServiceCatalogSeed(template);
+    ? _guidedBuiltinTemplateByKey(templateKey)
+    : _guidedTemplateByKey(templateKey);
+  const base = _guidedDefaultDraft(hasTemplateMatch ? (template?.key || templateKey) : "residencial_vertical_padrao");
+  const deletedServiceIds = Array.isArray(src.deletedServiceIds)
+    ? Array.from(new Set(src.deletedServiceIds.map(x=>String(x || "").trim()).filter(Boolean)))
+    : [];
+  const deletedSet = new Set(deletedServiceIds);
   const srcServices = Array.isArray(src.services) ? src.services : [];
+  const templateServices = hasTemplateMatch
+    ? _guidedServiceCatalogSeed(template).filter(svc=>{
+        const sid = String(svc?.id || svc?.key || "").trim();
+        return !sid || !deletedSet.has(sid);
+      })
+    : [];
   const srcById = new Map();
   srcServices.forEach((svc)=>{
     const sid = String(svc?.id || svc?.key || "").trim();
+    if(sid && deletedSet.has(sid)) return;
     if(sid && !srcById.has(sid)) srcById.set(sid, svc);
   });
-  const services = templateServices.map((svc, idx)=>{
-    const sid = String(svc?.id || svc?.key || "").trim();
-    const merged = srcById.has(sid) ? Object.assign({}, svc, srcById.get(sid) || {}) : Object.assign({}, svc);
-    const prevId = idx > 0 ? String(templateServices[idx-1]?.id || templateServices[idx-1]?.key || "") : "";
-    return _normalizeGuidedService(merged, idx+1, prevId);
-  });
+  const services = hasTemplateMatch
+    ? templateServices.map((svc, idx)=>{
+        const sid = String(svc?.id || svc?.key || "").trim();
+        const merged = srcById.has(sid) ? Object.assign({}, svc, srcById.get(sid) || {}) : Object.assign({}, svc);
+        const prevId = idx > 0 ? String(templateServices[idx-1]?.id || templateServices[idx-1]?.key || "") : "";
+        return _normalizeGuidedService(merged, idx+1, prevId);
+      })
+    : srcServices.map((svc, idx)=>_normalizeGuidedService(Object.assign({}, svc), idx+1, idx > 0 ? String(srcServices[idx-1]?.id || srcServices[idx-1]?.key || "") : ""));
   const rawTemplateLabel = src.templateLabel == null ? "" : String(src.templateLabel);
   const normalizedTemplateLabel = rawTemplateLabel.trim() ? rawTemplateLabel : String(template?.label || base.templateLabel || "");
   return {
@@ -12758,8 +12800,53 @@ function _normalizeGuidedDraft(draft, opts){
     commonAreas: String(src.commonAreas || base.commonAreas).trim() || base.commonAreas,
     specialAreas: String(src.specialAreas || base.specialAreas).trim() || base.specialAreas,
     flowRailCount: Math.max(3, Number(src.flowRailCount || base.flowRailCount || 5) || 5),
+    deletedServiceIds,
     services
   };
+}
+function _guidedDraftRenderSignature(draft){
+  const src = draft && typeof draft === "object" ? draft : {};
+  const services = Array.isArray(src.services) ? src.services : [];
+  const deleted = Array.isArray(src.deletedServiceIds) ? src.deletedServiceIds : [];
+  const parts = [
+    String(src.templateKey || "").trim(),
+    String(src.templateLabel || "").trim(),
+    String(src.clusterName || "").trim(),
+    String(src.executionDirection || "").trim(),
+    String(src.flowRailCount || 0).trim(),
+    String(services.length),
+    String(deleted.length)
+  ];
+  for(let i = 0; i < services.length; i++){
+    const svc = services[i] || {};
+    const stages = Array.isArray(svc.stages) ? svc.stages : [];
+    parts.push([
+      String(svc.id || svc.key || "").trim(),
+      String(svc.order || i + 1),
+      String(svc.name || "").trim(),
+      String(svc.code || "").trim(),
+      String(svc.scopeKind || "").trim(),
+      String(svc.durationDefault || "").trim(),
+      String(svc.predecessorServiceId || "").trim(),
+      String(svc.dependencyType || "").trim(),
+      String(svc.lagDays || "").trim(),
+      String(svc.visualLane ?? "").trim(),
+      String(svc.visualY ?? "").trim(),
+      String(svc.visualX ?? "").trim(),
+      String(stages.length)
+    ].join("|"));
+    for(let j = 0; j < stages.length; j++){
+      const st = stages[j] || {};
+      parts.push([
+        String(st.id || st.key || "").trim(),
+        String(st.name || "").trim(),
+        String(st.type || "").trim(),
+        String(st.notes || "").trim(),
+        String(st.order || j + 1)
+      ].join("|"));
+    }
+  }
+  return _projectIdentityHash(parts.join("§"));
 }
 function _readGuidedPlanDraft(){
   try{
@@ -12774,6 +12861,7 @@ function _readGuidedPlanDraft(){
 function _saveGuidedPlanDraft(draft){
   try{
     const normalized = _normalizeGuidedDraft(draft);
+    normalized.renderSignature = _guidedDraftRenderSignature(normalized);
     localStorage.setItem(GUIDED_EAP_DRAFT_KEY, JSON.stringify(normalized));
     return normalized;
   }catch(_){
@@ -12795,13 +12883,15 @@ function _guidedApplyDraftFromSelection(storedDraft, selectEl){
     return _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(template.baseTemplateKey || selectedTemplateKey), template.draftDefaults || {}, {
       templateKey: selectedTemplateKey,
       templateLabel: String(template.label || stored.templateLabel || selectedTemplateKey).trim(),
-      services: _guidedCloneServices(template.services || [])
+      services: _guidedCloneServices(template.services || []),
+      deletedServiceIds: []
     }));
   }
   return _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(selectedTemplateKey), {
     templateKey: selectedTemplateKey,
     templateLabel: String(template?.label || stored.templateLabel || "").trim(),
-    services: _guidedCloneServices((Array.isArray(template?.services) && template.services.length) ? template.services : (stored.services || []))
+    services: _guidedCloneServices((Array.isArray(template?.services) && template.services.length) ? template.services : (stored.services || [])),
+    deletedServiceIds: []
   }));
 }
 function _guidedReadDraftFromUI(){
@@ -12986,9 +13076,23 @@ function _guidedBuildMacroServices(groupKey, items){
 function _guidedUpdateServicesDraft(updater){
   const draft = _guidedReadDraftFromUI();
   const items = _guidedCloneServices(draft.services || []);
+  const laneSnapshot = new Map(items.map(svc=>[
+    String(svc?.key || svc?.id || "").trim(),
+    {
+      visualLane: Number.isFinite(Number(svc?.visualLane)) ? Math.max(0, Number(svc.visualLane)) : null,
+      visualY: Number.isFinite(Number(svc?.visualY)) ? Math.max(0, Number(svc.visualY)) : null
+    }
+  ]));
   let result = null;
-  try{ result = updater(items) || null; }catch(e){ console.warn("[GUIDED] update services draft failed", e); }
+  try{ result = updater(items, draft) || null; }catch(e){ console.warn("[GUIDED] update services draft failed", e); }
   const normalized = _guidedNormalizeGraphLinks(items);
+  normalized.forEach(svc=>{
+    const sid = String(svc?.key || svc?.id || "").trim();
+    const prev = laneSnapshot.get(sid);
+    if(!prev) return;
+    if(Number.isFinite(prev.visualLane)) svc.visualLane = prev.visualLane;
+    if(Number.isFinite(prev.visualY)) svc.visualY = prev.visualY;
+  });
   const cycleCheck = _guidedCheckServiceGraphCycle(normalized);
   if(!cycleCheck.ok){
     try{ alert(`${cycleCheck.message}\n\nA alteração não foi salva. Remova o vínculo circular antes de aplicar a EAP.`); }catch(_){}
@@ -12997,8 +13101,247 @@ function _guidedUpdateServicesDraft(updater){
   draft.services = normalized;
   _saveGuidedPlanDraft(draft);
   if(result && result.focus) __guidedServiceEditorFocus = result.focus;
-  renderGuidedPlanningView();
+  const laneMoveBypassUntil = Number(window.__guidedLaneMoveInFlightUntil || 0) || 0;
+  if(laneMoveBypassUntil && performance.now() < laneMoveBypassUntil){
+    return true;
+  }
+  _scheduleGuidedPlanningRender("services_changed");
   return true;
+}
+function _guidedReorderServicesDraft(items, focus){
+  try{
+    const draft = _guidedReadDraftFromUI();
+    const nextItems = _guidedCloneServices(Array.isArray(items) ? items : []);
+    nextItems.forEach((svc, idx)=>{
+      svc.order = idx + 1;
+    });
+    draft.services = nextItems;
+    _saveGuidedPlanDraft(draft);
+    if(focus) __guidedServiceEditorFocus = focus;
+    _scheduleGuidedPlanningRender("services_reordered");
+    return true;
+  }catch(e){
+    console.warn("[GUIDED] reorder services draft failed", e);
+    return false;
+  }
+}
+function _guidedSaveServicesDraftOnly(items, focus){
+  try{
+    const draft = _guidedReadDraftFromUI();
+    const nextItems = _guidedCloneServices(Array.isArray(items) ? items : []);
+    draft.services = nextItems;
+    const saved = _saveGuidedPlanDraft(draft);
+    if(focus) __guidedServiceEditorFocus = focus;
+    return saved || draft;
+  }catch(e){
+    console.warn("[GUIDED] save services draft only failed", e);
+    return false;
+  }
+}
+function _guidedApplyLaneMoveFast(moves, savedDraft){
+  try{
+    const root = document.getElementById("guidedServiceFlowRail");
+    if(!root) return false;
+    const board = root.querySelector(".guidedFlowSimpleBoard");
+    if(!board) return false;
+    const draft = savedDraft && typeof savedDraft === "object" ? savedDraft : _readGuidedPlanDraftSafe();
+    const services = Array.isArray(draft.services) ? draft.services : [];
+    const laneH = Math.max(108, Number(__guidedFlowLaneStepPx || 108) || 108);
+    const blockH = 88;
+    const laneCenterOffset = Math.max(0, Math.round((laneH - blockH) / 2));
+    const padY = Math.max(0, Number(__guidedFlowBoardPadYPx || 0) || 0);
+    const laneTop = (lane)=>Math.max(0, padY + Math.max(0, Number(lane || 0)) * laneH + laneCenterOffset);
+    const escapeSel = (key)=>{
+      const raw = String(key || "").trim();
+      if(!raw) return "";
+      if(typeof CSS !== "undefined" && CSS && typeof CSS.escape === "function") return CSS.escape(raw);
+      return raw.replace(/"/g, '\\"');
+    };
+    (Array.isArray(moves) ? moves : []).forEach(move=>{
+      const key = String(move?.key || "").trim();
+      if(!key) return;
+      const lane = Math.max(0, Number(move?.lane || 0));
+      const svc = services.find(x=>String(x.id || x.key || "").trim()===key);
+      if(svc){
+        svc.visualLane = lane;
+        svc.visualY = laneTop(lane);
+      }
+      const block = board.querySelector(`[data-guided-service-key="${escapeSel(key)}"]`);
+      if(block){
+        block.style.top = `${laneTop(lane)}px`;
+        block.setAttribute("data-guided-lane-id", String(lane));
+        block.setAttribute("data-guided-lane-rank", String(lane));
+        block.setAttribute("data-guided-lane", String(lane + 1));
+      }
+    });
+    return true;
+  }catch(e){
+    console.warn("[GUIDED_VIEW] fast lane move fail", e);
+    return false;
+  }
+}
+function _guidedQueueFlowEdgePaint(reason){
+  try{
+    if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return true;
+    if(typeof window.__guidedPaintFlowEdges === "function"){
+      window.__guidedPaintFlowEdges();
+      return true;
+    }
+    return true;
+  }catch(e){
+    console.warn("[GUIDED_VIEW] queue flow edge paint fail", { reason:String(reason || ""), error:e });
+    return false;
+  }
+}
+function _renderGuidedFlowRailOnlyFromDraft(){
+  try{
+    const draft = _readGuidedPlanDraftSafe();
+    const template = _guidedTemplateByKey(draft.templateKey);
+    const normalizedDraft = _normalizeGuidedDraft(Object.assign({}, draft, {
+      templateKey: template?.key || draft.templateKey,
+      templateLabel: String(draft.templateLabel || template?.label || "").trim() || String(template?.label || "").trim(),
+      services: _guidedCloneServices(draft.services || [])
+    }));
+    const services = normalizedDraft.services || [];
+    const flowRoot = document.getElementById("guidedServiceFlowRail");
+    const wrap = flowRoot ? flowRoot.querySelector(".guidedFlowRailWrap") : null;
+    const scrollLeft = wrap ? Number(wrap.scrollLeft || 0) : 0;
+    const scrollTop = wrap ? Number(wrap.scrollTop || 0) : 0;
+    if(flowRoot){
+      _renderGuidedServiceFlowRail(services);
+      _bindGuidedServiceFlowUI();
+      const nextWrap = flowRoot.querySelector(".guidedFlowRailWrap");
+      if(nextWrap){
+        nextWrap.scrollLeft = scrollLeft;
+        nextWrap.scrollTop = scrollTop;
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn("[GUIDED_VIEW] flow rail only render fail", e);
+    return false;
+  }
+}
+function _scheduleGuidedPlanningRender(reason){
+  try{
+    if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return false;
+    const suppressUntil = Number(window.__guidedPlanningRenderSuppressedUntil || 0) || 0;
+    if(suppressUntil && performance.now() < suppressUntil){
+      return false;
+    }
+    if(window.__guidedPlanningRenderScheduled) return true;
+    window.__guidedPlanningRenderScheduled = true;
+    const run = ()=>{
+      window.__guidedPlanningRenderScheduled = false;
+      if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return;
+      try{ renderGuidedPlanningView(); }catch(e){ console.warn("[GUIDED_VIEW] scheduled render fail", { reason:String(reason || ""), error:e }); }
+    };
+    if(typeof requestAnimationFrame === "function"){
+      requestAnimationFrame(()=>requestAnimationFrame(run));
+    }else{
+      setTimeout(run, 0);
+    }
+    return true;
+  }catch(e){
+    console.warn("[GUIDED_VIEW] schedule render fail", { reason:String(reason || ""), error:e });
+    return false;
+  }
+}
+function _guidedFlowCssEscape(raw){
+  const s = String(raw || "").trim();
+  if(!s) return "";
+  if(typeof CSS !== "undefined" && CSS && typeof CSS.escape === "function") return CSS.escape(s);
+  return s.replace(/"/g, '\\"');
+}
+function _guidedFlowHandlePoint(board, el, point){
+  const p = String(point || "out").toLowerCase() === "in" ? "in" : "out";
+  const handle = el.querySelector(`.guidedFlowConnHandle.${p}, .guidedFlowConnHandle[data-guided-link-point="${p}"]`);
+  const boardRect = board.getBoundingClientRect();
+  if(handle){
+    const handleRect = handle.getBoundingClientRect();
+    return {
+      x: Number(board.scrollLeft || 0) + handleRect.left - boardRect.left + handleRect.width / 2,
+      y: Number(board.scrollTop || 0) + handleRect.top - boardRect.top + handleRect.height / 2
+    };
+  }
+  const rect = el.getBoundingClientRect();
+  return {
+    x: Number(board.scrollLeft || 0) + (p === "out" ? rect.right : rect.left) - boardRect.left,
+    y: Number(board.scrollTop || 0) + rect.top - boardRect.top + rect.height / 2
+  };
+}
+function _guidedRouteFlowEdge(from, to, idx, boardW, boardH){
+  const x1 = Math.round(from.x);
+  const y1 = Math.round(from.y);
+  const x2 = Math.round(to.x);
+  const y2 = Math.round(to.y);
+  const fan = ((idx % 5) - 2) * 8;
+  if(x2 >= x1 + 28){
+    const dist = x2 - x1;
+    const pull = Math.min(118, Math.max(44, Math.round(dist * .42)));
+    return `M ${x1} ${y1} C ${x1 + pull} ${y1 + fan} ${x2 - pull} ${y2 + fan} ${x2} ${y2}`;
+  }
+  const outX = Math.min(boardW - 18, x1 + 58 + (idx % 3) * 14);
+  const inX = Math.max(18, x2 - 54 - (idx % 3) * 12);
+  const turnY = Math.min(Math.max(y1, y2) + 42 + (idx % 4) * 14, Math.max(18, boardH - 18));
+  return `M ${x1} ${y1} C ${outX} ${y1} ${outX} ${turnY} ${outX} ${turnY} H ${inX} C ${inX} ${turnY} ${inX} ${y2} ${x2} ${y2}`;
+}
+function _guidedBuildFlowEdgeMarkup(edge, edgeIdx, blocks, board, boardW, boardH){
+  const fromEl = blocks.get(edge.pid);
+  const toEl = blocks.get(edge.sid);
+  if(!fromEl || !toEl) return "";
+  const from = _guidedFlowHandlePoint(board, fromEl, "out");
+  const to = _guidedFlowHandlePoint(board, toEl, "in");
+  const tone = edge.tone || { id:"gray", stroke:"#5F666A" };
+  const active = __guidedFlowLinkSourceKey===edge.sid || __guidedFlowLinkSourceKey===edge.pid ? " active" : "";
+  const d = _guidedRouteFlowEdge(from, to, edgeIdx, boardW, boardH);
+  const stroke = escapeHtml(String(tone.stroke || "#5F666A"));
+  const toneId = escapeHtml(String(tone.id || "gray"));
+  const edgeKey = escapeHtml(String(edge.key || `${edge.pid}_${edge.sid}_${edgeIdx+1}`));
+  const edgeType = escapeHtml(String(edge.type || "FS"));
+  return `
+    <g data-guided-edge-key="${edgeKey}" data-guided-edge-pid="${escapeHtml(String(edge.pid || ""))}" data-guided-edge-sid="${escapeHtml(String(edge.sid || ""))}">
+      <path class="guidedFlowEdge${edge.branch ? " branch" : ""}${active}" data-edge-type="${edgeType}" d="${d}" style="stroke:${stroke};" marker-end="url(#guidedFlowArrow_${toneId})"></path>
+      <circle class="guidedFlowDot" cx="${Math.round(from.x)}" cy="${Math.round(from.y)}" r="2.6" style="stroke:${stroke};"></circle>
+      <circle class="guidedFlowDot" cx="${Math.round(to.x)}" cy="${Math.round(to.y)}" r="2.6" style="stroke:${stroke};"></circle>
+    </g>`;
+}
+function _guidedRefreshFlowEdgesForKeys(keys){
+  try{
+    const state = window.__guidedFlowEdgeState || null;
+    const board = state?.board || document.querySelector("#guidedServiceFlowRail .guidedFlowSimpleBoard");
+    const svg = state?.svg || document.querySelector("#guidedServiceFlowRail .guidedFlowSvg");
+    const edgeSpecs = Array.isArray(state?.edgeSpecs) ? state.edgeSpecs : [];
+    if(!board || !svg || !edgeSpecs.length) return false;
+    const keySet = new Set((Array.isArray(keys) ? keys : [keys]).map(x=>String(x || "").trim()).filter(Boolean));
+    if(!keySet.size) return false;
+    const blocks = new Map();
+    board.querySelectorAll(".guidedFlowBlock").forEach(el=>{
+      const key = String(el.getAttribute("data-guided-service-key") || "").trim();
+      if(key) blocks.set(key, el);
+    });
+    const boardRect = board.getBoundingClientRect();
+    const boardW = Math.max(1, Math.ceil(state?.boardW || svg.viewBox?.baseVal?.width || board.scrollWidth || board.offsetWidth || 1));
+    const boardH = Math.max(1, Math.ceil(state?.boardH || svg.viewBox?.baseVal?.height || board.scrollHeight || board.offsetHeight || 1));
+    let updated = 0;
+    edgeSpecs.forEach((edge, edgeIdx)=>{
+      if(!keySet.has(String(edge.pid || "").trim()) && !keySet.has(String(edge.sid || "").trim())) return;
+      const nextMarkup = _guidedBuildFlowEdgeMarkup(edge, edgeIdx, blocks, board, boardW, boardH);
+      if(!nextMarkup) return;
+      const group = svg.querySelector(`[data-guided-edge-key="${_guidedFlowCssEscape(edge.key)}"]`);
+      if(!group) return;
+      group.outerHTML = nextMarkup.trim();
+      updated += 1;
+    });
+    if(updated){
+      window.__guidedFlowEdgeState = Object.assign({}, state, { board, svg, boardW, boardH, edgeSpecs });
+      return true;
+    }
+    return false;
+  }catch(e){
+    console.warn("[GUIDED_VIEW] refresh edges for keys fail", e);
+    return false;
+  }
 }
 function _guidedClearServicePredecessor(serviceId){
   const sid = String(serviceId || "").trim();
@@ -13064,12 +13407,17 @@ function _guidedRemoveServiceFromEap(serviceId, options){
   const shouldPersist = !(options && options.persist === false);
   let removedName = "";
   let removed = false;
-  _guidedUpdateServicesDraft(arr=>{
+  _guidedUpdateServicesDraft((arr, draft)=>{
     const idx = arr.findIndex(svc=>String(svc.id || svc.key || "").trim()===sid);
     if(idx < 0) return null;
     const hit = arr[idx];
     const removedId = String(hit?.id || hit?.key || "").trim();
     removedName = String(hit?.name || hit?.code || removedId || "serviço").trim();
+    if(removedId){
+      const deleted = Array.isArray(draft.deletedServiceIds) ? draft.deletedServiceIds.slice() : [];
+      if(!deleted.some(x=>String(x || "").trim() === removedId)) deleted.push(removedId);
+      draft.deletedServiceIds = deleted;
+    }
     arr.splice(idx, 1);
     if(removedId){
       for(const svc of arr){
@@ -13092,9 +13440,6 @@ function _guidedRemoveServiceFromEap(serviceId, options){
   });
   if(removed){
     try{ toast(`Serviço removido da EAP: ${removedName}`); }catch(_){}
-    if(shouldPersist){
-      try{ _persistGuidedEapServicesToApi("guided_remove_service"); }catch(_){}
-    }
   }
   return removed;
 }
@@ -13174,7 +13519,7 @@ function _bindGuidedServiceEditorUI(){
     draft.services = normalized;
     _saveGuidedPlanDraft(draft);
     __guidedServiceEditorFocus = { key, field, select:false };
-    renderGuidedPlanningView();
+    _scheduleGuidedPlanningRender("service_field_input");
   });
   container.addEventListener("change", (evt)=>{
     const el = evt.target && evt.target.closest ? evt.target.closest("[data-guided-stage-field]") : null;
@@ -13200,7 +13545,7 @@ function _bindGuidedServiceEditorUI(){
     draft.services = normalized;
     _saveGuidedPlanDraft(draft);
     __guidedServiceEditorFocus = { key: serviceKey, field:"name", select:false };
-    renderGuidedPlanningView();
+    _scheduleGuidedPlanningRender("stage_field_change");
   });
   container.addEventListener("click", (evt)=>{
     const btn = evt.target && evt.target.closest ? evt.target.closest("[data-guided-service-action]") : null;
@@ -13208,22 +13553,74 @@ function _bindGuidedServiceEditorUI(){
     const action = String(btn.getAttribute("data-guided-service-action") || "").trim();
     const key = String(btn.getAttribute("data-guided-service-key") || "").trim();
     if(!action || !key) return;
+    if(action === "lane-up" || action === "lane-down") return;
     const draft = _readGuidedPlanDraftSafe();
     const items = _guidedCloneServices(draft.services || []);
     const idx = items.findIndex(x=>String(x.key || x.id || "").trim() === key);
     if(idx < 0) return;
+    const auditOrder = (list)=>list.map((svc, orderIdx)=>({
+      order: orderIdx + 1,
+      key: String(svc?.key || svc?.id || "").trim(),
+      name: String(svc?.name || "").trim()
+    }));
     if(action==="remove"){
       _guidedRemoveServiceFromEap(key);
       return;
     }
     if(action==="up" && idx > 0){
-      [items[idx-1], items[idx]] = [items[idx], items[idx-1]];
-      _guidedUpdateServicesDraft(arr=>{ arr.splice(0, arr.length, ...items); return { focus:{ key, field:"name", select:false } }; });
+      const t0 = performance.now();
+      window.__guidedPlanningRenderSuppressedUntil = performance.now() + 1800;
+      window.__guidedPlanningRenderLockUntil = performance.now() + 3500;
+      window.__guidedLaneMoveInFlightUntil = performance.now() + 800;
+      console.info("[EAP_AUDIT_MOVE]", {
+        action: "up",
+        key,
+        fromIndex: idx + 1,
+        toIndex: idx,
+        before: auditOrder(items)
+      });
+      const savedDraft = _guidedSaveServicesDraftOnly(items, { key, field:"name", select:false });
+      const fastOk = _guidedApplyLaneMoveFast([
+        { key, lane: Math.max(0, idx - 1) }
+      ], savedDraft);
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint("lane_move_up");
+      if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_up");
+      console.info("[EAP_AUDIT_MOVE]", {
+        action: "up",
+        key,
+        after: auditOrder(items),
+        persisted: true,
+        render: edgeOk ? "fast-edge-queued" : (fastOk ? "fast-dom" : "scheduled"),
+        ms: Math.round(performance.now() - t0)
+      });
       return;
     }
     if(action==="down" && idx < items.length - 1){
-      [items[idx+1], items[idx]] = [items[idx], items[idx+1]];
-      _guidedUpdateServicesDraft(arr=>{ arr.splice(0, arr.length, ...items); return { focus:{ key, field:"name", select:false } }; });
+      const t0 = performance.now();
+      window.__guidedPlanningRenderSuppressedUntil = performance.now() + 1800;
+      window.__guidedPlanningRenderLockUntil = performance.now() + 3500;
+      window.__guidedLaneMoveInFlightUntil = performance.now() + 800;
+      console.info("[EAP_AUDIT_MOVE]", {
+        action: "down",
+        key,
+        fromIndex: idx + 1,
+        toIndex: idx + 2,
+        before: auditOrder(items)
+      });
+      const savedDraft = _guidedSaveServicesDraftOnly(items, { key, field:"name", select:false });
+      const fastOk = _guidedApplyLaneMoveFast([
+        { key, lane: idx + 1 }
+      ], savedDraft);
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint("lane_move_down");
+      if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_down");
+      console.info("[EAP_AUDIT_MOVE]", {
+        action: "down",
+        key,
+        after: auditOrder(items),
+        persisted: true,
+        render: edgeOk ? "fast-edge-queued" : (fastOk ? "fast-dom" : "scheduled"),
+        ms: Math.round(performance.now() - t0)
+      });
       return;
     }
     if(action==="duplicate"){
@@ -13555,55 +13952,43 @@ function _bindGuidedServiceFlowUI(){
     if(laneBtn){
       evt.preventDefault();
       evt.stopPropagation();
+      if(evt.__guidedLaneMoveHandled) return;
+      evt.__guidedLaneMoveHandled = true;
       const action = String(laneBtn.getAttribute("data-guided-service-action") || "").trim();
       const key = String(laneBtn.getAttribute("data-guided-service-key") || "").trim();
       if(!key) return;
       const delta = action === "lane-up" ? -1 : 1;
+      const draft = _readGuidedPlanDraftSafe();
+      const items = _guidedCloneServices(draft.services || []);
+      const idx = items.findIndex(x=>String(x.key || x.id || "").trim()===key);
+      if(idx < 0) return;
+      const laneH = Math.max(96, Number(__guidedFlowLaneStepPx || 128) || 128);
+      const blockH = 88;
+      const laneCenterOffset = Math.max(0, Math.round((laneH - blockH) / 2));
+      const padY = Number(__guidedFlowBoardPadYPx || 46);
+      const laneTop = (lane)=>Math.max(0, padY + Math.max(0, Number(lane || 0)) * laneH + laneCenterOffset);
+      const currentLane = Number.isFinite(Number(items[idx]?.visualLane)) ? Number(items[idx].visualLane) : 0;
+      let nextLane = Math.max(0, currentLane + delta);
+      const t0 = performance.now();
+      window.__guidedPlanningRenderSuppressedUntil = performance.now() + 1800;
+      window.__guidedPlanningRenderLockUntil = performance.now() + 3500;
+      window.__guidedLaneMoveInFlightUntil = performance.now() + 800;
       __guidedServiceEditorFocus = null;
-      _guidedUpdateServicesDraft(arr=>{
-        const gsvc = arr.find(x=>String(x.id||x.key||"").trim()===key);
-        if(gsvc){
-          const laneH = Math.max(96, Number(__guidedFlowLaneStepPx || 128) || 128);
-          const blockH = 58;
-          const laneCenterOffset = Math.max(0, Math.round((laneH - blockH) / 2));
-          const padY = Number(__guidedFlowBoardPadYPx || 46);
-          const laneTop = (lane)=>Math.max(0, padY + Math.max(0, Number(lane || 0)) * laneH + laneCenterOffset);
-          const blocks = new Map();
-          container.querySelectorAll(".guidedFlowBlock").forEach(blockEl=>{
-            const bid = String(blockEl.getAttribute("data-guided-service-key") || "").trim();
-            if(!bid) return;
-            const left = Math.round(Number(blockEl.offsetLeft || 0));
-            const top = Math.round(Number(blockEl.offsetTop || 0));
-            const laneIdAttr = Number(blockEl.getAttribute("data-guided-lane-id"));
-            const laneId = Number.isFinite(laneIdAttr) ? Math.max(0, Math.round(laneIdAttr)) : Math.max(0, Math.round((top - padY - laneCenterOffset) / laneH));
-            blocks.set(bid, { left, top, laneId });
-          });
-          const currentBlock = blocks.get(key) || null;
-          const curLane = currentBlock ? currentBlock.laneId : (Number.isFinite(Number(gsvc.visualLane)) ? Number(gsvc.visualLane) : 0);
-          const nextLane = Math.max(0, curLane + delta);
-          const currentLeft = Number(currentBlock?.left || 0);
-          let swapKey = "";
-          let bestDistance = Infinity;
-          blocks.forEach((info, bid)=>{
-            if(bid === key) return;
-            if(Number(info.laneId || 0) !== nextLane) return;
-            const distance = Math.abs(Number(info.left || 0) - currentLeft);
-            if(distance < bestDistance && distance <= 80){
-              bestDistance = distance;
-              swapKey = bid;
-            }
-          });
-          gsvc.visualLane = nextLane;
-          gsvc.visualY = laneTop(nextLane);
-          if(swapKey){
-            const swapSvc = arr.find(x=>String(x.id||x.key||"").trim()===swapKey);
-            if(swapSvc){
-              swapSvc.visualLane = curLane;
-              swapSvc.visualY = laneTop(curLane);
-            }
-          }
-        }
-        return null;
+      items[idx].visualLane = nextLane;
+      items[idx].visualY = laneTop(nextLane);
+      const savedDraft = _guidedSaveServicesDraftOnly(items, { key, field:"name", select:false });
+      const fastOk = _guidedApplyLaneMoveFast([
+        { key, lane: nextLane }
+      ], savedDraft);
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint(`lane_move_${action}`);
+      if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_old_handler");
+      console.info("[EAP_AUDIT_MOVE]", {
+        action,
+        key,
+        currentLane,
+        nextLane,
+        render: edgeOk ? "fast-edge-queued" : (fastOk ? "fast-dom" : "scheduled"),
+        ms: Math.round(performance.now() - t0)
       });
       return;
     }
@@ -13627,14 +14012,14 @@ function _bindGuidedServiceFlowUI(){
       __guidedServiceEditorFocus = null;
       __guidedFlowLinkSourceKey = key;
       __guidedFlowLinkSourcePoint = point;
-      renderGuidedPlanningView();
+      _scheduleGuidedPlanningRender("flow_link_source");
       return;
     }
     if(__guidedFlowLinkSourceKey === key){
       __guidedServiceEditorFocus = null;
       __guidedFlowLinkSourceKey = "";
       __guidedFlowLinkSourcePoint = "";
-      renderGuidedPlanningView();
+      _scheduleGuidedPlanningRender("flow_link_source_clear");
       return;
     }
     __guidedServiceEditorFocus = null;
@@ -13647,7 +14032,7 @@ function _bindGuidedServiceFlowUI(){
     const draft = _readGuidedPlanDraftSafe();
     draft.flowRailCount = value;
     _saveGuidedPlanDraft(draft);
-    renderGuidedPlanningView();
+    _scheduleGuidedPlanningRender("rail_count_change");
   });
   container.addEventListener("input", (evt)=>{
     const input = evt.target && evt.target.closest ? evt.target.closest("[data-guided-flow-service-filter]") : null;
@@ -13831,16 +14216,6 @@ function _renderGuidedServiceFlowRail(services){
       childCount: Number((childMap.get(sid) || []).length || 0)
     };
   });
-  const occupiedFlowSlots = new Map();
-  rawItems.forEach(item=>{
-    const slotKey = `${Math.round(Number(item.left || 0))}|${Math.round(Number(item.top || 0))}`;
-    const used = Number(occupiedFlowSlots.get(slotKey) || 0);
-    if(used > 0){
-      item.laneId = Number(item.laneId || 0) + used;
-      item.top = Number(item.top || 0) + used * laneH;
-    }
-    occupiedFlowSlots.set(slotKey, used + 1);
-  });
   const maxExplicitLane = rawItems.length ? Math.max(...rawItems.map(it=>Math.max(0, Number(it.laneId || 0)))) : 0;
   const draftRailCount = Math.max(3, Number(_readGuidedPlanDraftSafe()?.flowRailCount || 0) || 0);
   const usedRailCount = Math.max(1, maxExplicitLane + 1);
@@ -13881,7 +14256,7 @@ function _renderGuidedServiceFlowRail(services){
     <div class="guidedFlowHeader">
       <div>
         <div class="ttl">Fluxo visual dos serviços</div>
-         <div class="subttl"><span style="color:#ef4444;font-weight:800;">? vermelho</span> = saída, <span style="color:#16a34a;font-weight:800;">? verde</span> = entrada. Use as setas de raia para ajustar a posição visual. Ramificações iguais aparecem em escada.</div>
+         <div class="subttl"><span style="color:#ef4444;font-weight:800;">● vermelho</span> = saída, <span style="color:#16a34a;font-weight:800;">● verde</span> = entrada. Use as setas de raia para ajustar a posição visual. Ramificações iguais aparecem em escada.</div>
       </div>
       <div class="guidedSectionActions">
         ${linkSource ? `<span class="guidedTag">Ligando: ${escapeHtml(String(linkSource.name || linkSource.code || linkSource.id || "—"))}</span>` : ""}
@@ -13904,8 +14279,8 @@ function _renderGuidedServiceFlowRail(services){
               <div class="name">${escapeHtml(String(svc.name || "—"))}</div>
             </div>
             <div class="guidedFlowLaneNudger">
-              <button class="btn" type="button" title="Mover para cima" aria-label="Mover para cima" data-guided-service-action="lane-up" data-guided-service-key="${escapeHtml(item.sid)}">?</button>
-              <button class="btn" type="button" title="Mover para baixo" aria-label="Mover para baixo" data-guided-service-action="lane-down" data-guided-service-key="${escapeHtml(item.sid)}">?</button>
+              <button class="btn" type="button" title="Mover para cima" aria-label="Mover para cima" data-guided-service-action="lane-up" data-guided-service-key="${escapeHtml(item.sid)}">↑</button>
+              <button class="btn" type="button" title="Mover para baixo" aria-label="Mover para baixo" data-guided-service-action="lane-down" data-guided-service-key="${escapeHtml(item.sid)}">↓</button>
             </div>
           </div>
         `;
@@ -13924,56 +14299,19 @@ function _renderGuidedServiceFlowRail(services){
       });
       const boardW = Math.max(1, Math.ceil(board.scrollWidth || board.offsetWidth || 1));
       const boardH = Math.max(1, Math.ceil(board.scrollHeight || board.offsetHeight || 1));
-      const handlePoint = (el, point)=>{
-        const p = String(point || "out").toLowerCase() === "in" ? "in" : "out";
-        const handle = el.querySelector(`.guidedFlowConnHandle.${p}, .guidedFlowConnHandle[data-guided-link-point="${p}"]`);
-        const boardRect = board.getBoundingClientRect();
-        if(handle){
-          const handleRect = handle.getBoundingClientRect();
-          return {
-            x: Number(board.scrollLeft || 0) + handleRect.left - boardRect.left + handleRect.width / 2,
-            y: Number(board.scrollTop || 0) + handleRect.top - boardRect.top + handleRect.height / 2
-          };
-        }
-        const rect = el.getBoundingClientRect();
-        return {
-          x: Number(board.scrollLeft || 0) + (p === "out" ? rect.right : rect.left) - boardRect.left,
-          y: Number(board.scrollTop || 0) + rect.top - boardRect.top + rect.height / 2
-        };
-      };
-      const routeFlowEdge = (from, to, idx)=>{
-        const x1 = Math.round(from.x);
-        const y1 = Math.round(from.y);
-        const x2 = Math.round(to.x);
-        const y2 = Math.round(to.y);
-        const fan = ((idx % 5) - 2) * 8;
-        if(x2 >= x1 + 28){
-          const dist = x2 - x1;
-          const pull = Math.min(118, Math.max(44, Math.round(dist * .42)));
-          return `M ${x1} ${y1} C ${x1 + pull} ${y1 + fan} ${x2 - pull} ${y2 + fan} ${x2} ${y2}`;
-        }
-        const outX = Math.min(boardW - 18, x1 + 58 + (idx % 3) * 14);
-        const inX = Math.max(18, x2 - 54 - (idx % 3) * 12);
-        const turnY = Math.min(Math.max(y1, y2) + 42 + (idx % 4) * 14, Math.max(18, boardH - 18));
-        return `M ${x1} ${y1} C ${outX} ${y1} ${outX} ${turnY} ${outX} ${turnY} H ${inX} C ${inX} ${turnY} ${inX} ${y2} ${x2} ${y2}`;
-      };
       const paths = [];
       edgeSpecs.forEach((edge, edgeIdx)=>{
         const fromEl = blocks.get(edge.pid);
         const toEl = blocks.get(edge.sid);
         if(!fromEl || !toEl) return;
-        const from = handlePoint(fromEl, "out");
-        const to = handlePoint(toEl, "in");
-        const tone = edge.tone || edgeToneFor(edge, 0);
-        const active = __guidedFlowLinkSourceKey===edge.sid || __guidedFlowLinkSourceKey===edge.pid ? " active" : "";
-        const d = routeFlowEdge(from, to, edgeIdx);
-        paths.push(`<path class="guidedFlowEdge${edge.branch ? " branch" : ""}${active}" data-edge-type="${escapeHtml(edge.type || "FS")}" d="${d}" style="stroke:${escapeHtml(tone.stroke)};" marker-end="url(#guidedFlowArrow_${escapeHtml(tone.id)})"></path><circle class="guidedFlowDot" cx="${Math.round(from.x)}" cy="${Math.round(from.y)}" r="2.6" style="stroke:${escapeHtml(tone.stroke)};"></circle><circle class="guidedFlowDot" cx="${Math.round(to.x)}" cy="${Math.round(to.y)}" r="2.6" style="stroke:${escapeHtml(tone.stroke)};"></circle>`);
+        paths.push(_guidedBuildFlowEdgeMarkup(edge, edgeIdx, blocks, board, boardW, boardH));
       });
       svg.setAttribute("viewBox", `0 0 ${boardW} ${boardH}`);
       svg.setAttribute("width", String(boardW));
       svg.setAttribute("height", String(boardH));
       const defs = edgePalette.map(t=>`<marker id="guidedFlowArrow_${escapeHtml(t.id)}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,4 L0,8 z" fill="${escapeHtml(t.stroke)}"></path></marker>`).join("");
       svg.innerHTML = `<defs>${defs}</defs>${paths.join("")}`;
+      window.__guidedFlowEdgeState = { board, svg, boardW, boardH, edgeSpecs };
     }catch(e){ console.warn("[GUIDED_VIEW] paint edges fail", e); }
   };
   window.__guidedPaintFlowEdges = paintEdges;
@@ -14046,7 +14384,7 @@ function _openGuidedAddServiceModal(){
         const label = `${String(s.name || s.code || s.id || "—")} (${String(s.code || "—")})`;
         return `
           <button type="button" class="btn ${active ? "primary" : ""}" data-guided-service-pick="${escapeHtml(sid)}" style="justify-content:flex-start; text-align:left; width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px;">
-            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "?" : "?"}</span>
+            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "✓" : "○"}</span>
             <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(label)}</span>
             ${exists ? `<span class="guidedTag" style="white-space:nowrap;">já na EAP</span>` : ``}
           </button>
@@ -14191,7 +14529,7 @@ function _openGuidedRemoveServiceModal(){
         const label = `${String(s.name || s.code || s.id || "—")} (${String(s.code || "—")})`;
         return `
           <button type="button" class="btn ${active ? "primary" : ""}" data-guided-remove-service-pick="${escapeHtml(sid)}" style="justify-content:flex-start; text-align:left; width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px;">
-            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "?" : "?"}</span>
+            <span style="width:16px; display:inline-flex; justify-content:center; font-size:12px; flex:0 0 16px;">${active ? "✓" : "○"}</span>
             <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(label)}</span>
           </button>
         `;
@@ -14225,12 +14563,9 @@ function _openGuidedRemoveServiceModal(){
     if(!confirm(`Remover ${sids.length} serviço(s) da EAP atual?\n\nOs vínculos desses serviços serão quebrados.`)) return;
     let removedCount = 0;
     sids.forEach(sid=>{ if(_guidedRemoveServiceFromEap(sid, { persist:false })) removedCount += 1; });
-    if(removedCount){
-      try{ _persistGuidedEapServicesToApi("guided_bulk_remove_service"); }catch(_){}
-    }
     try{ toast(`Serviços removidos da EAP: ${removedCount}`); }catch(_){}
     close();
-    try{ renderGuidedPlanningView(); }catch(_){}
+    try{ _scheduleGuidedPlanningRender("remove_selected_services"); }catch(_){}
     try{ scheduleRenderAll(); }catch(_){}
   };
   const removeAll = ()=>{
@@ -14241,16 +14576,15 @@ function _openGuidedRemoveServiceModal(){
     }
     if(!confirm(`Remover TODOS os ${count} serviços da EAP atual?\n\nIsso limpa a EAP, mas não apaga o projeto.`)) return;
     try{
-      _saveGuidedPlanDraft(Object.assign({}, draft, { services: [], selectedServiceId:"" }));
-      state.serviceBaseCatalog = [];
-      _syncServiceBaseCatalogToStateServicesWhenSafe();
-      try{ _markServiceCatalogMutation("guided_remove_all_services"); }catch(_){}
-      try{ saveServicesToStorage([], true); }catch(_){}
+      const deleted = Array.from(new Set((Array.isArray(draft.services) ? draft.services : [])
+        .map(svc=>String(svc?.id || svc?.key || "").trim())
+        .filter(Boolean)));
+      _saveGuidedPlanDraft(Object.assign({}, draft, { services: [], deletedServiceIds: deleted, selectedServiceId:"" }));
       state.ui = state.ui || {};
       state.ui.selectedServiceId = "";
     }catch(e){ console.warn(e); }
     close();
-    try{ renderGuidedPlanningView(); }catch(_){}
+    try{ _scheduleGuidedPlanningRender("remove_all_services"); }catch(_){}
     try{ scheduleRenderAll(); }catch(_){}
   };
   ov.querySelector("#guidedRemoveServiceSelectAll")?.addEventListener("click", ()=>{
@@ -14296,7 +14630,7 @@ function _renderGuidedServiceEditor(services, model){
     return `
       <div class="guidedServiceRow" data-guided-service-key="${escapeHtml(sid)}" draggable="true">
         <div class="guidedServiceRowTop">
-          <div class="guidedServiceIndex" title="Arraste para mudar a ordem">? ${idx+1}</div>
+          <div class="guidedServiceIndex" title="Arraste para mudar a ordem">↕ ${idx+1}</div>
           <div class="field" style="margin:0;">
             <label>Serviço</label>
             <div class="guidedServiceCellMeta">
@@ -14307,9 +14641,9 @@ function _renderGuidedServiceEditor(services, model){
             </div>
           </div>
           <div class="guidedServiceMiniActions">
-            <span class="guidedServiceDragHandle" title="Arrastar serviço">??</span>
-            <button class="btn" type="button" data-guided-service-action="up" data-guided-service-key="${escapeHtml(sid)}">?</button>
-            <button class="btn" type="button" data-guided-service-action="down" data-guided-service-key="${escapeHtml(sid)}">?</button>
+            <span class="guidedServiceDragHandle" title="Arrastar serviço">↕</span>
+            <button class="btn" type="button" data-guided-service-action="up" data-guided-service-key="${escapeHtml(sid)}">↑</button>
+            <button class="btn" type="button" data-guided-service-action="down" data-guided-service-key="${escapeHtml(sid)}">↓</button>
             <button class="btn" type="button" data-guided-service-action="duplicate" data-guided-service-key="${escapeHtml(sid)}">Duplicar</button>
             <button class="btn danger" type="button" data-guided-service-action="remove" data-guided-service-key="${escapeHtml(sid)}">Remover serviço</button>
           </div>
@@ -14382,8 +14716,8 @@ function _renderGuidedServiceEditor(services, model){
                     <input data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}" data-guided-stage-field="notes" value="${escapeHtml(String(stage.notes || ""))}" placeholder="Ex.: trecho 01" />
                   </div>
                   <div class="guidedStageActions">
-                    <button class="btn" type="button" data-guided-service-action="stage-up" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">?</button>
-                    <button class="btn" type="button" data-guided-service-action="stage-down" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">?</button>
+                    <button class="btn" type="button" data-guided-service-action="stage-up" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">↑</button>
+                    <button class="btn" type="button" data-guided-service-action="stage-down" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">↓</button>
                     <button class="btn danger" type="button" data-guided-service-action="stage-remove" data-guided-service-key="${escapeHtml(sid)}" data-guided-stage-key="${escapeHtml(stKey)}">Del</button>
                   </div>
                 </div>
@@ -14401,6 +14735,10 @@ function _renderGuidedServiceEditor(services, model){
   _applyGuidedServiceEditorFocus();
 }
 function renderGuidedPlanningView(){
+  const renderLockUntil = Number(window.__guidedPlanningRenderLockUntil || 0) || 0;
+  if(renderLockUntil && performance.now() < renderLockUntil){
+    return;
+  }
   const prevFlowWrap = document.querySelector(".guidedFlowRailWrap");
   const prevFlowScrollLeft = prevFlowWrap ? Number(prevFlowWrap.scrollLeft || 0) : 0;
   const prevFlowScrollTop = prevFlowWrap ? Number(prevFlowWrap.scrollTop || 0) : 0;
@@ -14412,9 +14750,6 @@ function renderGuidedPlanningView(){
     templateLabel: String(draft.templateLabel || template?.label || "").trim() || String(template?.label || "").trim(),
     services: draftServices
   }));
-  if(JSON.stringify(draft) !== JSON.stringify(normalizedDraft)){
-    _saveGuidedPlanDraft(normalizedDraft);
-  }
   const templateSelect = document.getElementById("guidedTemplate");
   const templateLabel = document.getElementById("guidedTemplateLabel");
   const templateOriginTag = document.getElementById("guidedTemplateOriginTag");
@@ -14456,7 +14791,7 @@ function renderGuidedPlanningView(){
   }
   if(templateLabel && templateLabel.value !== normalizedDraft.templateLabel) templateLabel.value = normalizedDraft.templateLabel;
   if(templateOriginTag) templateOriginTag.textContent = String(template?.sourceKind || "builtin") === "custom" ? "Modelo salvo" : "Padrão";
-  if(guidedTemplateMeta) guidedTemplateMeta.textContent = `${String(template?.description || "Modelo base da EAP selecionada.").trim()} A aplicação acontece em outra tela.`;
+  if(guidedTemplateMeta) guidedTemplateMeta.textContent = "";
   if(summaryTemplateTag) summaryTemplateTag.textContent = template?.label || "Modelo";
   if(summaryServiceTag) summaryServiceTag.textContent = `${services.length} serviços`;
   if(summaryLocationTag) summaryLocationTag.textContent = `${model.locations.length} pavimentos`;
@@ -14469,8 +14804,7 @@ function renderGuidedPlanningView(){
       <div class="guidedLibraryCard" data-guided-template-key="${escapeHtml(activeTemplate.key)}">
         <div class="body">
           <div class="title">${escapeHtml(activeTemplate.label)}</div>
-          <div class="meta">${escapeHtml(activeTemplate.description || (isCustom ? "Modelo salvo" : "Modelo padrão"))}</div>
-          <div class="meta" style="margin-top:6px;">Selecionado no momento</div>
+          <div class="meta">${escapeHtml(isCustom ? "Modelo salvo" : "Modelo padrão")}</div>
         </div>
         <div class="actions">
           <button class="btn primary" type="button" data-guided-template-action="use" data-guided-template-key="${escapeHtml(activeTemplate.key)}">Usar</button>
@@ -14478,7 +14812,6 @@ function renderGuidedPlanningView(){
           ${isCustom ? `<button class="btn danger" type="button" data-guided-template-action="delete" data-guided-template-key="${escapeHtml(activeTemplate.key)}">Excluir</button>` : ""}
         </div>
       </div>
-      <div class="hint" style="margin-top:8px;">${escapeHtml(`${templates.length} modelo(s) disponível(is)`)}</div>
     ` : `<div class="hint">Nenhum modelo disponível.</div>`;
   }
   const readiness = _guidedBuildReadiness(model, { requireLocations:false });
@@ -14517,16 +14850,19 @@ function renderGuidedPlanningView(){
       </tr>
     `).join("");
   }
-  _renderGuidedServiceFlowRail(services);
-  if(guidedMacroGroup){
-    guidedMacroGroup.innerHTML = [
-      `<option value="">Selecionar grupo</option>`,
-      ...Object.entries(GUIDED_MACRO_GROUPS).map(([key, macro])=>`<option value="${escapeHtml(key)}">${escapeHtml(macro.label)}</option>`)
-    ].join("");
-  }
-  _renderGuidedServiceEditor(services, model);
-  if(prevFlowWrap){
-    requestAnimationFrame(()=>{
+  const renderToken = (window.__guidedPlanningRenderToken = (Number(window.__guidedPlanningRenderToken || 0) || 0) + 1);
+  const paintHeavy = ()=>{
+    if(window.__guidedPlanningRenderToken !== renderToken) return;
+    if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return;
+    _renderGuidedServiceFlowRail(services);
+    if(guidedMacroGroup){
+      guidedMacroGroup.innerHTML = [
+        `<option value="">Selecionar grupo</option>`,
+        ...Object.entries(GUIDED_MACRO_GROUPS).map(([key, macro])=>`<option value="${escapeHtml(key)}">${escapeHtml(macro.label)}</option>`)
+      ].join("");
+    }
+    _renderGuidedServiceEditor(services, model);
+    if(prevFlowWrap){
       try{
         const nextWrap = document.querySelector(".guidedFlowRailWrap");
         if(nextWrap){
@@ -14534,9 +14870,17 @@ function renderGuidedPlanningView(){
           nextWrap.scrollTop = prevFlowScrollTop;
         }
       }catch(_){}
-    });
+    }
+  };
+  try{
+    if(typeof requestAnimationFrame === "function"){
+      requestAnimationFrame(()=>requestAnimationFrame(paintHeavy));
+    }else{
+      setTimeout(paintHeavy, 0);
+    }
+  }catch(_){
+    setTimeout(paintHeavy, 0);
   }
-  try{ renderGuidedApplyView(); }catch(_){}
 }
 function renderGuidedApplyView(){
   const selApply = document.getElementById("guidedTemplateApply");
@@ -14927,6 +15271,7 @@ function _reloadPlanningAssemblyFromEap(modelArg, locationsArg){
   try{
     state.ui = state.ui || {};
     state.ui.planningAssemblyServiceId = "";
+    state.ui.planningAssemblyNoPhaseDismissed = false;
   }catch(_){}
   try{ renderGuidedApplyView(); }catch(e){ console.warn("[PLANNING_ASSEMBLY] reload EAP failed", e); }
   return true;
@@ -15085,7 +15430,21 @@ function _planningPhaseFromAssembly(assembly, idx=0){
 function _planningMergeTopLevelIntoActivePhase(assembly){
   const safe = assembly && typeof assembly === "object" ? assembly : {};
   const normalizedPhases = Array.isArray(safe.phases) ? safe.phases.map((phase, idx)=>_planningNormalizePhase(phase, idx)) : [];
-  safe.phases = normalizedPhases.length ? normalizedPhases : [_planningPhaseFromAssembly(safe, 0)];
+  safe.phases = normalizedPhases;
+  if(!safe.phases.length){
+    const emptySnapshot = _planningNormalizeBaseSnapshot(safe.baseSnapshot || null) || null;
+    safe.activePhaseId = String(safe.activePhaseId || "").trim();
+    safe.phaseLabel = String(safe.phaseLabel || "").trim();
+    safe.originLabel = String(safe.originLabel || (emptySnapshot ? "EAP" : "Planejamento")).trim() || (emptySnapshot ? "EAP" : "Planejamento");
+    safe.capturedAtISO = String(safe.capturedAtISO || emptySnapshot?.capturedAtISO || "").trim();
+    safe.baseSnapshot = emptySnapshot;
+    safe.segmentsByService = _planningCloneDeep(safe.segmentsByService, {});
+    safe.deps = _planningCloneDeep(safe.deps, []);
+    safe.laneByNode = _planningCloneDeep(safe.laneByNode, {});
+    safe.blockedDepKeys = _planningCloneDeep(safe.blockedDepKeys, []);
+    safe.selectedServiceId = String(safe.selectedServiceId || "").trim();
+    return safe;
+  }
   const targetId = String(safe.activePhaseId || safe.phases[0]?.id || "").trim() || String(safe.phases[0]?.id || "").trim();
   const targetIndex = Math.max(0, safe.phases.findIndex(phase=>String(phase?.id || "").trim() === targetId));
   const activePhase = safe.phases[targetIndex] || safe.phases[0];
@@ -15114,7 +15473,21 @@ function _planningMergeTopLevelIntoActivePhase(assembly){
 function _planningSyncActivePhaseToAssembly(assembly){
   const safe = assembly && typeof assembly === "object" ? assembly : {};
   const normalizedPhases = Array.isArray(safe.phases) ? safe.phases.map((phase, idx)=>_planningNormalizePhase(phase, idx)) : [];
-  safe.phases = normalizedPhases.length ? normalizedPhases : [_planningPhaseFromAssembly(safe, 0)];
+  safe.phases = normalizedPhases;
+  if(!safe.phases.length){
+    const emptySnapshot = _planningNormalizeBaseSnapshot(safe.baseSnapshot || null) || null;
+    safe.activePhaseId = String(safe.activePhaseId || "").trim();
+    safe.phaseLabel = String(safe.phaseLabel || "").trim();
+    safe.originLabel = String(safe.originLabel || (emptySnapshot ? "EAP" : "Planejamento")).trim() || (emptySnapshot ? "EAP" : "Planejamento");
+    safe.capturedAtISO = String(safe.capturedAtISO || emptySnapshot?.capturedAtISO || "").trim();
+    safe.baseSnapshot = emptySnapshot;
+    safe.segmentsByService = _planningCloneDeep(safe.segmentsByService, {});
+    safe.deps = _planningCloneDeep(safe.deps, []);
+    safe.laneByNode = _planningCloneDeep(safe.laneByNode, {});
+    safe.blockedDepKeys = _planningCloneDeep(safe.blockedDepKeys, []);
+    safe.selectedServiceId = String(safe.selectedServiceId || "").trim();
+    return safe;
+  }
   const targetId = String(safe.activePhaseId || safe.phases[0]?.id || "").trim() || String(safe.phases[0]?.id || "").trim();
   const targetIndex = Math.max(0, safe.phases.findIndex(phase=>String(phase?.id || "").trim() === targetId));
   const activePhase = safe.phases[targetIndex] || safe.phases[0];
@@ -15357,15 +15730,15 @@ function _planningCreateNewPhase(nextLabel){
   const phases = Array.isArray(assembly.phases) ? assembly.phases : [];
   const sourceId = String(assembly.activePhaseId || phases[0]?.id || "").trim();
   const sourcePhase = phases.find(phase=>String(phase?.id || "").trim() === sourceId) || phases[0] || null;
-  if(!sourcePhase) return false;
+  const baseSnapshot = _planningNormalizeBaseSnapshot(assembly.baseSnapshot || sourcePhase?.baseSnapshot || null) || null;
   const nextIndex = phases.length + 1;
-  const labelBase = String(nextLabel || sourcePhase.label || "Nova fase").trim() || "Nova fase";
+  const labelBase = String(nextLabel || sourcePhase?.label || baseSnapshot?.templateLabel || "Nova fase").trim() || "Nova fase";
   const clonedPhase = _planningNormalizePhase({
     id:`phase_${Date.now().toString(36)}_${nextIndex}`,
     label: labelBase,
-    originLabel: String(sourcePhase.originLabel || assembly.originLabel || (sourcePhase.baseSnapshot ? "EAP" : "Planejamento")).trim() || "Planejamento",
+    originLabel: String(sourcePhase?.originLabel || assembly.originLabel || (baseSnapshot ? "EAP" : "Planejamento")).trim() || (baseSnapshot ? "EAP" : "Planejamento"),
     capturedAtISO: new Date().toISOString(),
-    baseSnapshot: _planningNormalizeBaseSnapshot(sourcePhase.baseSnapshot || assembly.baseSnapshot || null),
+    baseSnapshot,
     segmentsByService: {},
     deps: [],
     laneByNode: {},
@@ -15389,6 +15762,7 @@ function _planningCreateNewPhase(nextLabel){
   try{
     state.ui = state.ui || {};
     state.ui.planningAssemblyServiceId = String(clonedPhase.selectedServiceId || "").trim();
+    state.ui.planningAssemblyNoPhaseDismissed = false;
   }catch(_){}
   try{ renderGuidedApplyView(); }catch(e){ console.warn("[PLANNING_ASSEMBLY] phase create fail", e); }
   return true;
@@ -15396,8 +15770,8 @@ function _planningCreateNewPhase(nextLabel){
 function _planningDeleteActivePhase(){
   const assembly = _planningSyncActivePhaseToAssembly(_readPlanningAssemblyState());
   const phases = Array.isArray(assembly.phases) ? assembly.phases.slice() : [];
-  if(phases.length <= 1){
-    alert("A última fase não pode ser excluída.");
+  if(!phases.length){
+    alert("Não há fase para excluir.");
     return false;
   }
   const activeId = String(assembly.activePhaseId || phases[0]?.id || "").trim() || String(phases[0]?.id || "").trim();
@@ -15406,8 +15780,7 @@ function _planningDeleteActivePhase(){
   const removed = phases[idx];
   const keep = phases.filter((_, i)=>i !== idx);
   const nextPhase = keep[Math.min(idx, keep.length - 1)] || keep[0] || null;
-  if(!nextPhase) return false;
-  const next = Object.assign({}, assembly, {
+  const next = nextPhase ? Object.assign({}, assembly, {
     phases: keep,
     activePhaseId: String(nextPhase.id || "").trim(),
     phaseLabel: String(nextPhase.label || "").trim(),
@@ -15419,11 +15792,24 @@ function _planningDeleteActivePhase(){
     laneByNode: _planningCloneDeep(nextPhase.laneByNode, {}),
     blockedDepKeys: _planningCloneDeep(nextPhase.blockedDepKeys, []),
     selectedServiceId: String(nextPhase.selectedServiceId || "").trim()
+  }) : Object.assign({}, assembly, {
+    phases: [],
+    activePhaseId: "",
+    phaseLabel: "",
+    originLabel: String(removed?.originLabel || assembly.originLabel || (removed?.baseSnapshot ? "EAP" : "Planejamento")).trim() || (removed?.baseSnapshot ? "EAP" : "Planejamento"),
+    capturedAtISO: "",
+    baseSnapshot: _planningNormalizeBaseSnapshot(removed?.baseSnapshot || assembly.baseSnapshot || null) || null,
+    segmentsByService: {},
+    deps: [],
+    laneByNode: {},
+    blockedDepKeys: [],
+    selectedServiceId: ""
   });
   _savePlanningAssemblyState(next);
   try{
     state.ui = state.ui || {};
     state.ui.planningAssemblyServiceId = String(next.selectedServiceId || "").trim();
+    state.ui.planningAssemblyNoPhaseDismissed = false;
   }catch(_){}
   try{ renderGuidedApplyView(); }catch(e){ console.warn("[PLANNING_ASSEMBLY] phase delete fail", e); }
   console.info("[PLANNING_ASSEMBLY] phase removed", String(removed?.label || removed?.id || ""));
@@ -15973,14 +16359,40 @@ function renderPlanningAssemblyView(model, locations){
   const phaseRenameBtn = document.getElementById("btnPlanningRenamePhase");
   const phaseDeleteBtn = document.getElementById("btnPlanningDeletePhase");
   const phaseCountRoot = document.getElementById("planningPhaseCount");
+  const phaseEditorRoot = document.getElementById("planningPhaseEditor");
+  const phaseEmptyRoot = document.getElementById("planningPhaseEmptyState");
+  const phaseEmptyCreateBtn = document.getElementById("btnPlanningCreatePhaseEmpty");
+  const phaseContinueBtn = document.getElementById("btnPlanningContinueWithoutPhase");
   const phases = Array.isArray(assembly.phases) ? assembly.phases : [];
+  const noPhases = !phases.length;
+  const phaseStateDismissed = Boolean(state?.ui?.planningAssemblyNoPhaseDismissed);
+  if(!noPhases){
+    try{
+      state.ui = state.ui || {};
+      state.ui.planningAssemblyNoPhaseDismissed = false;
+    }catch(_){}
+  }
+  if(phaseEmptyRoot) phaseEmptyRoot.hidden = !noPhases;
+  if(phaseEditorRoot) phaseEditorRoot.hidden = noPhases;
+  if(phaseEmptyCreateBtn){
+    phaseEmptyCreateBtn.onclick = ()=>_planningCreateNewPhase("Nova fase");
+  }
+  if(phaseContinueBtn){
+    phaseContinueBtn.onclick = ()=>{
+      try{
+        state.ui = state.ui || {};
+        state.ui.planningAssemblyNoPhaseDismissed = true;
+      }catch(_){}
+      renderGuidedApplyView();
+    };
+  }
   if(!services.length){
     segRoot.innerHTML = `<div class="planningAssemblyPanel">Nenhum serviço cadastrado na EAP.</div>`;
     depRoot.innerHTML = "";
-    if(phaseBaseInfoRoot) phaseBaseInfoRoot.textContent = "Nenhuma fase carregada.";
+    if(phaseBaseInfoRoot) phaseBaseInfoRoot.textContent = noPhases ? "Nenhuma fase criada para esta obra." : "Nenhuma fase carregada.";
     if(phaseSelectRoot) phaseSelectRoot.innerHTML = `<option value="">Nenhuma fase</option>`;
     if(phaseNameRoot) phaseNameRoot.value = "";
-    if(phaseCountRoot) phaseCountRoot.textContent = "0 fases";
+    if(phaseCountRoot) phaseCountRoot.textContent = `${phases.length} fase${phases.length===1?"":"s"}`;
     return;
   }
 
@@ -16006,13 +16418,20 @@ function renderPlanningAssemblyView(model, locations){
     phaseSelectRoot.innerHTML = phaseSelectHtml;
     if(String(phaseSelectRoot.value || "").trim() !== activePhaseId) phaseSelectRoot.value = activePhaseId;
   }
-  if(phaseNameRoot && activePhase) phaseNameRoot.value = String(activePhase.label || "");
+  if(phaseNameRoot){
+    phaseNameRoot.value = String(activePhase?.label || "");
+    phaseNameRoot.disabled = !activePhase;
+  }
   if(phaseBaseInfoRoot){
     const snap = activePhase?.baseSnapshot || null;
     const eapLabel = String(snap?.templateLabel || snap?.model?.label || snap?.model?.name || "EAP não definida").trim();
     const capturedAt = String(activePhase?.capturedAtISO || snap?.capturedAtISO || "").trim();
     const capturedLabel = capturedAt ? new Date(capturedAt).toLocaleString("pt-BR") : "sem data";
-    phaseBaseInfoRoot.textContent = `EAP da fase: ${eapLabel} • Capturada em: ${capturedLabel}`;
+    phaseBaseInfoRoot.textContent = activePhase
+      ? `EAP da fase: ${eapLabel} • Capturada em: ${capturedLabel}`
+      : (phaseStateDismissed
+        ? "Obra sem fase ativa. Você pode criar uma nova fase quando quiser."
+        : "Nenhuma fase criada para esta obra. Crie uma nova fase ou continue sem fase para manter o planejamento visível.");
   }
   if(phaseSelectRoot){
     phaseSelectRoot.onchange = evt=>{
@@ -16021,7 +16440,9 @@ function renderPlanningAssemblyView(model, locations){
     };
   }
   if(phaseRenameBtn){
+    phaseRenameBtn.disabled = !activePhase;
     phaseRenameBtn.onclick = ()=>{
+      if(!activePhase) return;
       const nextLabel = String(phaseNameRoot?.value || "").trim();
       if(!nextLabel){
         alert("Informe o nome da fase.");
@@ -16044,7 +16465,7 @@ function renderPlanningAssemblyView(model, locations){
     };
   }
   if(phaseDeleteBtn){
-    phaseDeleteBtn.disabled = phases.length <= 1;
+    phaseDeleteBtn.disabled = !activePhase;
     phaseDeleteBtn.onclick = ()=>{
       if(!activePhase) return;
       const label = String(activePhase.label || activePhase.id || "fase").trim();
@@ -16968,7 +17389,7 @@ function _guidedPersistTemplateFromDraft(mode){
       savedAtISO: nowISO
     }));
   }catch(_){}
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("save_template");
   return true;
 }
 function _guidedStartNewTemplate(){
@@ -16992,7 +17413,7 @@ function _guidedStartNewTemplate(){
     services: []
   });
   _saveGuidedPlanDraft(draft);
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("start_new_template");
   try{ document.getElementById("guidedTemplateLabel")?.focus(); }catch(_){}
   return draft;
 }
@@ -17006,7 +17427,7 @@ function _guidedDuplicateCurrentTemplate(){
     services: _guidedCloneServices(draft.services)
   });
   _saveGuidedPlanDraft(cloned);
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("duplicate_template");
   try{ document.getElementById("guidedTemplateLabel")?.focus(); }catch(_){}
   return cloned;
 }
@@ -17058,7 +17479,7 @@ function _guidedDeleteTemplateByKey(templateKey){
   }catch(e){
     console.warn("[PLANNUS_EAP]", { event:"template_delete_preserve_failed", error:String(e && e.message || e) });
   }
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("delete_template");
   return true;
 }
 function _guidedClearSavedTemplates(){
@@ -17084,7 +17505,7 @@ function _guidedClearSavedTemplates(){
   }catch(e){
     console.warn("[PLANNUS_EAP]", { event:"clear_templates_preserve_failed", error:String(e && e.message || e) });
   }
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("clear_templates");
   return true;
 }
 function _guidedLoadSelectedTemplateIntoDraft(){
@@ -17096,7 +17517,7 @@ function _guidedLoadSelectedTemplateIntoDraft(){
   const templateServices = String(template?.sourceKind || "") === "custom" ? _guidedCloneServices(template?.services) : [];
   const draft = Object.assign({}, _guidedDefaultDraft(), template?.draftDefaults || {}, { templateKey, templateLabel: String(template?.label || "").trim(), services: templateServices });
   _saveGuidedPlanDraft(draft);
-  renderGuidedPlanningView();
+  _scheduleGuidedPlanningRender("load_selected_template");
   return draft;
 }
 function _guidedOperationalServiceId(baseServiceId, segmentId, hasExplicitSegments){
@@ -17884,7 +18305,7 @@ function _applyGuidedPlanningModelCore(){
       try{ delete state.ui.__guidedApplyStartISO; }catch(_){}
     }
   }
-  try{ renderGuidedPlanningView(); }catch(_){}
+  try{ _scheduleGuidedPlanningRender("apply_commit"); }catch(_){}
   try{ setView("planner"); }catch(_){}
   try{
     if(typeof __eapPostApplyRerender__ === "function") __eapPostApplyRerender__();
@@ -17911,7 +18332,7 @@ function _bindGuidedPlanningUI(){
         const selectedSource = String(el?.selectedOptions?.[0]?.getAttribute("data-source-kind") || "").trim();
         if(selectedSource === "draft"){
           _saveGuidedPlanDraft(draft);
-          renderGuidedPlanningView();
+          _scheduleGuidedPlanningRender("guided_template_same_draft");
           return;
         }
         const nextTemplate = _guidedTemplateByKey(draft.templateKey);
@@ -17946,11 +18367,11 @@ function _bindGuidedPlanningUI(){
       }
       if(id==="guidedApplyTargetGroupApply"){
         try{ state.ui = state.ui || {}; state.ui.guidedTargetGroup = String(document.getElementById("guidedApplyTargetGroupApply")?.value || "").trim(); }catch(_){}
-        renderGuidedPlanningView();
+        _scheduleGuidedPlanningRender("guided_target_group_change");
         return;
       }
       _saveGuidedPlanDraft(draft);
-      renderGuidedPlanningView();
+      _scheduleGuidedPlanningRender(`guided_${id}_change`);
     });
   });
   if(!window.__GUIDED_TEMPLATE_CARD_ACTIONS_BOUND__){
@@ -17979,7 +18400,7 @@ function _bindGuidedPlanningUI(){
   document.getElementById("btnGuidedReset")?.addEventListener("click", ()=>{ 
     const draft = _guidedDefaultDraft();
     _saveGuidedPlanDraft(draft);
-    renderGuidedPlanningView();
+    _scheduleGuidedPlanningRender("guided_reset");
   });
   document.getElementById("btnGuidedUseTemplate")?.addEventListener("click", ()=>{ _guidedLoadSelectedTemplateIntoDraft(); });
   document.getElementById("btnGuidedExportEapPdf")?.addEventListener("click", ()=>{ try{ exportGuidedEAPPDFNow(); }catch(e){ console.warn(e); } });
@@ -18001,7 +18422,7 @@ function _bindGuidedPlanningUI(){
         state.ui = state.ui || {};
         state.ui.guidedMode = String(btn.getAttribute("data-guided-mode") || "edit").trim() || "edit";
       }catch(_){}
-      renderGuidedPlanningView();
+      _scheduleGuidedPlanningRender("guided_mode_change");
     });
   });
   document.getElementById("btnGuidedNewTemplate")?.addEventListener("click", ()=>{ _guidedStartNewTemplate(); });
@@ -18033,7 +18454,7 @@ function _bindGuidedPlanningUI(){
     try{ saveProjectDatesToStorage(); }catch(_){}
     try{ if(typeof inStart !== "undefined" && inStart) inStart.value = cand; }catch(_){}
     try{ renderProjectHeader(); }catch(_){}
-    try{ renderGuidedPlanningView(); }catch(_){}
+    try{ _scheduleGuidedPlanningRender("project_start_change"); }catch(_){}
     try{ scheduleRenderAll(); }catch(_){}
   });
 }
@@ -18148,9 +18569,14 @@ function _saveProjectSetupView(){
   const draft = _readGuidedPlanDraftSafe();
   const selectedTemplate = String(document.getElementById("projectSetupTemplate")?.value || draft.templateKey || "residencial_vertical_padrao").trim();
   const template = _guidedTemplateByKey(selectedTemplate);
-  _saveGuidedPlanDraft(Object.assign({}, draft, { templateKey: selectedTemplate, templateLabel: String(template?.label || draft.templateLabel || "").trim(), services: _guidedCloneServices(template?.services) }));
+  _saveGuidedPlanDraft(Object.assign({}, draft, {
+    templateKey: selectedTemplate,
+    templateLabel: String(template?.label || draft.templateLabel || "").trim(),
+    services: _guidedCloneServices(template?.services),
+    deletedServiceIds: []
+  }));
   try{ renderProjectHeader(); }catch(_){}
-  try{ renderGuidedPlanningView(); }catch(_){}
+  try{ _scheduleGuidedPlanningRender("project_setup_save"); }catch(_){}
   try{ renderProjectSetupView(); }catch(_){}
   return true;
 }
@@ -18256,7 +18682,12 @@ function _bindProjectSetupUI(){
     const draft = _readGuidedPlanDraftSafe();
     const templateKey = String(document.getElementById("projectSetupTemplate")?.value || draft.templateKey || "").trim();
     const template = _guidedTemplateByKey(templateKey);
-    _saveGuidedPlanDraft(Object.assign({}, draft, { templateKey, templateLabel: String(template?.label || draft.templateLabel || "").trim(), services: _guidedCloneServices(template?.services) }));
+    _saveGuidedPlanDraft(Object.assign({}, draft, {
+      templateKey,
+      templateLabel: String(template?.label || draft.templateLabel || "").trim(),
+      services: _guidedCloneServices(template?.services),
+      deletedServiceIds: []
+    }));
     renderProjectSetupView();
     renderProjectHeader();
   });
@@ -20375,6 +20806,7 @@ function resolveLocationLabel(b){
   }
 
   function mkSpan(b, isBaseline, d0, d1){
+    const rowH = Math.max(18, Number(visualMeta?.rowH || state?.ui?.rowH || 28) || 28);
     const svcId = resolveServiceId(b);
     const planStartX = svcPlanStartXById.get(svcId);
     const baseStartX = svcBaseStartXById.get(svcId);
@@ -24709,7 +25141,7 @@ __bindEl(planningNodeOverlay, "click", (e)=>{
 });
  const _refreshDependencyVisuals = ()=>{
    if(state?.ui?.depsOnlyMode){
-     try{ renderGuidedPlanningView(); }catch(e){ console.warn("[GUIDED_VIEW] refresh deps visuals fail", e); }
+     try{ _scheduleGuidedPlanningRender("deps_only_change"); }catch(e){ console.warn("[GUIDED_VIEW] refresh deps visuals fail", e); }
    }else{
      try{ renderDependencyPreview(); }catch(e){}
    }
@@ -25111,7 +25543,7 @@ async function loadServicesFromStorage(){
             _syncServiceBaseCatalogToStateServicesWhenSafe();
             try{ ensureCyclesForServices(); }catch(_){}
             log(`[EAP] serviços carregados da API: ${state.services.length}`);
-            if(document.getElementById("serviceCatalogEditor")){
+            if(String(state?.ui?.currentViewName || "").trim().toLowerCase() === "service"){
               try{ renderServiceCatalogView(); }catch(_){}
             }
             return sorted.slice();
@@ -25330,11 +25762,11 @@ async function saveServicesToStorage(sourceList, forceImmediate = false){
         }
         if(res.ok && data?.ok !== false){
           log(`[EAP] serviços salvos na API: ${arr.length}`);
-          if(document.getElementById("serviceCatalogEditor")){
-            try{ await loadServicesFromStorage(); }catch(_){}
+          if(String(state?.ui?.currentViewName || "").trim().toLowerCase() === "service"){
+            try{ renderServiceCatalogView(); }catch(_){}
           }
-          if(document.getElementById("viewGuided")){
-            try{ renderGuidedPlanningView(); }catch(_){}
+          if(String(state?.ui?.currentViewName || "").trim().toLowerCase() === "guided"){
+            try{ _scheduleGuidedPlanningRender("service_catalog_saved"); }catch(_){}
           }
           return { ok:true, data };
         }
@@ -26424,7 +26856,17 @@ function setView(name){
   if(isProject){
     try{ renderProjectSetupView(); }catch(e){ console.warn("[PROJECT_VIEW] render fail", e); }
   }else if(isGuided){
-    try{ renderGuidedPlanningView(); }catch(e){ console.warn("[GUIDED_VIEW] render fail", e); }
+    try{
+      requestAnimationFrame(()=>{
+        try{
+          if(String(state?.ui?.currentViewName || "").trim().toLowerCase() === "guided"){
+            _scheduleGuidedPlanningRender("guided_view_enter");
+          }
+        }catch(e){ console.warn("[GUIDED_VIEW] render fail", e); }
+      });
+    }catch(e){
+      try{ _scheduleGuidedPlanningRender("guided_view_enter_fallback"); }catch(err){ console.warn("[GUIDED_VIEW] render fail", err); }
+    }
   }else if(isGuidedApply){
     try{ renderGuidedApplyView(); }catch(e){ console.warn("[GUIDED_APPLY_VIEW] render fail", e); }
   }else if(isPav){
@@ -26765,6 +27207,32 @@ function renderServiceCatalogView(){
     const txt = String(svc?.classification || svc?.classificação || svc?.classificationLabel || "").trim();
     return txt || "—";
   };
+  const deleteServiceCatalogItem = (serviceId)=>{
+    const sid = String(serviceId || "").trim();
+    if(!sid) return false;
+    const items = _getServiceBaseCatalogForStorage().slice();
+    const idx = items.findIndex(s=>String(s.id||"").trim()===sid);
+    if(idx < 0) return false;
+    const current = items[idx];
+    if(String(current?.sourceKind || "").trim() === "builtin"){
+      alert("Modelos padrão não podem ser excluídos.");
+      return false;
+    }
+    const label = String(current?.name || current?.code || sid || "pacote").trim();
+    if(!confirm(`Excluir o pacote "${label}"?\n\nIsso remove o serviço do catálogo de Pacotes / Serviços. A EAP atual não será alterada.`)) return false;
+    items.splice(idx, 1);
+    items.forEach((svc, i)=>{ svc.order = i + 1; });
+    state.serviceBaseCatalog = items;
+    _syncServiceBaseCatalogToStateServicesWhenSafe();
+    if(String(state?.ui?.selectedServiceId || "").trim() === sid){
+      state.ui.selectedServiceId = items[0]?.id || "";
+    }
+    _markServiceCatalogMutation("delete");
+    try{ saveServicesToStorage(state.serviceBaseCatalog, true); }catch(_){}
+    renderServiceCatalogView();
+    try{ if(String(state?.ui?.currentViewName || "").trim().toLowerCase() === "guided") _scheduleGuidedPlanningRender("service_catalog_delete"); }catch(_){}
+    return true;
+  };
   const totalSubservices = services.reduce((acc,svc)=>acc + getSubservicesCount(svc), 0);
   const totalTeams = services.reduce((acc,svc)=>{
     const n = Number(svc?.teams ?? svc?.teamCount ?? 0);
@@ -26807,6 +27275,9 @@ function renderServiceCatalogView(){
           <input data-service-catalog-key="${escapeHtml(sid)}" data-service-catalog-field="strategic" type="checkbox"${isStrategic(svc) ? " checked" : ""} />
         </label>
       </td>
+      <td style="width:110px; padding-right:14px;">
+        <button class="btn danger" type="button" data-service-catalog-delete="${escapeHtml(sid)}"${String(svc?.sourceKind || "").trim() === "builtin" ? " disabled title=\"Modelo padrão não pode ser excluído\"" : ""}>Excluir</button>
+      </td>
     </tr>
   `;};
   const buildPackageDetailHtml = (pkg)=>{
@@ -26815,6 +27286,9 @@ function renderServiceCatalogView(){
     <div class="detailKicker">Pacote selecionado</div>
     <div class="detailTitle">${escapeHtml(String(pkg.name || "Pacote"))}</div>
     <div class="detailSub">Código: ${escapeHtml(String(pkg.code || "—"))}</div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin:12px 0 0;">
+      <button class="btn danger" type="button" data-service-catalog-delete="${escapeHtml(String(pkg.id || ""))}"${String(pkg?.sourceKind || "").trim() === "builtin" ? " disabled title=\"Modelo padrão não pode ser excluído\"" : ""}>Excluir pacote</button>
+    </div>
     <div class="detailGrid">
       <div class="detailCard"><span class="lbl">Subserviços</span><span class="val">${escapeHtml(String(getSubservicesCount(pkg)))}</span></div>
       <div class="detailCard"><span class="lbl">Classificação</span><span class="val">${escapeHtml(getClassificationText(pkg))}</span></div>
@@ -26859,6 +27333,7 @@ function renderServiceCatalogView(){
             <th>Equipe base</th>
             <th>Duração</th>
             <th>Crítico</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -26908,7 +27383,18 @@ function renderServiceCatalogView(){
       overlay.setAttribute("aria-hidden", "true");
     };
     overlay.addEventListener("click", ev=>{
-      if(ev.target === overlay || (ev.target instanceof HTMLElement && ev.target.closest("[data-package-edit-close]"))) close();
+      const target = ev.target instanceof HTMLElement ? ev.target : null;
+      if(!target) return;
+      const deleteBtn = target.closest("[data-service-catalog-delete]");
+      if(deleteBtn){
+        ev.preventDefault();
+        ev.stopPropagation();
+        const key = String(deleteBtn.getAttribute("data-service-catalog-delete") || "").trim();
+        close();
+        deleteServiceCatalogItem(key);
+        return;
+      }
+      if(target === overlay || target.closest("[data-package-edit-close]")) close();
     });
     overlay.addEventListener("input", ev=>{
       const el = ev.target;
@@ -27027,6 +27513,14 @@ function renderServiceCatalogView(){
     root.addEventListener("click", ev=>{
       const target = ev.target instanceof HTMLElement ? ev.target : null;
       if(!target) return;
+      const deleteBtn = target.closest("[data-service-catalog-delete]");
+      if(deleteBtn){
+        ev.preventDefault();
+        ev.stopPropagation();
+        const key = String(deleteBtn.getAttribute("data-service-catalog-delete") || "").trim();
+        deleteServiceCatalogItem(key);
+        return;
+      }
       if(target.closest("input, select, textarea, button")) return;
       const row = target.closest("[data-service-catalog-select]");
       if(!row) return;
@@ -37641,7 +38135,7 @@ log("installed.");
   }
 
   const PredEngine = {
-    version: "v1.0.0",
+    version: "v1.0.1",
     parsePredRaw,
     normalizeFromPlannus,
     solve: function(input){
@@ -40655,10 +41149,10 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       return j(url, opts);
     },
     async listServices(){
-      return this.request(`${API_BASE}/api/serviços`);
+      return this.request(`${API_BASE}/api/servicos`);
     },
     async saveServicesCatalog(payload){
-      return this.request(`${API_BASE}/api/serviços`, {
+      return this.request(`${API_BASE}/api/servicos`, {
         method: "POST",
         headers: { "Content-Type":"application/json" },
         body: JSON.stringify({ services: Array.isArray(payload) ? payload : [] })
@@ -42009,6 +42503,10 @@ function readJsonLocalStorage(key){
   async function openObra(obra){
     const id = obraId(obra) || DEFAULT_OBRA_ID;
     const nm = obraNome(obra);
+    if(window.__plannusOnlineOpeningObraId === id) return;
+    const currentMeta = readMeta();
+    if(String(currentMeta?.obraId || "").trim() === id && !q("#plannusObrasGate")) return;
+    window.__plannusOnlineOpeningObraId = id;
     try{
       setStatus(`Carregando ${id}...`, "warn", SYNC_STATES.SAVING);
       const {res,data} = await PlannusOnlineRepository.loadObra(id);
@@ -42070,8 +42568,6 @@ function readJsonLocalStorage(key){
             }
           }catch(_){}
           if(typeof buildCalendarDays === "function") buildCalendarDays();
-          await loadServicesFromStorage();
-          try{ ensureServiceBaseCatalogAfterOpen(state); }catch(_){}
           if(typeof loadOperational === "function") loadOperational({ obraId:id, strictObraId:true });
           if(typeof renderAll === "function") renderAll();
           if(typeof renderProjectHeader === "function") renderProjectHeader();
@@ -42110,6 +42606,8 @@ function readJsonLocalStorage(key){
       if(gate) gate.remove();
     }catch(e){
       setStatus(`Erro: ${String(e&&e.message||e)}`, "error", SYNC_STATES.SAVE_ERROR);
+    }finally{
+      if(window.__plannusOnlineOpeningObraId === id) window.__plannusOnlineOpeningObraId = "";
     }
   }
 
@@ -42202,6 +42700,8 @@ function readJsonLocalStorage(key){
   }
 
   async function refreshList(){
+    if(window.__plannusOnlineListInFlight) return window.__plannusOnlineListInFlight;
+    window.__plannusOnlineListInFlight = (async ()=>{
     const tb = q("#plannusObrasRows");
     setStatus("Carregando obras...", "warn", SYNC_STATES.SAVING);
     if(tb) tb.innerHTML = "<div class='pln-empty'>Carregando...</div>";
@@ -42221,6 +42721,12 @@ function readJsonLocalStorage(key){
       setStatus(`Erro de rede: ${String(e&&e.message||e)}`, "error", SYNC_STATES.OFFLINE);
       if(tb) tb.innerHTML = "<div class='pln-empty'>Erro de rede.</div>";
     }
+    })();
+    try{
+      return await window.__plannusOnlineListInFlight;
+    }finally{
+      window.__plannusOnlineListInFlight = null;
+    }
   }
 
   async function loadMe(){
@@ -42232,9 +42738,6 @@ function readJsonLocalStorage(key){
       if(el){
         const u = __plnMe || {};
         el.textContent = `${u.email || "-"} | role=${u.role || "usuario"} | delete=${String(!!u.can_delete_obras)}`;
-      }
-      if(q("#plannusObrasRows")){
-        refreshList();
       }
       const canManage = !!(__plnMe?.can_grant_permissions || __plnMe?.can_manage_users || String(__plnMe?.role||"").toLowerCase()==="planejador");
       const btn = q("#plnManagePerm");
@@ -42361,6 +42864,8 @@ function readJsonLocalStorage(key){
   }
 
   function ensureGate(){
+    if(window.__plannusOnlineGateBooted) return;
+    window.__plannusOnlineGateBooted = true;
     if(q("#plannusObrasGate")) return;
     const meta = readMeta();
     const hasLocal = !!localStorage.getItem(APP_KEY);
@@ -42782,7 +43287,7 @@ function readJsonLocalStorage(key){
           color:#667085!important;
         }
         #plannusObrasGate .pln-obraInfo:before{
-          content:"?"!important;
+          content:"ℹ"!important;
           margin-right:7px!important;
           color:#667085!important;
         }
@@ -43025,7 +43530,6 @@ function readJsonLocalStorage(key){
     window.PlannusOnlineActions = window.PlannusOnlineActions || {};
     window.PlannusOnlineActions.listObras = ()=>refreshList();
     window.PlannusOnlineRepository = PlannusOnlineRepository;
-    try{ loadServicesFromStorage(); }catch(_){}
     window.PlannusOnlineActions.openObra = (obra)=>openObra(obra);
     window.PlannusOnlineActions.createObra = (nome, codigo)=>createOnlineObra(nome, codigo);
     window.PlannusOnlineActions.deleteObra = (obraId)=>PlannusOnlineRepository.deleteObra(obraId);
@@ -43061,7 +43565,10 @@ function readJsonLocalStorage(key){
       }
     })();
     loadMe();
-    window.PlannusOnlineActions.listObras();
+    if(!window.__plannusOnlineInitialListRequested){
+      window.__plannusOnlineInitialListRequested = true;
+      window.PlannusOnlineActions.listObras();
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ensureGate);
   else ensureGate();
@@ -44978,22 +45485,65 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
 }
 
 /* EAP: modelos salvos sem empilhar botões em cima do texto */
+#viewGuidedPlan #guidedEditPane{
+  display:grid!important;
+  grid-template-columns:minmax(320px,420px) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+#viewGuidedPlan #guidedEditPane > .guidedSplit{
+  display:block!important;
+  padding:0!important;
+}
+#viewGuidedPlan #guidedEditPane > .guidedServiceSection{
+  margin:0!important;
+}
+#viewGuidedPlan .cardHead{
+  min-height:86px!important;
+}
+#viewGuidedPlan .cardHead .sub,
+#viewGuidedPlan .guidedSectionTitle .subttl,
+#viewGuidedPlan .guidedServiceToolbarHint,
+#viewGuidedPlan #guidedTemplateMeta,
+#viewGuidedPlan #guidedLibraryPanel > .hint{
+  display:none!important;
+}
+#viewGuidedPlan .guidedSection{
+  padding:14px!important;
+  border-radius:18px!important;
+}
+#viewGuidedPlan .guidedSection + .guidedSection{
+  margin-top:10px!important;
+}
+#viewGuidedPlan .guidedSectionTitle{
+  align-items:center!important;
+  margin-bottom:10px!important;
+}
+#viewGuidedPlan .guidedSectionTitle .ttl{
+  font-size:14px!important;
+  letter-spacing:-.01em!important;
+}
+#viewGuidedPlan .guidedSectionActions .btn{
+  min-height:34px!important;
+  padding:8px 12px!important;
+  border-radius:13px!important;
+}
 #viewGuidedPlan .guidedLibraryGrid{
   display:block!important;
   grid-template-columns:1fr!important;
   gap:10px!important;
   width:100%!important;
-  margin-top:10px!important;
+  margin-top:8px!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
   position:relative!important;
   display:grid!important;
   grid-template-columns:minmax(0,1fr) auto!important;
   align-items:center!important;
-  gap:12px!important;
+  gap:10px!important;
   width:100%!important;
   min-height:unset!important;
-  padding:14px!important;
+  padding:12px!important;
   border:1px solid #dbe4f0!important;
   border-radius:16px!important;
   background:#fff!important;
@@ -45014,9 +45564,7 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
   text-overflow:ellipsis!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .meta{
-  font-size:12px!important;
-  line-height:1.35!important;
-  color:#667085!important;
+  display:none!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions{
   position:static!important;
@@ -45031,23 +45579,18 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
   margin:0!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions .btn{
-  height:34px!important;
-  min-height:34px!important;
+  height:32px!important;
+  min-height:32px!important;
   padding:0 12px!important;
   border-radius:12px!important;
   font-size:12px!important;
   line-height:1!important;
   white-space:nowrap!important;
 }
-#viewGuidedPlan #guidedLibraryPanel > .hint{
-  display:block!important;
-  margin:8px 0 0!important;
-  padding:0!important;
-  font-size:12px!important;
-  color:#667085!important;
-  clear:both!important;
-}
 @media (max-width:760px){
+  #viewGuidedPlan #guidedEditPane{
+    grid-template-columns:1fr!important;
+  }
   #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
     grid-template-columns:1fr!important;
   }

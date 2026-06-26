@@ -2,7 +2,7 @@
 
 // FILE: src/domain/contracts.js
 const APP_KEY = "plannus.app.state";
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 const SCHEMA_VERSION = 1;
 const STATUS = Object.freeze({
   NAO_INICIADO: "NAO_INICIADO",

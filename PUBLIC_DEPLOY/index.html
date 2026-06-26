@@ -6304,10 +6304,9 @@ document.addEventListener("click", function(ev){
 
   <div id="viewGuidedPlan" style="display:none;">
     <section class="card" style="grid-column:1 / -1;">
-      <div class="cardHead">
+          <div class="cardHead">
         <div>
           <div class="title plnPageTitle">EAP</div>
-              <div class="sub plnPageSubtitle">Monte e salve a biblioteca de serviços.</div>
         </div>
         <div class="actions guidedActions">
           <button class="btn" id="btnGuidedReset" type="button">Limpar questionário</button>
@@ -6321,7 +6320,6 @@ document.addEventListener("click", function(ev){
           <div class="guidedSectionTitle">
             <div>
               <div class="ttl">Biblioteca de EAP</div>
-              <div class="subttl">Escolha um modelo e veja os salvos na mesma área.</div>
             </div>
               <div class="guidedSectionActions">
                 <button class="btn" id="btnGuidedUseTemplate" type="button">Usar modelo</button>
@@ -6334,7 +6332,6 @@ document.addEventListener("click", function(ev){
               <div class="guidedTag" id="guidedTemplateOriginTag">Padrão</div>
             </div>
             <div class="label" style="margin-top:12px;">Modelos salvos</div>
-            <div class="hint">Excluir remove só o modelo, sem apagar o projeto.</div>
             <div id="guidedLibraryPanel" class="guidedLibraryGrid"></div>
           </div>
 
@@ -6342,7 +6339,6 @@ document.addEventListener("click", function(ev){
             <div class="guidedSectionTitle">
               <div>
               <div class="ttl">Serviços</div>
-          <div class="subttl">Cadastre os serviços da biblioteca.</div>
               </div>
               <div class="guidedSectionActions primary">
                 <button class="btn" id="btnGuidedNewTemplate" type="button">Nova EAP</button>
@@ -6357,7 +6353,6 @@ document.addEventListener("click", function(ev){
               <input id="guidedTemplateLabel" placeholder="Ex.: Residencial vertical padrão" />
             </div>
 
-            <div class="hint" style="margin-top:12px;">Selecione um modelo, ajuste os serviços e salve. A aplicação acontece em outra tela.</div>
             <details class="guidedAdvancedActions">
               <summary>Ações avançadas</summary>
               <div class="row">
@@ -6372,17 +6367,15 @@ document.addEventListener("click", function(ev){
         <div class="guidedSection guidedServiceSection">
           <div class="guidedSectionTitle">
             <div>
-              <div class="ttl">3. Predecessoras da EAP</div>
-              <div class="subttl">Os serviços são cadastrados na tela própria. Aqui você só organiza predecessoras e regras do modelo.</div>
+              <div class="ttl">Predecessoras da EAP</div>
             </div>
             <div class="guidedSectionActions">
               <button class="btn" id="btnGuidedExportEapPdf" type="button">PDF EAP</button>
-              <button class="btn" id="btnOpenServiceCatalog" type="button">Abrir cadastro de serviços</button>
+              <button class="btn" id="btnOpenServiceCatalog" type="button">Pacotes / Serviços</button>
               <button class="btn danger" id="btnGuidedRemoveSvcFromEap" type="button">Remover serviço</button>
               <button class="btn danger" id="btnGuidedClearAllPreds" type="button">Limpar predecessoras</button>
             </div>
           </div>
-            <div class="guidedServiceToolbarHint">Cadastre os serviços na biblioteca. Depois volte para esta tela para amarrar predecessoras e ordem operacional.</div>
           <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
             <button class="btn" id="btnGuidedAddService" type="button">Adicionar serviço</button>
           </div>
@@ -12713,6 +12706,7 @@ function _guidedDefaultDraft(templateKey){
     specialAreas: String(d.specialAreas || "SS1\nÁTICO").trim(),
     flowRailCount: Math.max(3, Number(d.flowRailCount || 5) || 5),
     services: _guidedCloneServices(_guidedServiceCatalogSeed(template)),
+    deletedServiceIds: [],
     ui: { guidedMode:"edit" }
   };
 }
@@ -12731,11 +12725,19 @@ function _normalizeGuidedDraft(draft, opts){
     ? _guidedBuiltinTemplateByKey(src.templateKey || "residencial_vertical_padrao")
     : _guidedTemplateByKey(src.templateKey || "residencial_vertical_padrao");
   const base = _guidedDefaultDraft(template?.key || "residencial_vertical_padrao");
-  const templateServices = _guidedServiceCatalogSeed(template);
+  const deletedServiceIds = Array.isArray(src.deletedServiceIds)
+    ? Array.from(new Set(src.deletedServiceIds.map(x=>String(x || "").trim()).filter(Boolean)))
+    : [];
+  const deletedSet = new Set(deletedServiceIds);
+  const templateServices = _guidedServiceCatalogSeed(template).filter(svc=>{
+    const sid = String(svc?.id || svc?.key || "").trim();
+    return !sid || !deletedSet.has(sid);
+  });
   const srcServices = Array.isArray(src.services) ? src.services : [];
   const srcById = new Map();
   srcServices.forEach((svc)=>{
     const sid = String(svc?.id || svc?.key || "").trim();
+    if(sid && deletedSet.has(sid)) return;
     if(sid && !srcById.has(sid)) srcById.set(sid, svc);
   });
   const services = templateServices.map((svc, idx)=>{
@@ -12758,6 +12760,7 @@ function _normalizeGuidedDraft(draft, opts){
     commonAreas: String(src.commonAreas || base.commonAreas).trim() || base.commonAreas,
     specialAreas: String(src.specialAreas || base.specialAreas).trim() || base.specialAreas,
     flowRailCount: Math.max(3, Number(src.flowRailCount || base.flowRailCount || 5) || 5),
+    deletedServiceIds,
     services
   };
 }
@@ -12795,13 +12798,15 @@ function _guidedApplyDraftFromSelection(storedDraft, selectEl){
     return _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(template.baseTemplateKey || selectedTemplateKey), template.draftDefaults || {}, {
       templateKey: selectedTemplateKey,
       templateLabel: String(template.label || stored.templateLabel || selectedTemplateKey).trim(),
-      services: _guidedCloneServices(template.services || [])
+      services: _guidedCloneServices(template.services || []),
+      deletedServiceIds: []
     }));
   }
   return _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(selectedTemplateKey), {
     templateKey: selectedTemplateKey,
     templateLabel: String(template?.label || stored.templateLabel || "").trim(),
-    services: _guidedCloneServices((Array.isArray(template?.services) && template.services.length) ? template.services : (stored.services || []))
+    services: _guidedCloneServices((Array.isArray(template?.services) && template.services.length) ? template.services : (stored.services || [])),
+    deletedServiceIds: []
   }));
 }
 function _guidedReadDraftFromUI(){
@@ -12987,7 +12992,7 @@ function _guidedUpdateServicesDraft(updater){
   const draft = _guidedReadDraftFromUI();
   const items = _guidedCloneServices(draft.services || []);
   let result = null;
-  try{ result = updater(items) || null; }catch(e){ console.warn("[GUIDED] update services draft failed", e); }
+  try{ result = updater(items, draft) || null; }catch(e){ console.warn("[GUIDED] update services draft failed", e); }
   const normalized = _guidedNormalizeGraphLinks(items);
   const cycleCheck = _guidedCheckServiceGraphCycle(normalized);
   if(!cycleCheck.ok){
@@ -13064,12 +13069,17 @@ function _guidedRemoveServiceFromEap(serviceId, options){
   const shouldPersist = !(options && options.persist === false);
   let removedName = "";
   let removed = false;
-  _guidedUpdateServicesDraft(arr=>{
+  _guidedUpdateServicesDraft((arr, draft)=>{
     const idx = arr.findIndex(svc=>String(svc.id || svc.key || "").trim()===sid);
     if(idx < 0) return null;
     const hit = arr[idx];
     const removedId = String(hit?.id || hit?.key || "").trim();
     removedName = String(hit?.name || hit?.code || removedId || "serviço").trim();
+    if(removedId){
+      const deleted = Array.isArray(draft.deletedServiceIds) ? draft.deletedServiceIds.slice() : [];
+      if(!deleted.some(x=>String(x || "").trim() === removedId)) deleted.push(removedId);
+      draft.deletedServiceIds = deleted;
+    }
     arr.splice(idx, 1);
     if(removedId){
       for(const svc of arr){
@@ -13092,9 +13102,6 @@ function _guidedRemoveServiceFromEap(serviceId, options){
   });
   if(removed){
     try{ toast(`Serviço removido da EAP: ${removedName}`); }catch(_){}
-    if(shouldPersist){
-      try{ _persistGuidedEapServicesToApi("guided_remove_service"); }catch(_){}
-    }
   }
   return removed;
 }
@@ -14225,9 +14232,6 @@ function _openGuidedRemoveServiceModal(){
     if(!confirm(`Remover ${sids.length} serviço(s) da EAP atual?\n\nOs vínculos desses serviços serão quebrados.`)) return;
     let removedCount = 0;
     sids.forEach(sid=>{ if(_guidedRemoveServiceFromEap(sid, { persist:false })) removedCount += 1; });
-    if(removedCount){
-      try{ _persistGuidedEapServicesToApi("guided_bulk_remove_service"); }catch(_){}
-    }
     try{ toast(`Serviços removidos da EAP: ${removedCount}`); }catch(_){}
     close();
     try{ renderGuidedPlanningView(); }catch(_){}
@@ -14241,11 +14245,10 @@ function _openGuidedRemoveServiceModal(){
     }
     if(!confirm(`Remover TODOS os ${count} serviços da EAP atual?\n\nIsso limpa a EAP, mas não apaga o projeto.`)) return;
     try{
-      _saveGuidedPlanDraft(Object.assign({}, draft, { services: [], selectedServiceId:"" }));
-      state.serviceBaseCatalog = [];
-      _syncServiceBaseCatalogToStateServicesWhenSafe();
-      try{ _markServiceCatalogMutation("guided_remove_all_services"); }catch(_){}
-      try{ saveServicesToStorage([], true); }catch(_){}
+      const deleted = Array.from(new Set((Array.isArray(draft.services) ? draft.services : [])
+        .map(svc=>String(svc?.id || svc?.key || "").trim())
+        .filter(Boolean)));
+      _saveGuidedPlanDraft(Object.assign({}, draft, { services: [], deletedServiceIds: deleted, selectedServiceId:"" }));
       state.ui = state.ui || {};
       state.ui.selectedServiceId = "";
     }catch(e){ console.warn(e); }
@@ -14456,7 +14459,7 @@ function renderGuidedPlanningView(){
   }
   if(templateLabel && templateLabel.value !== normalizedDraft.templateLabel) templateLabel.value = normalizedDraft.templateLabel;
   if(templateOriginTag) templateOriginTag.textContent = String(template?.sourceKind || "builtin") === "custom" ? "Modelo salvo" : "Padrão";
-  if(guidedTemplateMeta) guidedTemplateMeta.textContent = `${String(template?.description || "Modelo base da EAP selecionada.").trim()} A aplicação acontece em outra tela.`;
+  if(guidedTemplateMeta) guidedTemplateMeta.textContent = "";
   if(summaryTemplateTag) summaryTemplateTag.textContent = template?.label || "Modelo";
   if(summaryServiceTag) summaryServiceTag.textContent = `${services.length} serviços`;
   if(summaryLocationTag) summaryLocationTag.textContent = `${model.locations.length} pavimentos`;
@@ -14469,8 +14472,7 @@ function renderGuidedPlanningView(){
       <div class="guidedLibraryCard" data-guided-template-key="${escapeHtml(activeTemplate.key)}">
         <div class="body">
           <div class="title">${escapeHtml(activeTemplate.label)}</div>
-          <div class="meta">${escapeHtml(activeTemplate.description || (isCustom ? "Modelo salvo" : "Modelo padrão"))}</div>
-          <div class="meta" style="margin-top:6px;">Selecionado no momento</div>
+          <div class="meta">${escapeHtml(isCustom ? "Modelo salvo" : "Modelo padrão")}</div>
         </div>
         <div class="actions">
           <button class="btn primary" type="button" data-guided-template-action="use" data-guided-template-key="${escapeHtml(activeTemplate.key)}">Usar</button>
@@ -14478,7 +14480,6 @@ function renderGuidedPlanningView(){
           ${isCustom ? `<button class="btn danger" type="button" data-guided-template-action="delete" data-guided-template-key="${escapeHtml(activeTemplate.key)}">Excluir</button>` : ""}
         </div>
       </div>
-      <div class="hint" style="margin-top:8px;">${escapeHtml(`${templates.length} modelo(s) disponível(is)`)}</div>
     ` : `<div class="hint">Nenhum modelo disponível.</div>`;
   }
   const readiness = _guidedBuildReadiness(model, { requireLocations:false });
@@ -18148,7 +18149,12 @@ function _saveProjectSetupView(){
   const draft = _readGuidedPlanDraftSafe();
   const selectedTemplate = String(document.getElementById("projectSetupTemplate")?.value || draft.templateKey || "residencial_vertical_padrao").trim();
   const template = _guidedTemplateByKey(selectedTemplate);
-  _saveGuidedPlanDraft(Object.assign({}, draft, { templateKey: selectedTemplate, templateLabel: String(template?.label || draft.templateLabel || "").trim(), services: _guidedCloneServices(template?.services) }));
+  _saveGuidedPlanDraft(Object.assign({}, draft, {
+    templateKey: selectedTemplate,
+    templateLabel: String(template?.label || draft.templateLabel || "").trim(),
+    services: _guidedCloneServices(template?.services),
+    deletedServiceIds: []
+  }));
   try{ renderProjectHeader(); }catch(_){}
   try{ renderGuidedPlanningView(); }catch(_){}
   try{ renderProjectSetupView(); }catch(_){}
@@ -18256,7 +18262,12 @@ function _bindProjectSetupUI(){
     const draft = _readGuidedPlanDraftSafe();
     const templateKey = String(document.getElementById("projectSetupTemplate")?.value || draft.templateKey || "").trim();
     const template = _guidedTemplateByKey(templateKey);
-    _saveGuidedPlanDraft(Object.assign({}, draft, { templateKey, templateLabel: String(template?.label || draft.templateLabel || "").trim(), services: _guidedCloneServices(template?.services) }));
+    _saveGuidedPlanDraft(Object.assign({}, draft, {
+      templateKey,
+      templateLabel: String(template?.label || draft.templateLabel || "").trim(),
+      services: _guidedCloneServices(template?.services),
+      deletedServiceIds: []
+    }));
     renderProjectSetupView();
     renderProjectHeader();
   });
@@ -20375,6 +20386,7 @@ function resolveLocationLabel(b){
   }
 
   function mkSpan(b, isBaseline, d0, d1){
+    const rowH = Math.max(18, Number(visualMeta?.rowH || state?.ui?.rowH || 28) || 28);
     const svcId = resolveServiceId(b);
     const planStartX = svcPlanStartXById.get(svcId);
     const baseStartX = svcBaseStartXById.get(svcId);
@@ -37641,7 +37653,7 @@ log("installed.");
   }
 
   const PredEngine = {
-    version: "v1.0.0",
+    version: "v1.0.1",
     parsePredRaw,
     normalizeFromPlannus,
     solve: function(input){
@@ -40655,10 +40667,10 @@ return { services:domain.services, locations:domain.locations, serviceLocationMa
       return j(url, opts);
     },
     async listServices(){
-      return this.request(`${API_BASE}/api/serviços`);
+      return this.request(`${API_BASE}/api/servicos`);
     },
     async saveServicesCatalog(payload){
-      return this.request(`${API_BASE}/api/serviços`, {
+      return this.request(`${API_BASE}/api/servicos`, {
         method: "POST",
         headers: { "Content-Type":"application/json" },
         body: JSON.stringify({ services: Array.isArray(payload) ? payload : [] })
@@ -44978,22 +44990,65 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
 }
 
 /* EAP: modelos salvos sem empilhar botões em cima do texto */
+#viewGuidedPlan #guidedEditPane{
+  display:grid!important;
+  grid-template-columns:minmax(320px,420px) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+#viewGuidedPlan #guidedEditPane > .guidedSplit{
+  display:block!important;
+  padding:0!important;
+}
+#viewGuidedPlan #guidedEditPane > .guidedServiceSection{
+  margin:0!important;
+}
+#viewGuidedPlan .cardHead{
+  min-height:86px!important;
+}
+#viewGuidedPlan .cardHead .sub,
+#viewGuidedPlan .guidedSectionTitle .subttl,
+#viewGuidedPlan .guidedServiceToolbarHint,
+#viewGuidedPlan #guidedTemplateMeta,
+#viewGuidedPlan #guidedLibraryPanel > .hint{
+  display:none!important;
+}
+#viewGuidedPlan .guidedSection{
+  padding:14px!important;
+  border-radius:18px!important;
+}
+#viewGuidedPlan .guidedSection + .guidedSection{
+  margin-top:10px!important;
+}
+#viewGuidedPlan .guidedSectionTitle{
+  align-items:center!important;
+  margin-bottom:10px!important;
+}
+#viewGuidedPlan .guidedSectionTitle .ttl{
+  font-size:14px!important;
+  letter-spacing:-.01em!important;
+}
+#viewGuidedPlan .guidedSectionActions .btn{
+  min-height:34px!important;
+  padding:8px 12px!important;
+  border-radius:13px!important;
+}
 #viewGuidedPlan .guidedLibraryGrid{
   display:block!important;
   grid-template-columns:1fr!important;
   gap:10px!important;
   width:100%!important;
-  margin-top:10px!important;
+  margin-top:8px!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
   position:relative!important;
   display:grid!important;
   grid-template-columns:minmax(0,1fr) auto!important;
   align-items:center!important;
-  gap:12px!important;
+  gap:10px!important;
   width:100%!important;
   min-height:unset!important;
-  padding:14px!important;
+  padding:12px!important;
   border:1px solid #dbe4f0!important;
   border-radius:16px!important;
   background:#fff!important;
@@ -45014,9 +45069,7 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
   text-overflow:ellipsis!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .meta{
-  font-size:12px!important;
-  line-height:1.35!important;
-  color:#667085!important;
+  display:none!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions{
   position:static!important;
@@ -45031,23 +45084,18 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
   margin:0!important;
 }
 #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard .actions .btn{
-  height:34px!important;
-  min-height:34px!important;
+  height:32px!important;
+  min-height:32px!important;
   padding:0 12px!important;
   border-radius:12px!important;
   font-size:12px!important;
   line-height:1!important;
   white-space:nowrap!important;
 }
-#viewGuidedPlan #guidedLibraryPanel > .hint{
-  display:block!important;
-  margin:8px 0 0!important;
-  padding:0!important;
-  font-size:12px!important;
-  color:#667085!important;
-  clear:both!important;
-}
 @media (max-width:760px){
+  #viewGuidedPlan #guidedEditPane{
+    grid-template-columns:1fr!important;
+  }
   #viewGuidedPlan #guidedLibraryPanel .guidedLibraryCard{
     grid-template-columns:1fr!important;
   }
