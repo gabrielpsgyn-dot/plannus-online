@@ -13180,13 +13180,29 @@ function _guidedApplyLaneMoveFast(moves, savedDraft){
     return false;
   }
 }
-function _guidedQueueFlowEdgePaint(reason){
+function _guidedQueueFlowEdgePaint(keys, reason){
   try{
     if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return true;
-    if(typeof window.__guidedPaintFlowEdges === "function"){
-      window.__guidedPaintFlowEdges();
-      return true;
-    }
+    const pendingKeys = Array.isArray(keys) ? keys : [keys];
+    const cleanedKeys = pendingKeys.map(x=>String(x || "").trim()).filter(Boolean);
+    if(!cleanedKeys.length) return false;
+    window.__guidedEdgePaintPendingKeys = Array.from(new Set([...(window.__guidedEdgePaintPendingKeys || []), ...cleanedKeys]));
+    if(window.__guidedEdgePaintScheduled) return true;
+    window.__guidedEdgePaintScheduled = true;
+    const run = ()=>{
+      const runKeys = Array.from(new Set(window.__guidedEdgePaintPendingKeys || [])).filter(Boolean);
+      window.__guidedEdgePaintPendingKeys = [];
+      window.__guidedEdgePaintScheduled = false;
+      if(String(state?.ui?.currentViewName || "").trim().toLowerCase() !== "guided") return;
+      try{
+        if(!_guidedRefreshFlowEdgesForKeys(runKeys) && typeof window.__guidedPaintFlowEdges === "function"){
+          window.__guidedPaintFlowEdges();
+        }
+      }catch(e){
+        console.warn("[GUIDED_VIEW] queued flow edge paint fail", { reason:String(reason || ""), error:e });
+      }
+    };
+    run();
     return true;
   }catch(e){
     console.warn("[GUIDED_VIEW] queue flow edge paint fail", { reason:String(reason || ""), error:e });
@@ -13237,7 +13253,7 @@ function _scheduleGuidedPlanningRender(reason){
       try{ renderGuidedPlanningView(); }catch(e){ console.warn("[GUIDED_VIEW] scheduled render fail", { reason:String(reason || ""), error:e }); }
     };
     if(typeof requestAnimationFrame === "function"){
-      requestAnimationFrame(()=>requestAnimationFrame(run));
+      requestAnimationFrame(run);
     }else{
       setTimeout(run, 0);
     }
@@ -13313,6 +13329,7 @@ function _guidedRefreshFlowEdgesForKeys(keys){
     const svg = state?.svg || document.querySelector("#guidedServiceFlowRail .guidedFlowSvg");
     const edgeSpecs = Array.isArray(state?.edgeSpecs) ? state.edgeSpecs : [];
     if(!board || !svg || !edgeSpecs.length) return false;
+    try{ board.getBoundingClientRect(); svg.getBoundingClientRect(); }catch(_){}
     const keySet = new Set((Array.isArray(keys) ? keys : [keys]).map(x=>String(x || "").trim()).filter(Boolean));
     if(!keySet.size) return false;
     const blocks = new Map();
@@ -13583,7 +13600,7 @@ function _bindGuidedServiceEditorUI(){
       const fastOk = _guidedApplyLaneMoveFast([
         { key, lane: Math.max(0, idx - 1) }
       ], savedDraft);
-      const edgeOk = fastOk && _guidedQueueFlowEdgePaint("lane_move_up");
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint([key], "lane_move_up");
       if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_up");
       console.info("[EAP_AUDIT_MOVE]", {
         action: "up",
@@ -13611,7 +13628,7 @@ function _bindGuidedServiceEditorUI(){
       const fastOk = _guidedApplyLaneMoveFast([
         { key, lane: idx + 1 }
       ], savedDraft);
-      const edgeOk = fastOk && _guidedQueueFlowEdgePaint("lane_move_down");
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint([key], "lane_move_down");
       if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_down");
       console.info("[EAP_AUDIT_MOVE]", {
         action: "down",
@@ -13980,7 +13997,7 @@ function _bindGuidedServiceFlowUI(){
       const fastOk = _guidedApplyLaneMoveFast([
         { key, lane: nextLane }
       ], savedDraft);
-      const edgeOk = fastOk && _guidedQueueFlowEdgePaint(`lane_move_${action}`);
+      const edgeOk = fastOk && _guidedQueueFlowEdgePaint([key], `lane_move_${action}`);
       if(!edgeOk) _scheduleGuidedPlanningRender("lane_move_fallback_old_handler");
       console.info("[EAP_AUDIT_MOVE]", {
         action,
