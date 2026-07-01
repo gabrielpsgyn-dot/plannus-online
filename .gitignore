@@ -4,3 +4,6 @@
 PLANNUS_GIT*.bat
 node_modules/
 .DS_Store
+tools/maintenance/
+outputs/archives/
+PUBLIC_DEPLOY.zip

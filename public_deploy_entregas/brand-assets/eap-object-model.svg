@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" fill="none">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5F6F6"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#101820" flood-opacity=".08"/>
+    </filter>
+    <marker id="arrowGrey" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#B1B3B3"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#D50032"/>
+    </marker>
+    <marker id="arrowBlack" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#101820"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#panel)"/>
+
+  <!-- subtle grid -->
+  <g opacity=".10" stroke="#B1B3B3" stroke-width="1">
+    <path d="M80 76H1520"/>
+    <path d="M80 166H1520"/>
+    <path d="M80 256H1520"/>
+    <path d="M80 346H1520"/>
+    <path d="M80 436H1520"/>
+  </g>
+
+  <!-- rail labels -->
+  <g font-family="Inter, Arial, sans-serif" font-weight="800">
+    <rect x="78" y="92" width="62" height="22" rx="11" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <text x="89" y="108" font-size="10" fill="#101820">RAIA 1</text>
+  </g>
+
+  <!-- blocks -->
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <!-- Block 1 -->
+    <rect x="120" y="132" width="184" height="86" rx="16" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <rect x="120" y="132" width="184" height="18" rx="16" fill="#FAFAFA"/>
+    <rect x="128" y="149" width="30" height="14" rx="7" fill="#101820"/>
+    <text x="126" y="163" font-size="10" font-weight="800" fill="#FFFFFF">RAIA 1</text>
+    <rect x="242" y="141" width="28" height="22" rx="11" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <text x="251" y="157" font-size="14" font-weight="900" fill="#101820">×</text>
+    <rect x="122" y="156" width="22" height="14" rx="7" fill="#101820"/>
+    <rect x="290" y="163" width="22" height="14" rx="7" fill="#D50032"/>
+    <text x="150" y="190" font-size="17" font-weight="900" fill="#101820">ALVENARIA</text>
+    <text x="150" y="210" font-size="17" font-weight="900" fill="#101820">INTERNA</text>
+    <rect x="154" y="213" width="56" height="18" rx="9" fill="#F5F6F6" stroke="#E4E7E8"/>
+    <text x="163" y="226" font-size="9" font-weight="900" fill="#101820">RAIA 1</text>
+    <text x="118" y="225" font-size="10" font-weight="700" fill="#5F666A">Padrão</text>
+
+    <!-- Block 2 -->
+    <rect x="458" y="132" width="184" height="86" rx="16" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <rect x="458" y="132" width="184" height="18" rx="16" fill="#FAFAFA"/>
+    <rect x="466" y="149" width="30" height="14" rx="7" fill="#101820"/>
+    <text x="474" y="163" font-size="10" font-weight="800" fill="#FFFFFF">RAIA 1</text>
+    <rect x="580" y="141" width="28" height="22" rx="11" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <text x="589" y="157" font-size="14" font-weight="900" fill="#101820">×</text>
+    <rect x="460" y="156" width="22" height="14" rx="7" fill="#101820"/>
+    <rect x="628" y="163" width="22" height="14" rx="7" fill="#D50032"/>
+    <text x="488" y="190" font-size="17" font-weight="900" fill="#101820">TALISCA</text>
+    <rect x="492" y="213" width="56" height="18" rx="9" fill="#F5F6F6" stroke="#E4E7E8"/>
+    <text x="501" y="226" font-size="9" font-weight="900" fill="#101820">RAIA 1</text>
+
+    <!-- Block 3 -->
+    <rect x="796" y="132" width="184" height="86" rx="16" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <rect x="796" y="132" width="184" height="18" rx="16" fill="#FAFAFA"/>
+    <rect x="804" y="149" width="30" height="14" rx="7" fill="#101820"/>
+    <text x="812" y="163" font-size="10" font-weight="800" fill="#FFFFFF">RAIA 1</text>
+    <rect x="918" y="141" width="28" height="22" rx="11" fill="#FFFFFF" stroke="#E4E7E8"/>
+    <text x="927" y="157" font-size="14" font-weight="900" fill="#101820">×</text>
+    <rect x="798" y="156" width="22" height="14" rx="7" fill="#101820"/>
+    <rect x="966" y="163" width="22" height="14" rx="7" fill="#D50032"/>
+    <text x="826" y="190" font-size="17" font-weight="900" fill="#101820">CONTRAMARCO</text>
+    <rect x="830" y="213" width="56" height="18" rx="9" fill="#F5F6F6" stroke="#E4E7E8"/>
+    <text x="839" y="226" font-size="9" font-weight="900" fill="#101820">RAIA 1</text>
+  </g>
+
+  <!-- connections -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M312 170H450" stroke="#F5A15A" stroke-width="2.5" marker-end="url(#arrowGrey)"/>
+    <path d="M650 170H788" stroke="#9F7AEA" stroke-width="2.5" marker-end="url(#arrowGrey)"/>
+    <path d="M1080 170H1420" stroke="#B1B3B3" stroke-width="2.0" opacity=".45"/>
+  </g>
+
+  <!-- tiny dot hints -->
+  <g>
+    <circle cx="122" cy="163" r="6" fill="#101820"/>
+    <circle cx="290" cy="170" r="6" fill="#D50032"/>
+    <circle cx="460" cy="163" r="6" fill="#101820"/>
+    <circle cx="628" cy="170" r="6" fill="#D50032"/>
+    <circle cx="798" cy="163" r="6" fill="#101820"/>
+    <circle cx="966" cy="170" r="6" fill="#D50032"/>
+  </g>
+
+  <!-- footer note -->
+  <text x="80" y="470" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#5F666A">
+    Modelo de bloco EAP: texto acima, identificação curta, pontos discretos e ligação limpa.
+  </text>
+</svg>
