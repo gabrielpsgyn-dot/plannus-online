@@ -12611,6 +12611,9 @@ function _guidedStageTypeLabel(raw){
   const v = _guidedStageType(raw);
   return ({ bloco:"Bloco", trecho:"Trecho", frente:"Frente", geral:"Geral" })[v] || "Geral";
 }
+function _guidedRepoApi(){
+  return (typeof window !== "undefined" && window.PlannusOnlineRepository) ? window.PlannusOnlineRepository : null;
+}
 function _normalizeGuidedPredecessorLink(raw, idx, defaultFrom){
   const src = raw && typeof raw === "object" ? raw : {};
   const fromServiceId = String(src.fromServiceId || src.predServiceId || src.predecessorServiceId || defaultFrom || "").trim();
@@ -12632,6 +12635,38 @@ function _guidedPrimaryPredecessorId(svc){
   const arr = Array.isArray(svc?.predecessors) ? svc.predecessors : [];
   const first = arr.find(p=>String(p?.fromServiceId || "").trim()) || null;
   return String(first?.fromServiceId || svc?.predecessorServiceId || "").trim();
+}
+function _guidedNormalizeTemplateRecord(raw, fallbackKey, idx){
+  if(!raw || typeof raw !== "object") return null;
+  const key = String(raw.key || raw.templateKey || fallbackKey || "").trim();
+  if(!key) return null;
+  const baseKey = String(raw.baseTemplateKey || raw.base_template_key || raw.draftDefaults?.templateKey || raw.draft_defaults?.templateKey || "residencial_vertical_padrao").trim() || "residencial_vertical_padrao";
+  const label = String(raw.label || raw.name || key).trim() || key;
+  const draftDefaults = raw.draftDefaults && typeof raw.draftDefaults === "object"
+    ? raw.draftDefaults
+    : raw.draft_defaults && typeof raw.draft_defaults === "object"
+      ? raw.draft_defaults
+      : raw.draft && typeof raw.draft === "object"
+        ? raw.draft
+        : {};
+  const createdAtISO = String(raw.createdAtISO || raw.created_at || raw.savedAtISO || raw.updatedAtISO || raw.updated_at || "").trim();
+  const updatedAtISO = String(raw.updatedAtISO || raw.updated_at || raw.savedAtISO || raw.createdAtISO || raw.created_at || "").trim();
+  const services = Array.isArray(raw.services) ? raw.services : [];
+  return {
+    key,
+    label,
+    sourceKind: "custom",
+    description: String(raw.description || "").trim(),
+    baseTemplateKey: baseKey,
+    draftDefaults: _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(baseKey), draftDefaults, {
+      templateKey: key,
+      templateLabel: label
+    }), { allowBuiltinOnly:true, skipLibraryLookup:true }),
+    services: _guidedCloneServices(services),
+    createdAtISO,
+    updatedAtISO,
+    savedAtISO: updatedAtISO || createdAtISO || String(idx != null ? idx : "").trim()
+  };
 }
 function _guidedSyncPredecessorCompatFields(svc){
   if(!svc || typeof svc !== "object") return;
@@ -12907,17 +12942,8 @@ function _readGuidedEapLibrary(){
     if(!obj || typeof obj !== "object") return {};
     const out = {};
     for(const [key, value] of Object.entries(obj)){
-      if(!value || typeof value !== "object") continue;
-      const baseKey = String(value.baseTemplateKey || "residencial_vertical_padrao").trim() || "residencial_vertical_padrao";
-      const normalized = {
-        key: String(value.key || key || "").trim(),
-        label: String(value.label || key || "").trim(),
-        sourceKind: "custom",
-        description: String(value.description || "").trim(),
-        baseTemplateKey: baseKey,
-        draftDefaults: _normalizeGuidedDraft(Object.assign({}, _guidedDefaultDraft(baseKey), value.draftDefaults || value, { templateKey: String(value.key || key || "").trim(), templateLabel: String(value.label || key || "").trim() }), { allowBuiltinOnly:true }),
-        services: _guidedCloneServices(Array.isArray(value.services) ? value.services : [])
-      };
+      const normalized = _guidedNormalizeTemplateRecord(value, key, 0);
+      if(!normalized) continue;
       out[normalized.key] = normalized;
     }
     return out;
@@ -12925,24 +12951,104 @@ function _readGuidedEapLibrary(){
     return {};
   }
 }
+async function _persistGuidedEapLibraryRemote(library){
+  try{
+    const repo = _guidedRepoApi();
+    if(!repo || typeof repo.saveEapTemplates !== "function") return { ok:false, skipped:true, reason:"repo_unavailable" };
+    const templates = Object.values(library || {}).map((value, idx)=>({
+      key: String(value?.key || "").trim(),
+      label: String(value?.label || "").trim(),
+      description: String(value?.description || "").trim(),
+      source_kind: "custom",
+      base_template_key: String(value?.baseTemplateKey || "").trim(),
+      order_index: idx + 1,
+      ativo: 1,
+      draft: value?.draftDefaults && typeof value.draftDefaults === "object" ? value.draftDefaults : {},
+      services: Array.isArray(value?.services) ? value.services : []
+    })).filter(t=>t.key && t.label);
+    const { res, data } = await repo.saveEapTemplates(templates);
+    if(res?.ok && data?.ok !== false){
+      console.log("[PLANNUS_EAP]", { event:"remote_save_ok", total:templates.length });
+      return { ok:true, data };
+    }
+    console.warn("[PLANNUS_EAP]", { event:"remote_save_failed", status:res?.status || 0, erro:data?.erro || null, total:templates.length });
+    return { ok:false, status:res?.status || 0, data };
+  }catch(e){
+    console.warn("[PLANNUS_EAP]", { event:"remote_save_exception", error:String(e && e.message || e) });
+    return { ok:false, error:String(e && e.message || e) };
+  }
+}
+let __guidedEapRemoteSaveTimer = null;
+let __guidedEapHydratePromise = null;
+function _scheduleGuidedEapRemoteSave(library){
+  try{
+    if(__guidedEapRemoteSaveTimer){
+      clearTimeout(__guidedEapRemoteSaveTimer);
+      __guidedEapRemoteSaveTimer = null;
+    }
+    const snapshot = JSON.parse(JSON.stringify(library || {}));
+    __guidedEapRemoteSaveTimer = setTimeout(()=>{
+      _persistGuidedEapLibraryRemote(snapshot).catch(e=>{
+        console.warn("[PLANNUS_EAP]", { event:"remote_save_timer_failed", error:String(e && e.message || e) });
+      });
+    }, 350);
+  }catch(e){
+    console.warn("[PLANNUS_EAP]", { event:"remote_save_schedule_failed", error:String(e && e.message || e) });
+  }
+}
+async function _hydrateGuidedEapLibraryFromRemote(reason){
+  try{
+    if(__guidedEapHydratePromise) return __guidedEapHydratePromise;
+    __guidedEapHydratePromise = (async ()=>{
+      const repo = _guidedRepoApi();
+      if(!repo || typeof repo.listEapTemplates !== "function") return null;
+      const { res, data } = await repo.listEapTemplates();
+      if(!res?.ok || data?.ok === false || !Array.isArray(data?.templates)) return null;
+      const remote = {};
+      data.templates.forEach((tpl, idx)=>{
+        const normalized = _guidedNormalizeTemplateRecord(tpl, tpl?.key, idx);
+        if(normalized) remote[normalized.key] = normalized;
+      });
+      if(!Object.keys(remote).length) return null;
+      const local = _readGuidedEapLibrary();
+      const merged = Object.assign({}, local);
+      for(const [key, value] of Object.entries(remote)){
+        const current = merged[key];
+        if(!current || _guidedTemplateSavedAt(value) >= _guidedTemplateSavedAt(current)){
+          merged[key] = value;
+        }
+      }
+      localStorage.setItem(GUIDED_EAP_LIBRARY_KEY, JSON.stringify(merged));
+      console.log("[PLANNUS_EAP]", { event:"remote_hydrate_ok", reason:String(reason || ""), remoteCount:Object.keys(remote).length, mergedCount:Object.keys(merged).length });
+      try{
+        const guidedVisible = !!(document.getElementById("viewGuided") && getComputedStyle(document.getElementById("viewGuided")).display !== "none");
+        const projectVisible = !!(document.getElementById("viewProjectSetup") && getComputedStyle(document.getElementById("viewProjectSetup")).display !== "none");
+        const guidedApplyVisible = !!(document.getElementById("viewGuidedApply") && getComputedStyle(document.getElementById("viewGuidedApply")).display !== "none");
+        if(guidedVisible){
+          _scheduleGuidedPlanningRender("guided_eap_hydrated");
+        }else if(projectVisible){
+          renderProjectSetupView();
+        }else if(guidedApplyVisible){
+          renderGuidedApplyView();
+        }
+      }catch(_){}
+      return merged;
+    })();
+    return await __guidedEapHydratePromise;
+  }finally{
+    __guidedEapHydratePromise = null;
+  }
+}
 function _saveGuidedEapLibrary(library){
   try{
     const out = {};
     for(const [key, value] of Object.entries(library || {})){
-      if(!value || typeof value !== "object") continue;
-      const baseKey = String(value.baseTemplateKey || value.draftDefaults?.templateKey || "residencial_vertical_padrao").trim() || "residencial_vertical_padrao";
-      const normalized = {
-        key: String(value.key || key || "").trim(),
-        label: String(value.label || key || "").trim(),
-        sourceKind: "custom",
-        description: String(value.description || "").trim(),
-        baseTemplateKey: baseKey,
-        draftDefaults: _normalizeGuidedDraft(value.draftDefaults || _guidedDefaultDraft(baseKey), { allowBuiltinOnly:true }),
-        services: _guidedCloneServices(Array.isArray(value.services) ? value.services : [])
-      };
+      const normalized = _guidedNormalizeTemplateRecord(value, key, 0);
+      if(!normalized) continue;
       out[normalized.key] = normalized;
     }
     localStorage.setItem(GUIDED_EAP_LIBRARY_KEY, JSON.stringify(out));
+    _scheduleGuidedEapRemoteSave(out);
     return true;
   }catch(_){
     return false;
@@ -12988,15 +13094,7 @@ function _guidedPickTemplateOption(current, next){
   return a;
 }
 function _guidedTemplateOptions(){
-  const builtins = Object.values(GUIDED_EAP_TEMPLATES || {}).map(t=>({
-    key:String(t.key||"").trim(),
-    label:String(t.label||t.key||"").trim(),
-    sourceKind:String(t.sourceKind||"builtin").trim() || "builtin",
-    description:String(t.description||"Modelo padrão").trim(),
-    createdAtISO:String(t.createdAtISO || "").trim(),
-    updatedAtISO:String(t.updatedAtISO || "").trim(),
-    savedAtISO:String(t.savedAtISO || "").trim()
-  })).filter(x=>x.key);
+  try{ void _hydrateGuidedEapLibraryFromRemote("template_options"); }catch(_){}
   const custom = Object.values(_readGuidedEapLibrary()).map(t=>({
     key:String(t.key||"").trim(),
     label:String(t.label||t.key||"").trim(),
@@ -13004,19 +13102,12 @@ function _guidedTemplateOptions(){
     description:String(t.description||"Modelo salvo").trim(),
     createdAtISO:String(t.createdAtISO || "").trim(),
     updatedAtISO:String(t.updatedAtISO || "").trim(),
-    savedAtISO:String(t.savedAtISO || "").trim()
+    savedAtISO:String(t.savedAtISO || t.updatedAtISO || t.createdAtISO || "").trim()
   })).filter(x=>x.key);
-  const byLabel = new Map();
-  [...builtins, ...custom].forEach(t=>{
-    const lk = _guidedTemplateLabelKey(t.label || t.key);
-    if(!lk) return;
-    const prev = byLabel.get(lk);
-    byLabel.set(lk, _guidedPickTemplateOption(prev, t));
-  });
-  return Array.from(byLabel.values()).sort((a,b)=>{
-    const ak = String(a.sourceKind||"") === "builtin" ? 0 : 1;
-    const bk = String(b.sourceKind||"") === "builtin" ? 0 : 1;
-    if(ak !== bk) return ak - bk;
+  return custom.sort((a,b)=>{
+    const at = _guidedTemplateSavedAt(a);
+    const bt = _guidedTemplateSavedAt(b);
+    if(at !== bt) return bt - at;
     return String(a.label||"").localeCompare(String(b.label||""), "pt-BR");
   });
 }
@@ -13056,7 +13147,7 @@ function _guidedServiceCatalogSeed(template){
 function _normalizeGuidedDraft(draft, opts){
   const src = draft && typeof draft === "object" ? draft : {};
   const templateKey = String(src.templateKey || "residencial_vertical_padrao").trim() || "residencial_vertical_padrao";
-  const library = _readGuidedEapLibrary();
+  const library = opts && opts.skipLibraryLookup ? {} : _readGuidedEapLibrary();
   const hasBuiltinTemplate = !!GUIDED_EAP_TEMPLATES[templateKey];
   const hasCustomTemplate = !!library[templateKey];
   const hasTemplateMatch = hasBuiltinTemplate || hasCustomTemplate;

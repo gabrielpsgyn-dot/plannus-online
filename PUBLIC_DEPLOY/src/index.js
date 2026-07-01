@@ -14,7 +14,13 @@ export default {
         }, 500);
       }
 
-      const path = url.pathname;
+      const rawPath = url.pathname;
+      let path = rawPath;
+      try {
+        path = decodeURIComponent(rawPath);
+      } catch (_err) {
+        path = rawPath;
+      }
       const method = request.method;
       const parts = path.split("/").filter(Boolean);
 
@@ -470,7 +476,7 @@ export default {
       // OBRAS — CRIAR OBRA REAL NO D1
       // ============================================================
 
-      if (path === "/api/servicos" && method === "GET") {
+      if ((path === "/api/servicos" || path === "/api/serviços") && method === "GET") {
         const services = await loadServiceCatalogFromDb(env);
 
         return json({
@@ -479,7 +485,7 @@ export default {
         });
       }
 
-      if (path === "/api/servicos" && method === "POST") {
+      if ((path === "/api/servicos" || path === "/api/serviços") && method === "POST") {
         const actorEmail = getUserEmail(request);
         const body = await readJson(request);
         const incoming = Array.isArray(body.services) ? body.services : [];
@@ -1525,7 +1531,7 @@ export default {
       return json({
         ok: false,
         erro: "Rota não encontrada",
-        path: url.pathname
+        path: rawPath
       }, 404);
 
     } catch (error) {

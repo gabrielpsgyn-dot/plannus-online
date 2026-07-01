@@ -695,6 +695,7 @@
                 </div>
                 <div class="actions" style="margin-top:0">
                   <button class="ghost" id="btnPresentationPdf" type="button">PDF acompanhamento</button>
+                  <button class="ghost" id="btnOperationalPdf" type="button">PDF operacional</button>
                 </div>
               </div>
             </div>
@@ -2662,12 +2663,15 @@
         }
         const importedByPackage = new Map();
         const minDates = [];
+        const importedOverrides = {};
         importedRows.forEach((raw, index) => {
           const local = String(readImportCell(raw, ["Local", "Unidade", "Apartamento", "Pavimento"]) || "").trim();
           const floor = readImportCell(raw, ["Pavimento", "Pav.", "Andar"]);
           const serviceName = String(readImportCell(raw, ["Serviço", "Servico", "Atividade"]) || "").trim();
           const startDate = parseImportDate(readImportCell(raw, ["Início previsto", "Inicio previsto", "Início", "Inicio", "Data início", "Data inicio"]));
           const endDate = parseImportDate(readImportCell(raw, ["Fim previsto", "Término previsto", "Termino previsto", "Fim", "Término", "Termino", "Data fim"]));
+          const actualStartDate = parseImportDate(readImportCell(raw, ["Início real", "Inicio real", "Data início real", "Data inicio real", "Início executado", "Inicio executado"]));
+          const actualEndDate = parseImportDate(readImportCell(raw, ["Fim real", "Término real", "Termino real", "Data fim real", "Fim executado", "Termino executado"]));
           if (!local || !serviceName || !startDate || !endDate) return;
           minDates.push(startDate);
           const criticality = "media";
@@ -2687,8 +2691,10 @@
             existing.packageTeams = packageTeams == null
               ? existing.packageTeams
               : Math.max(existing.packageTeams == null ? 0 : existing.packageTeams, packageTeams);
+            existing.actualStartDate = existing.actualStartDate || actualStartDate;
+            existing.actualEndDate = existing.actualEndDate || actualEndDate;
           } else {
-            importedByPackage.set(packageKey, { raw, unit, service, startDate, endDate, criticality, durationDays, packageTeams });
+            importedByPackage.set(packageKey, { raw, unit, service, startDate, endDate, criticality, durationDays, packageTeams, actualStartDate, actualEndDate });
           }
         });
         const imported = [...importedByPackage.values()];
@@ -2717,8 +2723,16 @@
           const startDay = dateInputToPlanDay(item.startDate);
           const endDay = dateInputToPlanDay(item.endDate);
           const durationDays = Math.max(1, endDay - startDay + 1);
+          const key = planRowKey(item.unit.id, item.service.id);
+          if (item.actualStartDate || item.actualEndDate) {
+            importedOverrides[key] = {
+              ...(state.plan?.overrides?.[key] || {}),
+              ...(item.actualStartDate ? { actualStartDate: String(item.actualStartDate || "") } : {}),
+              ...(item.actualEndDate ? { actualEndDate: String(item.actualEndDate || "") } : {}),
+            };
+          }
           return {
-            key: planRowKey(item.unit.id, item.service.id),
+            key,
             unitId: item.unit.id,
             unitLabel: unitDisplayName(item.unit),
             unitCode: item.unit.code || "",
@@ -2753,6 +2767,10 @@
           ...state.plan,
           generatedAt: new Date().toISOString(),
           rows: rowsOut,
+          overrides: {
+            ...(state.plan?.overrides || {}),
+            ...importedOverrides,
+          },
           selectedPackageKey: rowsOut[0]?.key || "",
           source: "excel",
           importSummary: {
@@ -3325,12 +3343,34 @@
           );
       }
 
+
+      function openPrintableReport(html, alertMessage) {
+        const report = window.open("", "_blank", "width=1200,height=800");
+        if (!report) {
+          window.alert(alertMessage);
+          return null;
+        }
+        report.document.open();
+        report.document.write(html);
+        report.document.close();
+        report.focus();
+        return report;
+      }
+
       function generateOperationalPdf() {
         const referenceDate = referenceDateObject();
-        const rows = operationalRows(referenceDate);
+        const rows = filteredPlanRows();
         const days = Array.from({ length: 15 }, (_, index) => addDays(referenceDate, index)).filter(Boolean);
         const reportDate = referenceDate.toLocaleDateString("pt-BR");
         const generatedAt = new Date().toLocaleString("pt-BR");
+        const activeServiceId = String(els.trackService?.value || "");
+        const activeService = activeServiceId ? serviceById(activeServiceId) : null;
+        const legend = [
+          { label: "Programado", color: "#98a2b3", bg: "#f3f4f6" },
+          { label: "Em andamento", color: "#f59e0b", bg: "#fff7ed" },
+          { label: "Atrasado", color: "#ef4444", bg: "#fef2f2" },
+          { label: "Medido", color: "#10b981", bg: "#ecfdf5" },
+        ];
         const tableRows = rows.map((row) => {
           const interval = operationalInterval(row);
           const activeStart = interval.activeStart;
@@ -3358,6 +3398,12 @@
           </tr>`;
         }).join("");
         const dayHeaders = days.map((day) => `<th>${escapeHtml(day.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }))}</th>`).join("");
+        const legendHtml = legend.map((item) => `
+          <span class="legend" style="background:${item.bg};border-color:${item.color}33">
+            <span class="dot" style="background:${item.color}"></span>
+            ${escapeHtml(item.label)}
+          </span>
+        `).join("");
         const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -3367,6 +3413,12 @@
     @page{size:A4 landscape;margin:10mm}
     body{font-family:Arial,sans-serif;color:#111827;margin:0}
     h1{font-size:18px;margin:0 0 4px}
+    .hero{border:1px solid #e5e7eb;border-radius:14px;padding:8px 10px;margin-bottom:8px;background:linear-gradient(135deg,#ffffff 0%,#fff6f7 60%,#f8fafc 100%);box-shadow:0 6px 16px rgba(15,23,42,.05);border-left:4px solid #ef1735}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid #d0d5dd;border-radius:999px;font-size:9px;background:#fff;box-shadow:0 1px 0 rgba(16,24,40,.03)}
+    .legend-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px}
+    .legend{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border:1px solid #e5e7eb;border-radius:999px;font-size:9px;background:#fff}
+    .dot{width:7px;height:7px;border-radius:999px;display:inline-block}
     .meta{font-size:11px;color:#475467;margin-bottom:10px}
     table{width:100%;border-collapse:collapse;font-size:9px}
     th,td{border:1px solid #cbd5e1;padding:4px;vertical-align:middle}
@@ -3377,11 +3429,19 @@
   </style>
 </head>
 <body>
-  <h1>Operacional - Atividades da janela</h1>
-  <div class="meta">
-    Projeto: ${escapeHtml(state.obra.nome || "-")} - Código: ${escapeHtml(state.obra.codigo || "-")} 
-    Data de referência: ${escapeHtml(reportDate)} - Gerado em: ${escapeHtml(generatedAt)}
+  <div class="hero">
+    <h1>Operacional - Atividades da janela</h1>
+    <div class="meta">
+      Projeto: ${escapeHtml(state.obra.nome || "-")} - Código: ${escapeHtml(state.obra.codigo || "-")}
+      Data de referência: ${escapeHtml(reportDate)} - Gerado em: ${escapeHtml(generatedAt)}
+      ${activeService ? ` - Serviço filtrado: ${escapeHtml(activeService.name || activeService.code || "-")}` : ""}
+    </div>
+    <div class="chips">
+      <span class="chip"><strong>${escapeHtml(rows.length)}</strong> pacotes</span>
+      <span class="chip"><strong>${escapeHtml(days.length)}</strong> dias</span>
+    </div>
   </div>
+  <div class="legend-row">${legendHtml}</div>
   ${rows.length ? `<table>
     <thead>
       <tr>
@@ -3389,7 +3449,7 @@
         <th>Pav.</th>
         <th>Serviço</th>
         <th>Status</th>
-        <th>Predecessoras lgicas</th>
+        <th>Predecessoras lógicas</th>
         <th>Equipe atual</th>
         <th>Equipe necessária</th>
         <th>Início previsto</th>
@@ -3399,19 +3459,13 @@
     </thead>
     <tbody>${tableRows}</tbody>
   </table>` : `<div class="empty">Nenhuma atividade encontrada na janela operacional de 15 dias.</div>`}
-  <div class="note">Marcao X: dias em que a atividade ocorre dentro da janela operacional. Quando não houver início real, o relatério usa o plano previsto. Equipe necessária: m²nimo estimado para cumprir a durao prevista a partir da durao base por criticidade.</div>
+  <div class="note">Marcação X: dias em que a atividade ocorre dentro da janela operacional. Quando não houver início real, o relatório usa o plano previsto. Equipe necessária: mínimo estimado para cumprir a duração prevista a partir da duração base por criticidade.</div>
   <script>window.addEventListener("load",()=>setTimeout(()=>window.print(),250));<\/script>
 </body>
 </html>`;
-        const reportUrl = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
-        const report = window.open(reportUrl, "_blank", "noopener,noreferrer,width=1200,height=800");
-        if (!report) {
-          URL.revokeObjectURL(reportUrl);
-          window.alert("Não foi possvel abrir o relatério. Libere pop-ups para gerar o PDF operacional.");
-          return;
-        }
-        report.addEventListener("load", () => URL.revokeObjectURL(reportUrl), { once: true });
+        openPrintableReport(html, "Não foi possível abrir o relatório. Libere pop-ups para gerar o PDF operacional.");
       }
+
 
       function serviceSummaryForPdf(referenceDate = referenceDateObject(), sourceRows = planRowsList()) {
         const rows = Array.isArray(sourceRows) ? sourceRows : planRowsList();
@@ -3653,15 +3707,7 @@
   <script>window.addEventListener("load",()=>setTimeout(()=>window.print(),250));<\/script>
 </body>
 </html>`;
-        const reportUrl = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
-        const report = window.open(reportUrl, "_blank", "noopener,noreferrer,width=1200,height=800");
-        if (!report) {
-          URL.revokeObjectURL(reportUrl);
-          window.alert("Nao foi possivel abrir o relatorio. Libere pop-ups para gerar o PDF de apresentacao.");
-          return;
-        }
-        report.addEventListener("load", () => URL.revokeObjectURL(reportUrl), { once: true });
-        report.focus();
+        openPrintableReport(html, "Nao foi possivel abrir o relatorio. Libere pop-ups para gerar o PDF de apresentacao.");
       }
 
       function renderBalance() {
