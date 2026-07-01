@@ -7,3 +7,8 @@ node_modules/
 tools/maintenance/
 outputs/archives/
 PUBLIC_DEPLOY.zip
+dist-pages/
+outputs/
+vendor/
+publicar_worker.*
+wrangler.deploy.temp.toml
