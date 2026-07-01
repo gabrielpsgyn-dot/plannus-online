@@ -2817,51 +2817,6 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
 #viewPlanner .gridOuter::-webkit-scrollbar-thumb{
   background:rgba(213,0,50,.38);
 }
-@media (max-width:760px){
-  #viewPlanner .plannerShell{
-    grid-template-columns:84px minmax(0,1fr);
-  }
-  #viewPlanner .plannerRailTop{
-    padding:0 6px;
-    font-size:10px;
-  }
-  #viewPlanner .lobLocRow{
-    padding:3px 6px;
-  }
-  #viewPlanner .lobLocRow .n{
-    font-size:14px;
-  }
-  #viewPlanner .svcHeader{
-    padding:6px 6px;
-    gap:4px;
-  }
-  #viewPlanner .svcHeader .name{
-    font-size:10px;
-    min-height:24px;
-  }
-  #viewPlanner .svcHeader .deps{
-    font-size:9px;
-    padding:3px 6px;
-    border-radius:8px;
-  }
-  #viewPlanner .dayHeader{
-    padding:18px 1px 4px;
-    gap:1px;
-  }
-  #viewPlanner .dayHeader .d{
-    font-size:10px;
-  }
-  #viewPlanner .dayHeader .w{
-    font-size:8px;
-  }
-  #viewPlanner .lobServiceBlock{
-    border-radius:10px;
-  }
-  #viewPlanner .lobServiceBlock .ttlIn,
-  #viewPlanner .lobServiceBlock .ttlOut{
-    font-size:10px;
-  }
-}
 .guidedFlowLane{
   position:relative;
   min-height:124px;
@@ -19568,11 +19523,7 @@ function renderTodayLine(){
 function _laneWFromUI(){
   const uiColW = Number((state.ui && state.ui.colW) ? state.ui.colW : 220);
   // laneW é a largura real de cada subcoluna (T1, T2, ...). Mantemos compacto para respeitar as colunas.
-  const mobile = typeof window !== "undefined" && window.innerWidth <= 760;
-  const scale = mobile ? 0.26 : 0.55;
-  const minW = mobile ? 36 : 90;
-  const maxW = mobile ? 64 : 140;
-  return Math.max(minW, Math.min(maxW, Math.round(uiColW * scale)));
+  return Math.max(90, Math.min(140, Math.round(uiColW * 0.55)));
 }
 function _baseLaneWFromUI(){
   // Para não haver "sair/entrar" entre colunas, BASE e PLANO precisam usar a mesma unidade de largura.
@@ -22745,16 +22696,11 @@ function _forcePlannerVisualModeRender(){
 }
 function _plannerDayWidth(){
   const lobZoom = Math.max(0.4, Math.min(3, Number(state?.ui?.lobZoom || 1)));
-  const mobile = typeof window !== "undefined" && window.innerWidth <= 760;
-  const baseDayW = mobile ? 18 : 54;
-  const minW = mobile ? 12 : 24;
-  const maxW = mobile ? 56 : 168;
-  return Math.max(minW, Math.min(maxW, Math.round(baseDayW * lobZoom)));
+  const baseDayW = 54;
+  return Math.max(24, Math.min(168, Math.round(baseDayW * lobZoom)));
 }
 function _plannerLobBaseRowHeight(){
-  const mobile = typeof window !== "undefined" && window.innerWidth <= 760;
-  const base = Number(state?.ui?.rowH || (mobile ? 40 : 64));
-  return Math.max(mobile ? 30 : 42, Math.min(mobile ? 84 : 120, base));
+  return Math.max(42, Math.min(120, Number(state?.ui?.rowH || 64)));
 }
 function _plannerServiceColor(serviceId, svc){
   const direct = String(svc?.color || svc?.serviceColor || "").trim();
