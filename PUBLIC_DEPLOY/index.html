@@ -1275,6 +1275,68 @@ body.reportsActiveView #btnRelatorioClose{ display:none !important; }
     }
     .miniBtn:hover{border-color:rgba(255,255,255,.24)}
     .miniBtn.danger{border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.10);}
+    .locTipoFlag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:0;
+      min-height:14px;
+      padding:0;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
+      width:auto;
+      max-width:none;
+      overflow:visible;
+    }
+    .locTipoFlag input[type="checkbox"]{
+      appearance:auto !important;
+      -webkit-appearance:auto !important;
+      width:14px !important;
+      height:14px !important;
+      min-width:14px !important;
+      min-height:14px !important;
+      max-width:14px !important;
+      max-height:14px !important;
+      margin:0;
+      flex:0 0 auto;
+      accent-color:var(--accent);
+      display:inline-block !important;
+    }
+    .locTipoFlag span{
+      display:none;
+    }
+    .compactFlag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:20px;
+      padding:0;
+      margin:0;
+      width:auto;
+      max-width:100%;
+    }
+    .compactFlag input[type="checkbox"]{
+      appearance:auto !important;
+      -webkit-appearance:auto !important;
+      width:14px !important;
+      height:14px !important;
+      min-width:14px !important;
+      min-height:14px !important;
+      max-width:14px !important;
+      max-height:14px !important;
+      margin:0;
+      accent-color:var(--accent);
+      flex:0 0 auto;
+      display:inline-block !important;
+    }
+    .compactFlag span{
+      font-size:11px;
+      line-height:1.1;
+      color:#475467;
+      white-space:nowrap;
+    }
     .inlineForm{
       display:grid;
       grid-template-columns: 1.6fr .8fr .7fr .8fr auto;
@@ -5387,11 +5449,11 @@ body.withSideNav:not(.plannerGridFullscreen) textarea{border:1px solid var(--pln
 #viewGuidedPlan .guidedFlowToolHeader{margin-top:12px !important;}
 #viewGuided .guidedFlowSearchBox,
 #viewGuidedApply .guidedFlowSearchBox,
-#viewGuidedPlan .guidedFlowSearchBox{display:grid !important; grid-template-columns:minmax(320px,1.25fr) minmax(250px,.95fr) !important; gap:12px !important; align-items:stretch !important; padding:14px 16px !important; border:1px solid #dce5f0 !important; border-radius:20px !important; background:linear-gradient(90deg, rgba(239,23,53,.06) 0 4px, transparent 4px), #fff !important; box-shadow:0 10px 28px rgba(16,24,40,.04) !important;}
+#viewGuidedPlan .guidedFlowSearchBox{display:grid !important; grid-template-columns:1fr !important; gap:10px !important; align-items:stretch !important; padding:14px 16px !important; border:1px solid #dce5f0 !important; border-radius:20px !important; background:linear-gradient(90deg, rgba(239,23,53,.06) 0 4px, transparent 4px), #fff !important; box-shadow:0 10px 28px rgba(16,24,40,.04) !important;}
 #viewGuided .guidedFlowSearchBox label, #viewGuidedApply .guidedFlowSearchBox label, #viewGuidedPlan .guidedFlowSearchBox label{display:block !important; margin-bottom:6px !important; font-size:12px !important; font-weight:900 !important; text-transform:uppercase !important; letter-spacing:.06em !important; color:#475467 !important;}
 #viewGuided .guidedFlowSearchBox input, #viewGuidedApply .guidedFlowSearchBox input, #viewGuidedPlan .guidedFlowSearchBox input{height:44px !important; border-radius:14px !important; border:1px solid #d8e2ee !important; box-shadow:0 0 0 3px rgba(239,23,53,.06) !important;}
-#viewGuided .guidedFlowSearchServiceBox, #viewGuidedApply .guidedFlowSearchServiceBox, #viewGuidedPlan .guidedFlowSearchServiceBox{min-height:84px !important; height:100% !important; border-radius:18px !important; border:1px solid #dce5f0 !important; background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%) !important; padding:12px 14px !important;}
-#viewGuided .guidedFlowSearchResults, #viewGuidedApply .guidedFlowSearchResults, #viewGuidedPlan .guidedFlowSearchResults{grid-column:1 / -1 !important; display:flex !important; flex-wrap:wrap !important; gap:8px !important;}
+#viewGuided .guidedFlowSearchServiceBox, #viewGuidedApply .guidedFlowSearchServiceBox, #viewGuidedPlan .guidedFlowSearchServiceBox{min-height:64px !important; height:auto !important; width:100% !important; border-radius:18px !important; border:1px solid #dce5f0 !important; background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%) !important; padding:12px 14px !important; display:flex !important; flex-direction:column !important; justify-content:center !important; gap:2px !important;}
+#viewGuided .guidedFlowSearchResults, #viewGuidedApply .guidedFlowSearchResults, #viewGuidedPlan .guidedFlowSearchResults{display:flex !important; flex-wrap:wrap !important; gap:8px !important;}
 #viewGuided .guidedFlowSearchOverlap, #viewGuidedApply .guidedFlowSearchOverlap, #viewGuidedPlan .guidedFlowSearchOverlap{grid-column:1 / -1 !important; margin-top:0 !important; font-size:12px !important; color:#667085 !important;}
 #viewGuided .guidedFlowRailWrap, #viewGuidedApply .guidedFlowRailWrap, #viewGuidedPlan .guidedFlowRailWrap{padding:18px !important; border:1px solid #dbe4f0 !important; border-radius:24px !important; background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important; box-shadow:0 14px 30px rgba(16,24,40,.06) !important;}
 #viewGuided .guidedFlowSimpleBoard, #viewGuidedApply .guidedFlowSimpleBoard, #viewGuidedPlan .guidedFlowSimpleBoard, #planningStageFlowBoard{border-radius:22px !important; background:linear-gradient(180deg, rgba(255,255,255,.8) 0%, rgba(248,250,252,.9) 100%), repeating-linear-gradient(90deg, rgba(15,23,42,.04) 0 1px, transparent 1px var(--guided-flow-grid-x,304px)) !important; background-position:0 0, var(--guided-flow-grid-pad-x,112px) 0 !important;}
@@ -6592,22 +6654,19 @@ document.addEventListener("click", function(ev){
 
 <div id="viewPav" style="display:none;">
     <section class="card" style="grid-column:1 / -1;">
-      <h2>
-        <span class="plnPageTitle">Pavimentos</span>
-        <span class="hint plnPageSubtitle">Base, ordem visual e agrupamento dos pavimentos.</span>
+      <h2 style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+        <span style="display:flex; flex-direction:column; gap:3px; min-width:220px;">
+          <span class="plnPageTitle">Pavimentos</span>
+          <span class="hint plnPageSubtitle">Cadastre os pavimentos e organize a ordem visual.</span>
+        </span>
+        <button class="btn primary" id="btnApplyPlanAfterPav" type="button">Salvar pavimentos e montar planejamento</button>
       </h2>
-      <div class="body">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-          <div style="font-size:12px; color:var(--muted);">
-            Revise ordem, tipo e agrupamento dos pavimentos antes de aplicar o plano. Se quiser, use o questionário rápido para montar a base inicial.
-          </div>
-          <button class="btn primary" id="btnApplyPlanAfterPav" type="button">Salvar pavimentos e montar planejamento</button>
-        </div>
+      <div class="body" style="padding-top:10px;">
         <div class="card" style="margin-bottom:12px; border-radius:14px; background:rgba(255,255,255,.96); border:1px solid rgba(228,231,232,.95);">
-          <div style="padding:10px 10px 6px; display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="display:flex; flex-direction:column; gap:2px;">
-               <div style="font-size:12px; font-weight:800;">Cadastro guiado de pavimentos</div>
-               <div style="font-size:12px; color:var(--muted);">Escolha um preset e preencha só o necessário. O sistema monta a fila sem misturar cadastros.</div>
+          <div style="padding:10px 10px 8px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:2px; min-width:220px;">
+               <div style="font-size:12px; font-weight:800;">Cadastro guiado</div>
+               <div style="font-size:12px; color:var(--muted);">Crie pavimentos rapidamente e ajuste a ordem antes de montar o planejamento.</div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button class="btn" id="btnQClearItems" type="button">Limpar fila</button>
@@ -6621,7 +6680,7 @@ document.addEventListener("click", function(ev){
             <button class="btn" id="btnQPresetMezanino" type="button">Mezaninos</button>
             <button class="btn" id="btnQPresetExtra" type="button">Pavimento avulso</button>
           </div>
-          <div class="formGrid" style="grid-template-columns: .9fr 1fr .9fr .9fr .8fr .8fr .8fr .8fr; gap:10px; padding: 0 10px 10px;">
+          <div class="formGrid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:10px; padding: 0 10px 10px;">
             <div class="field" id="qFieldKind">
                <label>Categoria</label>
               <select id="qKind">
@@ -6665,7 +6724,7 @@ document.addEventListener("click", function(ev){
             </div>
             <div class="field" id="qFieldTipo">
               <label>É tipo?</label>
-              <label style="display:flex; align-items:center; gap:8px; min-height:42px; padding:0 4px;">
+              <label class="compactFlag">
                 <input id="qIsTipo" type="checkbox" checked />
                 <span>Usar como pavimento tipo</span>
               </label>
@@ -6684,9 +6743,9 @@ document.addEventListener("click", function(ev){
             </div>
             <div class="field" style="grid-column:1 / -1;">
               <label>Adicionar ao questionário</label>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                <button class="btn primary" id="btnQAddItem" type="button">Adicionar à fila</button>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
                 <div style="font-size:12px; color:var(--muted);">Cada item entra na fila com suas características explícitas.</div>
+                <button class="btn primary" id="btnQAddItem" type="button">Adicionar à fila</button>
               </div>
             </div>
           </div>
@@ -6704,7 +6763,7 @@ document.addEventListener("click", function(ev){
               </div>
               <div class="field">
                 <label>É tipo?</label>
-                <label style="display:flex; align-items:center; gap:8px; min-height:42px; padding:0 4px;">
+                <label class="compactFlag">
                   <input id="locIsTipo" type="checkbox" checked />
                   <span>Usar como pavimento tipo no motor</span>
                 </label>
@@ -7745,7 +7804,15 @@ document.addEventListener("click", function(ev){
   function reportServiceName(serviceId){
     const sid = String(serviceId || "").trim();
     const hit = (state.services||[]).find(s=>String(s.id||"").trim()===sid);
-    return String(hit?.name || sid || "—").trim();
+    return String(
+      hit?.label ||
+      hit?.title ||
+      hit?.displayName ||
+      hit?.serviceName ||
+      hit?.name ||
+      sid ||
+      "—"
+    ).trim();
   }
   function reportServiceNameFromBlock(block){
     const sid = String(block?.serviceId || "").trim();
@@ -7765,10 +7832,30 @@ document.addEventListener("click", function(ev){
     if(!txt) txt = String(sid || "Serviço").trim();
     return txt;
   }
-  function reportLocationName(locationId){
+function reportLocationName(locationId){
     const lid = String(locationId || "").trim();
     const hit = (state.locations||[]).find(l=>String(l.id||"").trim()===lid);
-    return String(hit?.name || lid || "—").trim();
+    const _looksTech = (v)=>{
+      const s = String(v || "").trim();
+      return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+    };
+    const name = String(
+      hit?.label ||
+      hit?.title ||
+      hit?.displayName ||
+      hit?.locationName ||
+      hit?.nome ||
+      hit?.pavimento ||
+      hit?.name ||
+      lid ||
+      "—"
+    ).trim();
+    if(name && name !== lid && !_looksTech(name)) return name;
+    if(typeof resolveLocationLabel === "function"){
+      const alt = String(resolveLocationLabel(hit || { id:lid }) || "").trim();
+      if(alt && alt !== lid) return alt;
+    }
+    return name || "—";
   }
   function reportCompanyText(serviceId, teamId){
     try{
@@ -8813,6 +8900,34 @@ function _inferLocationLineGroup(name, id){
   ) return "especial";
   return "pavimento_tipo";
 }
+function _inferLocationCluster(name, lineGroup){
+  const group = String(lineGroup || "").trim().toLowerCase();
+  const raw = String(name || "").trim().toLowerCase();
+  if(group === "pavimento_tipo") return "Pavimentos Tipo";
+  if(group === "area_comum"){
+    if(raw.includes("lazer")) return "Lazer";
+    if(raw.includes("área comum") || raw.includes("area comum")) return "Áreas Comuns";
+    return "Áreas Comuns";
+  }
+  if(raw.includes("subsolo")) return "Subsolos";
+  if(raw.includes("fundacao") || raw.includes("fundação")) return "Fundação";
+  if(raw.includes("terreo") || raw.includes("térreo")) return "Térreo";
+  if(raw.includes("mezanino")) return "Mezanino";
+  if(raw.includes("cobertura")) return "Cobertura";
+  if(raw.includes("atico") || raw.includes("ático")) return "Ático";
+  if(raw.includes("barrilete")) return "Barrilete";
+  if(raw.includes("fachada")) return "Fachada";
+  return group === "especial" ? "Especiais" : "Grupo";
+}
+function _isGenericLocationCluster(cluster, lineGroup){
+  const key = String(cluster || "").trim().toLowerCase();
+  if(!key) return true;
+  const group = String(lineGroup || "").trim().toLowerCase();
+  if(group === "pavimento_tipo") return ["pavimentos tipo", "pavimento tipo", "tipo"].includes(key);
+  if(group === "area_comum") return ["áreas comuns", "areas comuns", "area comum", "area comuns"].includes(key);
+  if(group === "especial") return ["especiais", "especial"].includes(key);
+  return false;
+}
 function _locationColorFromSeed(seed, group){
   const raw = String(seed || "").trim();
   let hash = 0;
@@ -8840,22 +8955,48 @@ function _locationColorFromSeed(seed, group){
   return hslToHex(hue, sat, light);
 }
 function _normalizeLocationRecord(raw, fallbackOrder){
-  const name = String(raw?.name||"").trim();
+  const _looksTechName = (v)=>{
+    const s = String(v || "").trim();
+    return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+  };
+  const nameCandidates = [
+    raw?.name,
+    raw?.label,
+    raw?.title,
+    raw?.displayName,
+    raw?.locationName,
+    raw?.nome,
+    raw?.pavimento,
+    raw?.cluster,
+    raw?.agrupador,
+    raw?.grupo
+  ].map(v=>String(v || "").trim()).filter(Boolean);
+  const humanName = nameCandidates.find(v=>!_looksTechName(v)) || nameCandidates[0] || "";
+  const name = String(humanName).trim();
   const id = String(raw?.id||"").trim();
-   const lineGroupRaw = String(raw?.lineGroup || raw?.grupoLinha || raw?.tipoLinha || raw?.lineType || "").trim().toLowerCase();
-   const lineGroup = (lineGroupRaw==="area_comum" || lineGroupRaw==="especial" || lineGroupRaw==="pavimento_tipo")
-     ? lineGroupRaw
-     : _inferLocationLineGroup(name, id);
-   const color = String(raw?.color || raw?.cor || _locationColorFromSeed(name || id || fallbackOrder, lineGroup)).trim() || _locationColorFromSeed(name || id || fallbackOrder, lineGroup);
+    const lineGroupRaw = String(raw?.lineGroup || raw?.grupoLinha || raw?.tipoLinha || raw?.lineType || "").trim().toLowerCase();
+    const lineGroup = (lineGroupRaw==="area_comum" || lineGroupRaw==="especial" || lineGroupRaw==="pavimento_tipo")
+      ? lineGroupRaw
+      : _inferLocationLineGroup(name, id);
+    const color = String(raw?.color || raw?.cor || _locationColorFromSeed(name || id || fallbackOrder, lineGroup)).trim() || _locationColorFromSeed(name || id || fallbackOrder, lineGroup);
    const order = Number(raw?.order ?? fallbackOrder ?? 1) || 1;
    const visualOrder = Number(raw?.visualOrder ?? raw?.displayOrder ?? raw?.uiOrder ?? order) || order;
-   const cluster = String(raw?.cluster || raw?.agrupador || raw?.grupo || "").trim() ||
-     (lineGroup==="area_comum" ? "Áreas Comuns" : lineGroup==="especial" ? "Especiais" : "Pavimentos Tipo");
+   const rawCluster = String(raw?.cluster || raw?.agrupador || raw?.grupo || "").trim();
+  const inferredCluster = _inferLocationCluster(name || id, lineGroup);
+   const cluster = !_isGenericLocationCluster(rawCluster, lineGroup) ? rawCluster : inferredCluster;
   const pipelineKeyRaw = String(raw?.pipelineKey || raw?.pipelineId || raw?.ramo || "").trim();
   const pipelineKey = lineGroup==="pavimento_tipo"
     ? (pipelineKeyRaw || cluster || "PIPE_DEFAULT")
     : "";
-  return { id, name, color, order, visualOrder, lineGroup, cluster, pipelineKey };
+  return {
+    id,
+    name,
+    label: String([raw?.label, raw?.title, raw?.displayName, raw?.locationName, raw?.nome, raw?.pavimento, raw?.cluster, raw?.agrupador, raw?.grupo, name].map(v=>String(v || "").trim()).find(v=>!_looksTechName(v)) || name).trim(),
+    title: String([raw?.title, raw?.displayName, raw?.label, raw?.locationName, raw?.nome, raw?.pavimento, raw?.cluster, raw?.agrupador, raw?.grupo, name].map(v=>String(v || "").trim()).find(v=>!_looksTechName(v)) || name).trim(),
+    displayName: String([raw?.displayName, raw?.title, raw?.label, raw?.locationName, raw?.nome, raw?.pavimento, raw?.cluster, raw?.agrupador, raw?.grupo, name].map(v=>String(v || "").trim()).find(v=>!_looksTechName(v)) || name).trim(),
+    locationName: String([raw?.locationName, raw?.displayName, raw?.label, raw?.title, raw?.nome, raw?.pavimento, raw?.cluster, raw?.agrupador, raw?.grupo, name].map(v=>String(v || "").trim()).find(v=>!_looksTechName(v)) || name).trim(),
+    color, order, visualOrder, lineGroup, cluster, pipelineKey
+  };
 }
 function _locationVisualOrderValue(loc, fallback){
   const v = Number(loc?.visualOrder);
@@ -9104,6 +9245,106 @@ function getCanonicalPlannerBlocksForFollowUp(){
   const planBlocks = Array.isArray(state?.plan?.blocks) ? state.plan.blocks : [];
   const stateBlocks = Array.isArray(state?.blocks) ? state.blocks : [];
   const operationalBlocks = Array.isArray(state?.operational?.blocks) ? state.operational.blocks : [];
+  const soleLocation = (Array.isArray(state?.locations) && state.locations.length === 1) ? state.locations[0] : null;
+  const soleLocationId = soleLocation ? String(soleLocation?.id || "").trim() : "";
+  const _canonText = (v)=>String(v == null ? "" : v).trim();
+  const _serviceLookupByName = new Map();
+  const _locationLookupByName = new Map();
+  for(const s of (Array.isArray(state?.services) ? state.services : [])){
+    const sid = _canonText(s?.id);
+    const names = [s?.label, s?.title, s?.displayName, s?.serviceName, s?.name, s?.code]
+      .map(v=>_canonText(v)).filter(Boolean);
+    for(const nm of names){
+      const key = nm.toLowerCase();
+      if(key && !_serviceLookupByName.has(key)) _serviceLookupByName.set(key, sid);
+      const dig = nm.match(/\d+/g);
+      if(dig){
+        const digKey = dig.join("");
+        if(digKey && !_serviceLookupByName.has(digKey)) _serviceLookupByName.set(digKey, sid);
+      }
+    }
+  }
+  for(const l of (Array.isArray(state?.locations) ? state.locations : [])){
+    const lid = _canonText(l?.id);
+    const names = [l?.label, l?.title, l?.displayName, l?.locationName, l?.nome, l?.pavimento, l?.name]
+      .map(v=>_canonText(v)).filter(Boolean);
+    for(const nm of names){
+      const key = nm.toLowerCase();
+      if(key && !_locationLookupByName.has(key)) _locationLookupByName.set(key, lid);
+      const dig = nm.match(/\d+/g);
+      if(dig){
+        const digKey = dig.join("");
+        if(digKey && !_locationLookupByName.has(digKey)) _locationLookupByName.set(digKey, lid);
+      }
+    }
+  }
+  const _serviceLabelById = (sid)=>{
+    const raw = _canonText(sid);
+    const hit = (Array.isArray(state?.services) ? state.services : []).find(s=>String(s?.id||"").trim()===raw) || null;
+    return _canonText(hit?.label || hit?.title || hit?.displayName || hit?.serviceName || hit?.name || hit?.code || raw);
+  };
+  const _locationLabelById = (lid)=>{
+    const raw = _canonText(lid);
+    const hit = (Array.isArray(state?.locations) ? state.locations : []).find(l=>String(l?.id||"").trim()===raw) || null;
+    return _canonText(hit?.label || hit?.title || hit?.displayName || hit?.locationName || hit?.nome || hit?.pavimento || hit?.name || raw);
+  };
+  const _canonicalizeBlock = (block)=>{
+    if(!block || typeof block !== "object") return block;
+    const rawSid = _canonText(block?.serviceId ?? block?.svcId ?? block?.service ?? block?.srvId);
+    const rawLid = _canonText(
+      block?.locationId ??
+      block?.locId ??
+      block?.location ??
+      block?.pavId ??
+      block?.locationKey ??
+      block?.locKey ??
+      block?.labelLocation ??
+      block?.locationName ??
+      block?.locationTitle ??
+      block?.locName ??
+      block?.label ??
+      block?.title ??
+      block?.nome ??
+      block?.pavimento
+    );
+    const rawServiceName = _canonText(block?.serviceName || block?.serviceTitle || block?.serviceLabel || block?.title || block?.labelService || block?.name || "");
+    const rawLocationName = _canonText(block?.locationName || block?.locationTitle || block?.labelLocation || block?.locName || block?.label || block?.pavimento || block?.location || block?.name || "");
+    const sid = rawSid || (_serviceLookupByName.get(rawServiceName.toLowerCase()) || _serviceLookupByName.get(_canonText(block?.label).toLowerCase()) || "");
+    const lid = (
+      rawLid &&
+      (
+        (Array.isArray(state?.locations) ? state.locations.some(l=>String(l?.id||"").trim()===rawLid) : false) ||
+        _locationLookupByName.has(rawLid.toLowerCase())
+      )
+    )
+      ? rawLid
+      : (_locationLookupByName.get(rawLocationName.toLowerCase()) || _locationLookupByName.get(rawLid.toLowerCase()) || "");
+    const remappedLid = (lid && (Array.isArray(state?.locations) ? state.locations.some(l=>String(l?.id||"").trim()===lid) : false))
+      ? lid
+      : (soleLocationId || lid || "");
+    const serviceName = _canonText(
+      _serviceLabelById(sid) ||
+      rawServiceName ||
+      _serviceLabelById(rawSid) ||
+      sid
+    );
+    const locationName = _canonText(
+      _locationLabelById(remappedLid) ||
+      rawLocationName ||
+      _locationLabelById(rawLid) ||
+      remappedLid
+    );
+    const finalLocationId = remappedLid;
+    return {
+      ...block,
+      serviceId: sid || _canonText(block?.serviceId || block?.svcId || block?.service || block?.srvId),
+      locationId: finalLocationId || _canonText(block?.locationId || block?.locId || block?.location || block?.pavId),
+      serviceName,
+      serviceLabel: serviceName,
+      locationName,
+      label: locationName
+    };
+  };
   let source = "empty";
   let blocks = [];
   if(planBlocks.length){
@@ -9112,9 +9353,12 @@ function getCanonicalPlannerBlocksForFollowUp(){
   }else if(stateBlocks.length){
     source = "state.blocks";
     blocks = stateBlocks;
+  }else if(operationalBlocks.length){
+    source = "state.operational.blocks";
+    blocks = operationalBlocks;
   }
   const out = {
-    blocks: Array.isArray(blocks) ? blocks : [],
+    blocks: Array.isArray(blocks) ? blocks.map(_canonicalizeBlock) : [],
     source,
     counts: {
       planBlocks: planBlocks.length,
@@ -9633,7 +9877,13 @@ try{
 
 function _setActivePlanBlocks(blocks){
   _ensureStateContracts();
-  const arr = Array.isArray(blocks) ? blocks : [];
+  const arr = Array.isArray(blocks) ? blocks.map(b=>({
+    ...b,
+    serviceId: String(b?.serviceId || b?.svcId || b?.service || b?.srvId || "").trim(),
+    locationId: String(b?.locationId || b?.locId || b?.location || b?.pavId || "").trim(),
+    serviceName: String(b?.serviceName || b?.serviceTitle || b?.serviceLabel || b?.title || "").trim(),
+    locationName: String(b?.locationName || b?.locationTitle || b?.labelLocation || b?.locName || b?.label || "").trim()
+  })) : [];
   state.plan.blocks = arr;
   state.blocks = arr;
   return arr;
@@ -10974,17 +11224,40 @@ const svcMap=new Map(state.services.map(s=>[s.id,s]));
     const scopeFilter = (list)=>hasGuidedScope
       ? (Array.isArray(list) ? list.map(id=>String(id||"").trim()).filter(id=>id && guidedScopeIds.has(id)) : [])
       : (Array.isArray(list) ? list.slice() : []);
+    const fallbackList = (list)=>Array.isArray(list) ? list.map(id=>String(id||"").trim()).filter(Boolean) : [];
     if(explicit !== null){
-      return scopeFilter(explicit);
+      const explicitScoped = scopeFilter(explicit);
+      if(explicitScoped.length || !hasGuidedScope) return explicitScoped;
+      const explicitFallback = fallbackList(explicit);
+      if(explicitFallback.length) return explicitFallback;
     }
     const configuredScoped = scopeFilter(configured);
-    if(configured.length || hasGuidedScope) return configuredScoped;
-    if(importedExecutionOrder.length) return scopeFilter(importedExecutionOrder);
-    if(__pairsOrderBySvc.has(s)) return scopeFilter(__pairsOrderBySvc.get(s));
+    if(configuredScoped.length || (!hasGuidedScope && configured.length)) return configuredScoped;
+    const configuredFallback = fallbackList(configured);
+    if(configuredFallback.length && hasGuidedScope) return configuredFallback;
+    if(importedExecutionOrder.length){
+      const importedScoped = scopeFilter(importedExecutionOrder);
+      if(importedScoped.length || !hasGuidedScope) return importedScoped;
+      const importedFallback = fallbackList(importedExecutionOrder);
+      if(importedFallback.length && hasGuidedScope) return importedFallback;
+    }
+    if(__pairsOrderBySvc.has(s)){
+      const pairScoped = scopeFilter(__pairsOrderBySvc.get(s));
+      if(pairScoped.length || !hasGuidedScope) return pairScoped;
+      const pairFallback = fallbackList(__pairsOrderBySvc.get(s));
+      if(pairFallback.length && hasGuidedScope) return pairFallback;
+    }
     // fallback: usa ciclo (comportamento antigo)
-    if(cycle && Array.isArray(cycle.locationsInOrder) && cycle.locationsInOrder.length) return scopeFilter(cycle.locationsInOrder);
+    if(cycle && Array.isArray(cycle.locationsInOrder) && cycle.locationsInOrder.length){
+      const cycleScoped = scopeFilter(cycle.locationsInOrder);
+      if(cycleScoped.length || !hasGuidedScope) return cycleScoped;
+      const cycleFallback = fallbackList(cycle.locationsInOrder);
+      if(cycleFallback.length && hasGuidedScope) return cycleFallback;
+    }
     // fallback final: todos locations
-    return scopeFilter((state.locations||[]).map(l=>l.id));
+    const allLocs = (state.locations||[]).map(l=>l.id);
+    const allScoped = scopeFilter(allLocs);
+    return allScoped.length || !hasGuidedScope ? allScoped : fallbackList(allLocs);
   }
 
 
@@ -11097,13 +11370,16 @@ const svcMap=new Map(state.services.map(s=>[s.id,s]));
 
       const block={
         serviceId:svcId,
+        serviceName: svcName,
+        serviceLabel: svcName,
         locationId:locId,
+        locationName: String(locMap.get(locId)?.label || locMap.get(locId)?.title || locMap.get(locId)?.displayName || locMap.get(locId)?.locationName || locMap.get(locId)?.nome || locMap.get(locId)?.pavimento || locMap.get(locId)?.name || locId).trim(),
         teamId:resolvedTeamId,
         startDateISO:startISO,
         endDateISO:endISO,
         teamPredLocIdResolved: teamPred.predecessorBlock ? String(teamPred.predecessorBlock.locationId||"").trim() : "",
         teamPredSource: teamPred.source || "none",
-        label:locMap.get(locId)?.name||locId
+        label: String(locMap.get(locId)?.label || locMap.get(locId)?.title || locMap.get(locId)?.displayName || locMap.get(locId)?.locationName || locMap.get(locId)?.nome || locMap.get(locId)?.pavimento || locMap.get(locId)?.name || locId).trim()
       };
       blocks.push(block);
       blocksByKey.set(`${svcId}||${locId}`, block);
@@ -11426,15 +11702,38 @@ function generateBlocksRespectingEdits(){
     const scopeFilter = (list)=>hasGuidedScope
       ? (Array.isArray(list) ? list.map(id=>String(id||"").trim()).filter(id=>id && guidedScopeIds.has(id)) : [])
       : (Array.isArray(list) ? list.slice() : []);
+    const fallbackList = (list)=>Array.isArray(list) ? list.map(id=>String(id||"").trim()).filter(Boolean) : [];
     if(explicit !== null){
-      return scopeFilter(explicit);
+      const explicitScoped = scopeFilter(explicit);
+      if(explicitScoped.length || !hasGuidedScope) return explicitScoped;
+      const explicitFallback = fallbackList(explicit);
+      if(explicitFallback.length) return explicitFallback;
     }
     const configuredScoped = scopeFilter(configured);
-    if(configured.length || hasGuidedScope) return configuredScoped;
-    if(importedExecutionOrder.length) return scopeFilter(importedExecutionOrder);
-    if(__pairsOrderBySvc.has(s)) return scopeFilter(__pairsOrderBySvc.get(s));
-    if(cycle && Array.isArray(cycle.locationsInOrder) && cycle.locationsInOrder.length) return scopeFilter(cycle.locationsInOrder);
-    return scopeFilter((state.locations||[]).map(l=>l.id));
+    if(configuredScoped.length || (!hasGuidedScope && configured.length)) return configuredScoped;
+    const configuredFallback = fallbackList(configured);
+    if(configuredFallback.length && hasGuidedScope) return configuredFallback;
+    if(importedExecutionOrder.length){
+      const importedScoped = scopeFilter(importedExecutionOrder);
+      if(importedScoped.length || !hasGuidedScope) return importedScoped;
+      const importedFallback = fallbackList(importedExecutionOrder);
+      if(importedFallback.length && hasGuidedScope) return importedFallback;
+    }
+    if(__pairsOrderBySvc.has(s)){
+      const pairScoped = scopeFilter(__pairsOrderBySvc.get(s));
+      if(pairScoped.length || !hasGuidedScope) return pairScoped;
+      const pairFallback = fallbackList(__pairsOrderBySvc.get(s));
+      if(pairFallback.length && hasGuidedScope) return pairFallback;
+    }
+    if(cycle && Array.isArray(cycle.locationsInOrder) && cycle.locationsInOrder.length){
+      const cycleScoped = scopeFilter(cycle.locationsInOrder);
+      if(cycleScoped.length || !hasGuidedScope) return cycleScoped;
+      const cycleFallback = fallbackList(cycle.locationsInOrder);
+      if(cycleFallback.length && hasGuidedScope) return cycleFallback;
+    }
+    const allLocs = (state.locations||[]).map(l=>l.id);
+    const allScoped = scopeFilter(allLocs);
+    return allScoped.length || !hasGuidedScope ? allScoped : fallbackList(allLocs);
   }
 
   const __existingBlocksByKey = new Map();
@@ -11637,14 +11936,17 @@ function generateBlocksRespectingEdits(){
 
       const block={
         serviceId:svcId,
+        serviceName: svcName,
+        serviceLabel: svcName,
         locationId:locId,
+        locationName: String(locMap.get(locId)?.label || locMap.get(locId)?.title || locMap.get(locId)?.displayName || locMap.get(locId)?.locationName || locMap.get(locId)?.nome || locMap.get(locId)?.pavimento || locMap.get(locId)?.name || locId).trim(),
         teamId: resolvedTeamId,
         startDateISO:startISO,
         endDateISO:endISO,
         constraintDateISO: importedConstraintISO || null,
         teamPredLocIdResolved: teamPred.predecessorBlock ? String(teamPred.predecessorBlock.locationId||"").trim() : "",
         teamPredSource: teamPred.source || "none",
-        label:locMap.get(locId)?.name||locId
+        label: String(locMap.get(locId)?.label || locMap.get(locId)?.title || locMap.get(locId)?.displayName || locMap.get(locId)?.locationName || locMap.get(locId)?.nome || locMap.get(locId)?.pavimento || locMap.get(locId)?.name || locId).trim()
       };
       blocks.push(block);
       blocksByKey.set(`${svcId}||${locId}`, block);
@@ -12918,16 +13220,20 @@ function _guidedReadDraftFromUI(){
 }
 function _guidedLocationGroupKey(loc){
   const lineGroup = String(loc?.lineGroup || "").trim().toLowerCase();
-  if(["pavimento_tipo","area_comum","especial"].includes(lineGroup)) return lineGroup;
   const cluster = String(loc?.cluster || loc?.group || loc?.pipelineKey || loc?.name || "").trim();
-  return _sanitizeGuidedTemplateKey(cluster || String(loc?.id || ""));
+  const clusterKey = _sanitizeGuidedTemplateKey(cluster || String(loc?.id || ""));
+  if(lineGroup === "area_comum") return `area_comum::${clusterKey || "area_comum"}`;
+  if(lineGroup === "especial") return `especial::${clusterKey || "especial"}`;
+  if(lineGroup === "pavimento_tipo") return clusterKey || "pavimento_tipo";
+  return clusterKey || _sanitizeGuidedTemplateKey(String(loc?.id || ""));
 }
 function _guidedLocationGroupLabel(loc, key){
   const lineGroup = String(loc?.lineGroup || "").trim().toLowerCase();
   if(lineGroup==="pavimento_tipo") return "Pavimentos tipo";
-  if(lineGroup==="area_comum") return "Áreas comuns";
-  if(lineGroup==="especial") return "Especiais";
-  return String(loc?.cluster || loc?.group || loc?.pipelineKey || loc?.name || key || "Grupo").trim();
+  const cluster = String(loc?.cluster || loc?.group || loc?.pipelineKey || loc?.name || "").trim();
+  if(lineGroup==="area_comum") return cluster || "Áreas comuns";
+  if(lineGroup==="especial") return cluster || "Especiais";
+  return cluster || String(key || "Grupo").trim();
 }
 function _guidedBaseGroupsFromState(){
   const locs = Array.isArray(state?.locations) ? state.locations : [];
@@ -12935,25 +13241,113 @@ function _guidedBaseGroupsFromState(){
   for(const loc of locs){
     const key = _guidedLocationGroupKey(loc);
     if(!groups.has(key)){
-      groups.set(key, { key, label:_guidedLocationGroupLabel(loc, key), count:0 });
+      groups.set(key, { key, root: String(loc?.lineGroup || "").trim().toLowerCase() || "pavimento_tipo", label:_guidedLocationGroupLabel(loc, key), count:0, locationIds:[], locationNames:[] });
     }
-    groups.get(key).count++;
+    const group = groups.get(key);
+    group.count++;
+    const locId = String(loc?.id || "").trim();
+    if(locId) group.locationIds.push(locId);
+    const locName = String(loc?.label || loc?.title || loc?.displayName || loc?.locationName || loc?.nome || loc?.pavimento || loc?.name || locId || "").trim();
+    if(locName) group.locationNames.push(locName);
   }
   const out = [...groups.values()];
   const order = { pavimento_tipo:0, area_comum:1, especial:2 };
   out.sort((a,b)=>{
-    const ao = Object.prototype.hasOwnProperty.call(order, a.key) ? order[a.key] : 99;
-    const bo = Object.prototype.hasOwnProperty.call(order, b.key) ? order[b.key] : 99;
+    const aRoot = String(a.root || "").trim().toLowerCase();
+    const bRoot = String(b.root || "").trim().toLowerCase();
+    const ao = Object.prototype.hasOwnProperty.call(order, aRoot) ? order[aRoot] : 99;
+    const bo = Object.prototype.hasOwnProperty.call(order, bRoot) ? order[bRoot] : 99;
     if(ao !== bo) return ao - bo;
     return String(a.label||"").localeCompare(String(b.label||""));
   });
   return out;
 }
+function _guidedNormalizeTargetGroupKey(raw){
+  const txt = String(raw || "").trim();
+  if(!txt) return "";
+  const withoutCount = txt.replace(/\s*\(\d+\)\s*$/, "");
+  try{
+    return _sanitizeGuidedTemplateKey(withoutCount);
+  }catch(_){
+    return withoutCount.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  }
+}
+function _guidedLocationMatchTokens(loc){
+  const groupKey = _guidedLocationGroupKey(loc);
+  const cluster = String(loc?.cluster || loc?.group || loc?.pipelineKey || loc?.name || "").trim();
+  const name = String(loc?.name || loc?.label || loc?.title || loc?.displayName || loc?.locationName || loc?.nome || loc?.pavimento || "").trim();
+  const label = _guidedLocationGroupLabel(loc, groupKey);
+  return [
+    _guidedNormalizeTargetGroupKey(groupKey),
+    _guidedNormalizeTargetGroupKey(label),
+    _guidedNormalizeTargetGroupKey(cluster),
+    _guidedNormalizeTargetGroupKey(String(loc?.lineGroup || "")),
+    _guidedNormalizeTargetGroupKey(name),
+    _guidedNormalizeTargetGroupKey(String(loc?.label || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.title || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.displayName || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.locationName || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.nome || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.pavimento || "")),
+    _guidedNormalizeTargetGroupKey(String(loc?.id || ""))
+  ].filter(Boolean);
+}
+function _guidedTokenMatchesTarget(token, target){
+  const a = String(token || "").trim();
+  const b = String(target || "").trim();
+  if(!a || !b) return false;
+  if(a === b) return true;
+  if(a.startsWith(b) || b.startsWith(a)) return true;
+  return false;
+}
 function _guidedLocationIdsForTargetGroup(targetGroup){
-  const groupKey = String(targetGroup || "").trim();
+  const groupKeyRaw = String(targetGroup || "").trim();
   const locs = Array.isArray(state?.locations) ? state.locations : [];
-  if(!groupKey) return new Set(locs.map(loc=>String(loc?.id || "").trim()).filter(Boolean));
-  return new Set(locs.filter(loc=>_guidedLocationGroupKey(loc)===groupKey).map(loc=>String(loc?.id || "").trim()).filter(Boolean));
+  if(!groupKeyRaw) return new Set(locs.map(loc=>String(loc?.id || "").trim()).filter(Boolean));
+  const groups = _guidedBaseGroupsFromState();
+  const resolved = _guidedResolveTargetGroupKey(groupKeyRaw, groups);
+  const hitGroup = groups.find(g=>String(g.key||"").trim()===resolved)
+    || groups.find(g=>_guidedNormalizeTargetGroupKey(g.key||"")===_guidedNormalizeTargetGroupKey(resolved || groupKeyRaw))
+    || groups.find(g=>_guidedNormalizeTargetGroupKey(g.label||"")===_guidedNormalizeTargetGroupKey(resolved || groupKeyRaw));
+  if(hitGroup && Array.isArray(hitGroup.locationIds) && hitGroup.locationIds.length){
+    return new Set(hitGroup.locationIds.map(id=>String(id||"").trim()).filter(Boolean));
+  }
+  const groupKey = _guidedNormalizeTargetGroupKey(resolved || groupKeyRaw);
+  const matches = loc=>{
+    const tokens = _guidedLocationMatchTokens(loc);
+    if(tokens.some(tok=>_guidedTokenMatchesTarget(tok, groupKey))) return true;
+    const rawName = String(loc?.name || loc?.label || loc?.title || loc?.displayName || loc?.locationName || loc?.nome || loc?.pavimento || loc?.id || "").trim();
+    const normalizedName = _guidedNormalizeTargetGroupKey(rawName);
+    if(normalizedName && _guidedTokenMatchesTarget(normalizedName, groupKey)) return true;
+    return false;
+  };
+  const ids = locs.filter(matches).map(loc=>String(loc?.id || "").trim()).filter(Boolean);
+  if(ids.length) return new Set(ids);
+  const labelFallback = locs.filter(loc=>{
+    const tokens = _guidedLocationMatchTokens(loc);
+    return tokens.some(tok=>_guidedTokenMatchesTarget(tok, groupKey));
+  }).map(loc=>String(loc?.id || "").trim()).filter(Boolean);
+  return new Set(labelFallback);
+}
+function _guidedResolveTargetGroupKey(targetGroup, groups){
+  const raw = String(targetGroup || "").trim();
+  if(!raw) return "";
+  const list = Array.isArray(groups) ? groups : [];
+  const rawNorm = _guidedNormalizeTargetGroupKey(raw);
+  const exact = list.find(g=>String(g?.key || "").trim() === raw);
+  if(exact) return String(exact.key || "").trim();
+  const byKeyNorm = list.find(g=>_guidedNormalizeTargetGroupKey(g?.key || "") === rawNorm);
+  if(byKeyNorm) return String(byKeyNorm.key || "").trim();
+  const byLabelNorm = list.find(g=>_guidedNormalizeTargetGroupKey(g?.label || "") === rawNorm);
+  if(byLabelNorm) return String(byLabelNorm.key || "").trim();
+  const byLabelContain = list.find(g=>{
+    const gKey = _guidedNormalizeTargetGroupKey(g?.key || "");
+    const gLabel = _guidedNormalizeTargetGroupKey(g?.label || "");
+    const keyMatch = !!gKey && (gKey.includes(rawNorm) || rawNorm.includes(gKey));
+    const labelMatch = !!gLabel && (gLabel.includes(rawNorm) || rawNorm.includes(gLabel));
+    return keyMatch || labelMatch;
+  });
+  return byLabelContain ? String(byLabelContain.key || "").trim() : "";
 }
 function _guidedBuildModel(draftInput){
   const draft = _normalizeGuidedDraft(draftInput);
@@ -14812,7 +15206,7 @@ function renderGuidedPlanningView(){
   if(guidedTemplateMeta) guidedTemplateMeta.textContent = "";
   if(summaryTemplateTag) summaryTemplateTag.textContent = template?.label || "Modelo";
   if(summaryServiceTag) summaryServiceTag.textContent = `${services.length} serviços`;
-  if(summaryLocationTag) summaryLocationTag.textContent = `${model.locations.length} pavimentos`;
+  if(summaryLocationTag) summaryLocationTag.textContent = `${Array.isArray(state?.locations) ? state.locations.length : 0} pavimentos da obra`;
   if(guidedLibraryPanel){
     const templates = _guidedTemplateOptions();
     const activeKey = String(normalizedDraft.templateKey || templates[0]?.key || "").trim();
@@ -14891,11 +15285,8 @@ function renderGuidedPlanningView(){
     }
   };
   try{
-    if(typeof requestAnimationFrame === "function"){
-      requestAnimationFrame(()=>requestAnimationFrame(paintHeavy));
-    }else{
-      setTimeout(paintHeavy, 0);
-    }
+    if(typeof requestAnimationFrame === "function") requestAnimationFrame(paintHeavy);
+    else setTimeout(paintHeavy, 0);
   }catch(_){
     setTimeout(paintHeavy, 0);
   }
@@ -14918,6 +15309,8 @@ function renderGuidedApplyView(){
   const draftKey = String(draft.templateKey || "").trim();
   const draftLabelKey = _guidedTemplateLabelKey(draft.templateLabel || "");
   const draftHasServices = Array.isArray(draft.services) && draft.services.length > 0;
+  const previousApplyTemplateKey = String(selApply?.value || "").trim();
+  const applyTemplateKey = String(state?.ui?.guidedApplyTemplateKey || previousApplyTemplateKey || "").trim();
   const visibleSavedOptions = draftHasServices
     ? savedTemplateOptions.filter(t=>_guidedTemplateLabelKey(t.label || t.key) !== draftLabelKey)
     : savedTemplateOptions;
@@ -14933,7 +15326,15 @@ function renderGuidedApplyView(){
     : `<option value="" selected>Nenhum modelo salvo</option>`;
   if(selApply.innerHTML !== optionsHtml) selApply.innerHTML = optionsHtml;
   if(templateOptions.length){
-    selApply.value = draftHasServices ? "__draft_current__" : (templateOptions.some(t=>t.key===draft.templateKey) ? draft.templateKey : templateOptions[0].key);
+    const allowedKeys = new Set(templateOptions.map(t=>String(t.key || "").trim()).filter(Boolean));
+    const preferredKey = allowedKeys.has(applyTemplateKey)
+      ? applyTemplateKey
+      : (allowedKeys.has(previousApplyTemplateKey)
+        ? previousApplyTemplateKey
+      : (draftHasServices && allowedKeys.has("__draft_current__")
+        ? "__draft_current__"
+        : (allowedKeys.has(draft.templateKey) ? draft.templateKey : templateOptions[0].key)));
+    selApply.value = preferredKey || "";
   }else{
     selApply.value = "";
   }
@@ -14947,24 +15348,41 @@ function renderGuidedApplyView(){
   }
   const isReplaceMode = applyMode === "replace";
   const targetGroups = _guidedBaseGroupsFromState();
-  const targetLabel = targetGroups.find(g=>g.key===targetGroup)?.label || "";
-  const targetLocationIds = _guidedLocationIdsForTargetGroup(targetGroup);
-  const isFilteredApply = !!targetGroup;
+  const resolvedTargetGroup = _guidedResolveTargetGroupKey(targetGroup, targetGroups);
+  if(resolvedTargetGroup && resolvedTargetGroup !== targetGroup){
+    try{ state.ui = state.ui || {}; state.ui.guidedTargetGroup = resolvedTargetGroup; }catch(_){}
+  }
+  const activeTargetGroup = resolvedTargetGroup || targetGroup;
+  const targetLabel = targetGroups.find(g=>g.key===activeTargetGroup)?.label || targetGroups.find(g=>_guidedNormalizeTargetGroupKey(g.label||"")===_guidedNormalizeTargetGroupKey(activeTargetGroup))?.label || "";
+  const targetLocationIds = _guidedLocationIdsForTargetGroup(activeTargetGroup);
+  const isFilteredApply = !!activeTargetGroup;
+  const modelLocations = Array.isArray(model.locations) ? model.locations.slice() : [];
+  const stateLocations = Array.isArray(state.locations) ? state.locations.slice() : [];
   const filteredLocations = isFilteredApply
-    ? (Array.isArray(model.locations) ? model.locations.filter(loc=>targetLocationIds.has(String(loc?.id || ""))) : [])
-    : (Array.isArray(model.locations) ? model.locations.slice() : []);
+    ? modelLocations.filter(loc=>targetLocationIds.has(String(loc?.id || "")))
+    : modelLocations.slice();
+  if(isFilteredApply && !filteredLocations.length){
+    const fallbackStateLocations = stateLocations.filter(loc=>targetLocationIds.has(String(loc?.id || "")));
+    if(fallbackStateLocations.length){
+      filteredLocations.push(...fallbackStateLocations);
+    }else if(modelLocations.length){
+      filteredLocations.push(...modelLocations);
+    }else if(stateLocations.length){
+      filteredLocations.push(...stateLocations);
+    }
+  }
   const groupOptions = [
     `<option value="">Base inteira</option>`,
-    ..._guidedBaseGroupsFromState().map(g=>`<option value="${escapeHtml(g.key)}"${g.key===targetGroup?" selected":""}>${escapeHtml(`${g.label} (${g.count})`)}</option>`)
+    ...targetGroups.map(g=>`<option value="${escapeHtml(g.key)}"${g.key===activeTargetGroup?" selected":""}>${escapeHtml(`${g.label} (${g.count})`)}</option>`)
   ].join("");
   if(targetGroupSelApply.innerHTML !== groupOptions) targetGroupSelApply.innerHTML = groupOptions;
-  targetGroupSelApply.value = targetGroup || "";
-  const readiness = _guidedBuildReadiness(model, { requireLocations:true });
+  targetGroupSelApply.value = activeTargetGroup || "";
+  const readiness = _guidedBuildReadiness(model, { requireLocations:false });
   if(applyHint) applyHint.textContent = "Selecione a base e o grupo para montar o planejamento.";
   if(applySummary){
     const scopeLabel = targetLabel || "Base inteira";
     const depCount = Array.isArray(model?.dependencies) ? model.dependencies.length : 0;
-    const locTotal = Array.isArray(model?.locations) ? model.locations.length : 0;
+    const locTotal = Array.isArray(state?.locations) ? state.locations.length : 0;
     const locScoped = Array.isArray(filteredLocations) ? filteredLocations.length : 0;
     applySummary.innerHTML = [
       `<span class="planningAssemblyChip">Serviços base: ${escapeHtml(String(Array.isArray(model?.services) ? model.services.length : 0))}</span>`,
@@ -14987,7 +15405,7 @@ function renderGuidedApplyView(){
   if(btnApply) btnApply.onclick = applyAction;
   if(btnSavePlanningStage) btnSavePlanningStage.onclick = ()=>{ try{ document.getElementById("btnPlanningSaveStages")?.click(); }catch(e){ console.warn("[PLANNING_ASSEMBLY] save stage fail", e); } };
   if(btnClearPlanning) btnClearPlanning.onclick = ()=>_clearGuidedOperationalPlanning();
-  if(btnReloadEap) btnReloadEap.onclick = ()=>_reloadPlanningAssemblyFromEap(model, filteredLocations);
+  if(btnReloadEap) btnReloadEap.onclick = ()=>_reloadPlanningAssemblyFromEap(model, Array.isArray(state?.locations) ? state.locations : filteredLocations);
   if(btnBack) btnBack.onclick = ()=>{ try{ setView("guided"); }catch(_){ } };
   try{ renderPlanningAssemblyView(model, filteredLocations); }catch(e){ console.warn("[PLANNING_ASSEMBLY] render fail", e); }
 }
@@ -15239,7 +15657,9 @@ function _reloadPlanningAssemblyFromEap(modelArg, locationsArg){
     }
   }
   if(!sourceLocations){
-    sourceLocations = Array.isArray(sourceModel?.locations) ? sourceModel.locations.slice() : [];
+    sourceLocations = Array.isArray(state?.locations) && state.locations.length
+      ? state.locations.slice()
+      : (Array.isArray(sourceModel?.locations) ? sourceModel.locations.slice() : []);
   }
   const snapshot = _planningNormalizeBaseSnapshot({
     templateKey: String(sourceModel?.template?.key || sourceModel?.templateKey || "").trim(),
@@ -16368,8 +16788,11 @@ function renderPlanningAssemblyView(model, locations){
   }
   const services = Array.isArray(sourceModel?.services) ? sourceModel.services : [];
   const baseDeps = Array.isArray(sourceModel?.dependencies) ? sourceModel.dependencies : [];
+  const sourceLocations = Array.isArray(locations) ? locations : (Array.isArray(sourceModel?.locations) ? sourceModel.locations : []);
   const locCount = Array.isArray(sourceModel?.locations) ? sourceModel.locations.length : (Array.isArray(locations) ? locations.length : 0);
+  const locSig = sourceLocations.slice(0, 24).map(loc=>`${String(loc?.id || loc?.code || loc?.name || "").trim()}:${String(loc?.name || loc?.label || "").trim()}`).join(",");
   const projectMeta = _getProjectMeta() || {};
+  const phaseDismissed = Boolean(state?.ui?.planningAssemblyNoPhaseDismissed);
   const phaseBaseInfoRoot = document.getElementById("planningPhaseBaseInfo");
   const phaseSelectRoot = document.getElementById("planningPhaseSelect");
   const phaseNameRoot = document.getElementById("planningPhaseName");
@@ -16383,7 +16806,7 @@ function renderPlanningAssemblyView(model, locations){
   const phaseContinueBtn = document.getElementById("btnPlanningContinueWithoutPhase");
   const phases = Array.isArray(assembly.phases) ? assembly.phases : [];
   const noPhases = !phases.length;
-  const phaseStateDismissed = Boolean(state?.ui?.planningAssemblyNoPhaseDismissed);
+  const phaseStateDismissed = phaseDismissed;
   if(!noPhases){
     try{
       state.ui = state.ui || {};
@@ -16432,6 +16855,30 @@ function renderPlanningAssemblyView(model, locations){
   const phaseSelectHtml = phaseUi.phaseSelectHtml;
   const activePhase = phaseUi.activePhase;
   const activePhaseId = phaseUi.activePhaseId;
+  const assemblySig = [
+    "v3",
+    String(activePhaseId || ""),
+    String(selectedId || ""),
+    phaseStateDismissed ? "1" : "0",
+    String(services.length || 0),
+    services.slice(0, 24).map(s=>`${String(_planningServiceId(s) || "").trim()}:${String(s?.name || s?.code || "").trim()}`).join(","),
+    String(baseDeps.length || 0),
+    baseDeps.slice(0, 24).map(d=>[
+      String(d?.predServiceId || d?.predecessorServiceId || "").trim(),
+      String(d?.succServiceId || d?.successorServiceId || "").trim(),
+      String(d?.type || "FS").trim(),
+      String(d?.lagDays || d?.lag || 0).trim()
+    ].join(":")).join(","),
+    String(locCount || 0),
+    locSig
+  ].join("|");
+  const sameDomRoot = window.__planningAssemblyLastSegRoot === segRoot && window.__planningAssemblyLastDepRoot === depRoot;
+  if(sameDomRoot && window.__planningAssemblyRenderSig === assemblySig){
+    return;
+  }
+  window.__planningAssemblyLastSegRoot = segRoot;
+  window.__planningAssemblyLastDepRoot = depRoot;
+  window.__planningAssemblyRenderSig = assemblySig;
   if(phaseSelectRoot){
     phaseSelectRoot.innerHTML = phaseSelectHtml;
     if(String(phaseSelectRoot.value || "").trim() !== activePhaseId) phaseSelectRoot.value = activePhaseId;
@@ -16491,14 +16938,6 @@ function renderPlanningAssemblyView(model, locations){
       _planningDeleteActivePhase();
     };
   }
-  try{
-    const tplSel = document.getElementById("guidedTemplateApply");
-    const phaseTplKey = String(activePhase?.baseSnapshot?.templateKey || "").trim();
-    if(tplSel && phaseTplKey){
-      const byTemplateKey = Array.from(tplSel.options || []).find(opt=>String(opt?.getAttribute("data-template-key") || "").trim() === phaseTplKey);
-      if(byTemplateKey) tplSel.value = String(byTemplateKey.value || "").trim();
-    }
-  }catch(_){}
   if(phaseCountRoot) phaseCountRoot.textContent = `${phases.length} fase${phases.length===1?"":"s"}`;
   const rawSegments = _planningExplicitSegments(assembly.segmentsByService?.[selectedId]);
   const visibleSegments = rawSegments.length ? rawSegments : [{
@@ -18173,25 +18612,44 @@ function _applyGuidedPlanningModelCore(){
   const effectiveApplyMode = hasOperationalPlanning ? applyMode : "replace";
   const isReplaceMode = effectiveApplyMode === "replace";
   const targetGroups = _guidedBaseGroupsFromState();
-  const targetLabel = targetGroups.find(g=>g.key===targetGroup)?.label || "";
-  const targetLocationIds = _guidedLocationIdsForTargetGroup(targetGroup);
-  const isFilteredApply = !!targetGroup;
+  const resolvedTargetGroup = _guidedResolveTargetGroupKey(targetGroup, targetGroups);
+  const activeTargetGroup = resolvedTargetGroup || targetGroup;
+  const targetLabel = targetGroups.find(g=>g.key===activeTargetGroup)?.label || targetGroups.find(g=>_guidedNormalizeTargetGroupKey(g.label||"")===_guidedNormalizeTargetGroupKey(activeTargetGroup))?.label || "";
+  const targetLocationIds = _guidedLocationIdsForTargetGroup(activeTargetGroup);
+  const isFilteredApply = !!activeTargetGroup;
+  const modelLocations = Array.isArray(model.locations) ? model.locations.slice() : [];
+  const stateLocations = Array.isArray(state.locations) ? state.locations.slice() : [];
+  const filteredLocations = isFilteredApply
+    ? modelLocations.filter(loc=>targetLocationIds.has(String(loc?.id || "")))
+    : modelLocations.slice();
+  if(isFilteredApply && !filteredLocations.length){
+    const fallbackStateLocations = stateLocations.filter(loc=>targetLocationIds.has(String(loc?.id || "")));
+    if(fallbackStateLocations.length){
+      filteredLocations.push(...fallbackStateLocations);
+    }else if(modelLocations.length){
+      filteredLocations.push(...modelLocations);
+    }else if(stateLocations.length){
+      filteredLocations.push(...stateLocations);
+    }
+  }
+  const filteredLocationIdList = Array.isArray(filteredLocations) ? filteredLocations.map(loc=>String(loc?.id || "").trim()).filter(Boolean) : [];
+  const effectiveTargetLocationIds = filteredLocationIdList.length ? new Set(filteredLocationIdList) : targetLocationIds;
   state.ui = state.ui || {};
-  state.ui.guidedApplyLocationScopeIds = isFilteredApply ? Array.from(targetLocationIds) : [];
+  state.ui.guidedApplyLocationScopeIds = isFilteredApply ? Array.from(effectiveTargetLocationIds) : [];
   const filteredServiceLocationMap = Object.fromEntries(
     Object.entries(model.serviceLocationMap || {}).map(([sid, locIds])=>{
-      const nextLocs = (Array.isArray(locIds) ? locIds : []).map(id=>String(id)).filter(id=>!isFilteredApply || targetLocationIds.has(id));
+      const nextLocs = (Array.isArray(locIds) ? locIds : []).map(id=>String(id).trim()).filter(id=>!isFilteredApply || effectiveTargetLocationIds.has(id));
       return [sid, nextLocs];
     })
   );
-  const filteredLocations = isFilteredApply
-    ? (Array.isArray(model.locations) ? model.locations.filter(loc=>targetLocationIds.has(String(loc?.id || ""))) : [])
-    : (Array.isArray(model.locations) ? model.locations.slice() : []);
-  if(!model.services.length || !model.locations.length){
+  const applyLocations = Array.isArray(filteredLocations) && filteredLocations.length
+    ? filteredLocations
+    : (stateLocations.length ? stateLocations : modelLocations);
+  if(!model.services.length){
     alert("O questionário não gerou serviços ou pavimentos válidos.");
     return false;
   }
-  if(isFilteredApply && !filteredLocations.length){
+  if(!(Array.isArray(applyLocations) && applyLocations.length)){
     alert("O grupo de pavimentos selecionado não possui locais válidos para aplicar a EAP.");
     return false;
   }
@@ -18207,7 +18665,7 @@ function _applyGuidedPlanningModelCore(){
     return false;
   }
   const stageCount = operational.services.filter(s=>s && s.isPlanningStage).length;
-  if(!confirm(`Vai aplicar a fase ativa ao planejamento.\n\nModo: ${isReplaceMode ? "substituir planejamento atual" : "adicionar à montagem atual"}\nGrupo de pavimentos de destino: ${targetLabel || "Base inteira"}\nServiços da fase: ${model.services.length}\nAtividades operacionais geradas: ${operational.services.length}${stageCount ? `\nEtapas detalhadas: ${stageCount}` : ""}\nPavimentos/locais no grupo: ${isFilteredApply ? filteredLocations.length : model.locations.length}\nDependências geradas: ${operational.dependencies.length}\n\nConfirmar?`)) return false;
+  if(!confirm(`Vai aplicar a fase ativa ao planejamento.\n\nModo: ${isReplaceMode ? "substituir planejamento atual" : "adicionar à montagem atual"}\nGrupo de pavimentos de destino: ${targetLabel || "Base inteira"}\nServiços da fase: ${model.services.length}\nAtividades operacionais geradas: ${operational.services.length}${stageCount ? `\nEtapas detalhadas: ${stageCount}` : ""}\nPavimentos/locais no grupo: ${applyLocations.length}\nDependências geradas: ${operational.dependencies.length}\n\nConfirmar?`)) return false;
   const previousPlanningState = {
     services: JSON.parse(JSON.stringify(Array.isArray(state.services) ? state.services : [])),
     cycles: JSON.parse(JSON.stringify(Array.isArray(state.cycles) ? state.cycles : [])),
@@ -18271,7 +18729,7 @@ function _applyGuidedPlanningModelCore(){
     state.activityGraph = { activities:[], dependencies:[] };
   }
   if(!(Array.isArray(state.locations) && state.locations.length)){
-    state.locations = filteredLocations.slice();
+    state.locations = applyLocations.slice();
   }
   state.ui = state.ui || {};
   state.ui.autoDependencyMode = "explicit_only";
@@ -18331,7 +18789,7 @@ function _applyGuidedPlanningModelCore(){
   try{ scheduleRenderAll(); }catch(_){}
   try{ renderProjectHeader(); }catch(_){}
   const appliedTemplateKey = String(model?.template?.key || model?.templateKey || model?.baseTemplateKey || assembly?.baseSnapshot?.templateKey || "sem_template").trim() || "sem_template";
-  log(`[GUIDED] EAP aplicada ao planejamento: mode=${effectiveApplyMode} template=${appliedTemplateKey} serviçosBase=${model.services.length} atividades=${operational.services.length} locais=${model.locations.length} deps=${operational.dependencies.length} blocks=${(_getActivePlanBlocks()||[]).length} autoDeps=explicit_only`);
+  log(`[GUIDED] EAP aplicada ao planejamento: mode=${effectiveApplyMode} template=${appliedTemplateKey} serviçosBase=${model.services.length} atividades=${operational.services.length} locais=${applyLocations.length} deps=${operational.dependencies.length} blocks=${(_getActivePlanBlocks()||[]).length} autoDeps=explicit_only`);
   return true;
 }
 function _bindGuidedPlanningUI(){
@@ -18361,7 +18819,9 @@ function _bindGuidedPlanningUI(){
       if(id==="guidedTemplateApply"){
         const applySel = document.getElementById("guidedTemplateApply");
         const selectedSource = String(applySel?.selectedOptions?.[0]?.getAttribute("data-source-kind") || "").trim();
+        const selectedTemplateKey = String(applySel?.selectedOptions?.[0]?.getAttribute("data-template-key") || applySel?.value || "").trim();
         if(selectedSource === "draft"){
+          try{ state.ui = state.ui || {}; state.ui.guidedApplyTemplateKey = "__draft_current__"; }catch(_){}
           renderGuidedApplyView();
           return;
         }
@@ -18375,6 +18835,7 @@ function _bindGuidedPlanningUI(){
           const mainLabel = document.getElementById("guidedTemplateLabel");
           if(mainLabel && !String(mainLabel.value || "").trim()) mainLabel.value = String(nextTemplate?.label || draft.templateLabel || "");
         }catch(_){}
+        try{ state.ui = state.ui || {}; state.ui.guidedApplyTemplateKey = selectedTemplateKey || draft.templateKey || ""; }catch(_){}
         _saveGuidedPlanDraft(draft);
         renderGuidedApplyView();
         return;
@@ -19341,7 +19802,11 @@ function renderDates(){
       row.style.borderLeft = "4px solid rgba(213,0,50,.45)";
       const nEl=document.createElement("div");
       nEl.className="n";
-      nEl.textContent=String(loc?.name||"");
+      nEl.textContent=String(
+        (typeof getPlannerLocationDisplayName === "function" ? getPlannerLocationDisplayName(loc) : "") ||
+        (typeof safeNameFromState === "function" ? safeNameFromState("location", loc?.id) : "") ||
+        ""
+      ).trim();
       row.appendChild(nEl);
       row.addEventListener("dblclick", (ev)=>{
         ev.preventDefault();
@@ -19387,7 +19852,12 @@ function renderLegend(){
     const tx=document.createElement("div");
     const typeLabel = l.lineGroup==="area_comum" ? "Área Comum" : l.lineGroup==="especial" ? "Especial" : "Pavimento Tipo";
     const pipe = _locationPipelineKey(l);
-    tx.textContent=`${l.name} • ${typeLabel}${pipe ? " • pipeline "+pipe : ""}${l.cluster ? " • "+l.cluster : ""}`;
+    const displayName = String(
+      (typeof getPlannerLocationDisplayName === "function" ? getPlannerLocationDisplayName(l) : "") ||
+      (typeof safeNameFromState === "function" ? safeNameFromState("location", l?.id) : "") ||
+      ""
+    ).trim();
+    tx.textContent=`${displayName || l.name || l.id || "—"} • ${typeLabel}${pipe ? " • pipeline "+pipe : ""}${l.cluster ? " • "+l.cluster : ""}`;
     item.appendChild(sw);
     item.appendChild(tx);
     legendEl.appendChild(item);
@@ -19916,7 +20386,18 @@ function _inferImportedTeamBranches(blocks, activityDeps, locations){
       return {
         orderIndex: idx + 1,
         locationId: locId,
-        locationName: String(loc?.name || locId || "").trim(),
+        locationName: String(
+          loc?.label ||
+          loc?.title ||
+          loc?.displayName ||
+          loc?.locationName ||
+          loc?.nome ||
+          loc?.pavimento ||
+          loc?.name ||
+          (typeof resolveLocationLabel === "function" ? resolveLocationLabel(loc || { id:locId }) : "") ||
+          locId ||
+          ""
+        ).trim(),
         lineGroup: String(loc?.lineGroup || "").trim(),
         cluster: String(loc?.cluster || "").trim(),
         startISO: String(block?.startDateISO || block?.startISO || block?.start || "").trim(),
@@ -19935,7 +20416,18 @@ function _inferImportedTeamBranches(blocks, activityDeps, locations){
       .map(([startISO, locationIds])=>({
         startISO,
         locationIds: locationIds.slice(),
-        locationNames: locationIds.map(locId=>String(locById.get(locId)?.name || locId || "").trim())
+        locationNames: locationIds.map(locId=>String(
+          locById.get(locId)?.label ||
+          locById.get(locId)?.title ||
+          locById.get(locId)?.displayName ||
+          locById.get(locId)?.locationName ||
+          locById.get(locId)?.nome ||
+          locById.get(locId)?.pavimento ||
+          locById.get(locId)?.name ||
+          (typeof resolveLocationLabel === "function" ? resolveLocationLabel(locById.get(locId) || { id:locId }) : "") ||
+          locId ||
+          ""
+        ).trim())
       }));
     profiles.set(serviceId, {
       serviceId,
@@ -20300,12 +20792,21 @@ function renderBlocks(){
     const __maxY = __relTop + __viewH + __bufferY;
     const serviceName = (svcId)=>{
       const sid = String(svcId||"").trim();
-      const byMeta = String(meta.svcById.get(sid)?.name || "").trim();
-      const byState = String((state.services||[]).find(s=>String(s?.id||"").trim()===sid)?.name || "").trim();
-      const raw = byMeta || byState || sid;
-      const cleaned = String(raw)
+      const svc = meta.svcById.get(sid) || (state.services||[]).find(s=>String(s?.id||"").trim()===sid) || null;
+      const raw = String(
+        svc?.label ||
+        svc?.title ||
+        svc?.displayName ||
+        svc?.serviceName ||
+        svc?.name ||
+        sid
+      ).trim();
+      const cleaned = String(raw || sid)
+        .replace(/^srv[_\-\s]*/i, "")
+        .replace(/^servi[cç]o[_\-\s]*/i, "")
         .replace(/^srv[\s_-]+/i, "")
         .replace(/_/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
       return cleaned || sid;
     };
@@ -20355,15 +20856,20 @@ function renderBlocks(){
       el.style.height = `${height}px`;
       const svcMeta = meta.svcById.get(String(entry.svcId||"")) || null;
       const locMeta = meta.locations.find(l=>String(l.id||"").trim()===String(entry.locId||"").trim()) || null;
+      const locTitle = String(
+        (typeof getPlannerLocationDisplayName === "function" ? getPlannerLocationDisplayName(locMeta || entry.locId, entry.block) : "") ||
+        (typeof resolveLocationLabel === "function" ? resolveLocationLabel(entry.block) : "") ||
+        ""
+      ).trim();
       const locCol = String(colorForBlock(entry.block) || locMeta?.color || locMeta?.cor || "").trim();
       const svcCol = String(_plannerServiceColor(entry.svcId, svcMeta)).trim();
       const brandBase = "#D50032";
       const fillCol = _plannerUseLobMatrix() ? (svcCol || locCol || brandBase) : brandBase;
-      el.style.background = colorToRgba(fillCol, isBaseline ? 0.24 : 0.90);
-      el.style.borderColor = colorToRgba(fillCol, isBaseline ? 0.44 : 0.34);
-      if(!isBaseline){
-        el.dataset.serviceId = String(entry.svcId||"");
-        el.dataset.locationId = String(entry.locId||"");
+        el.style.background = colorToRgba(fillCol, isBaseline ? 0.24 : 0.90);
+        el.style.borderColor = colorToRgba(fillCol, isBaseline ? 0.44 : 0.34);
+        if(!isBaseline){
+          el.dataset.serviceId = String(entry.svcId||"");
+          el.dataset.locationId = String(entry.locId||"");
         el.dataset.teamId = String(entry.block?.teamId || "");
         el.dataset.startISO = String(entry.block?.startDateISO || entry.block?.startISO || entry.block?.start || "");
         el.dataset.endISO = String(entry.block?.endDateISO || entry.block?.endISO || entry.block?.end || "");
@@ -20388,13 +20894,14 @@ function renderBlocks(){
           if(width >= 150){
             const sub=document.createElement("div");
             sub.className="sub";
-            sub.textContent=String(entry.block?.teamId||"");
+            sub.textContent=locTitle || "";
             el.appendChild(sub);
           }
         }
         el.addEventListener("click", ()=>openBlockEditModal({
           serviceId: String(entry.svcId||""),
           locationId: String(entry.locId||""),
+          locationName: String(locTitle || ""),
           teamId: String(entry.block?.teamId||""),
           startISO: String(entry.block?.startDateISO || entry.block?.startISO || entry.block?.start || ""),
           endISO: String(entry.block?.endDateISO || entry.block?.endISO || entry.block?.end || "")
@@ -20405,6 +20912,7 @@ function renderBlocks(){
           openFamilyPavChoiceModal({
             serviceId: String(entry.svcId||""),
             locationId: String(entry.locId||""),
+            locationName: String(locTitle || ""),
             teamId: String(entry.block?.teamId||""),
             startISO: String(entry.block?.startDateISO || entry.block?.startISO || entry.block?.start || ""),
             endISO: String(entry.block?.endDateISO || entry.block?.endISO || entry.block?.end || "")
@@ -20415,7 +20923,7 @@ function renderBlocks(){
         if(width >= 120){
           const ttl=document.createElement("div");
           ttl.className="ttl";
-          ttl.textContent=serviceName(entry.svcId);
+          ttl.textContent = locTitle || resolveLocationLabel(entry.block) || "";
           ttl.style.fontSize = "9px";
           ttl.style.opacity = ".85";
           el.appendChild(ttl);
@@ -20766,33 +21274,102 @@ for(const svc of services){
 function resolveLocationLabel(b){
   try{
     if(!b) return "";
-    // Prefer explicit label/name carried on block
-    let direct = (b.label || b.locLabel || b.locationName || b.locName || b.location_label || b.locationLabel);
-    if(direct!=null){
-      direct = String(direct).trim();
-      if(direct!==""){
-        // Normalize: if it's just a number like "3100", display as "PAV 3100"
-        if(/^\d+$/.test(direct)) return "PAV " + direct;
-        return direct;
-      }
-    }
-
+    const _looksTech = (v)=>{
+      const s = String(v || "").trim();
+      return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+    };
     const locId = resolveLocationId(b);
+    if(locId && window.__plannerLocationDisplayNameById && typeof window.__plannerLocationDisplayNameById.get === "function"){
+      const cached = String(window.__plannerLocationDisplayNameById.get(String(locId).trim()) || "").trim();
+      if(cached && !_looksTech(cached)) return cached;
+    }
     if(locId && Array.isArray(state.locations)){
       const hit = state.locations.find(x=>String(x.id)===String(locId));
       if(hit){
-        let nm = (hit.name!=null? String(hit.name).trim() : "");
-        if(nm){
-          if(/^\d+$/.test(nm)) return "PAV " + nm;
-          return nm;
-        }
+        let nm = String(
+          hit.label ||
+          hit.title ||
+          hit.displayName ||
+          hit.locationName ||
+          hit.nome ||
+          hit.pavimento ||
+          hit.name ||
+          ""
+        ).trim();
+        if(nm && !_looksTech(nm)) return nm;
       }
     }
-    // Fallback: if locId looks numeric, format as PAV ###
-    const m = String(locId||"").match(/(\d+)/);
-    if(m) return "PAV " + m[1];
-    return String(locId||"").trim();
+    // Fallback explícito do bloco: só usa se não houver pavimento resolvido.
+    let direct = (
+      b.locationName ||
+      b.locName ||
+      b.location_label ||
+      b.locationLabel ||
+      b.locLabel ||
+      b.title ||
+      b.displayName ||
+      b.nome ||
+      b.pavimento ||
+      b.label
+    );
+    if(direct!=null){
+      direct = String(direct).trim();
+      if(direct!=="" && !_looksTech(direct)) return direct;
+    }
+    return "";
 }catch(e){ return ""; }
+}
+
+function getPlannerLocationDisplayName(locOrId, fallbackBlock){
+  try{
+    const _looksTech = (v)=>{
+      const s = String(v || "").trim();
+      return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+    };
+    const _pickName = (obj)=>{
+      if(!obj || typeof obj !== "object") return "";
+    const names = [
+      obj?.label,
+      obj?.title,
+      obj?.displayName,
+      obj?.locationName,
+      obj?.nome,
+      obj?.pavimento,
+      obj?.cluster,
+      obj?.agrupador,
+      obj?.grupo,
+      obj?.name
+    ].map(v=>String(v || "").trim()).filter(Boolean);
+      return names.find(v=>!_looksTech(v)) || "";
+    };
+    const id = typeof locOrId === "object"
+      ? String(locOrId?.id || locOrId?.locationId || locOrId?.locId || "").trim()
+      : String(locOrId || "").trim();
+    if(id){
+      const cached = (window.__plannerLocationDisplayNameById && window.__plannerLocationDisplayNameById.get)
+        ? String(window.__plannerLocationDisplayNameById.get(id) || "").trim()
+        : "";
+      if(cached && !_looksTech(cached)) return cached;
+    }
+    if(locOrId && typeof locOrId === "object"){
+      const direct = _pickName(locOrId);
+      if(direct) return direct;
+      if(id && Array.isArray(state?.locations)){
+        const hit = state.locations.find(x=>String(x.id||"").trim()===id);
+        const hitName = _pickName(hit);
+        if(hitName) return hitName;
+      }
+    }else if(id && Array.isArray(state?.locations)){
+      const hit = state.locations.find(x=>String(x.id||"").trim()===id);
+      const hitName = _pickName(hit);
+      if(hitName) return hitName;
+    }
+    const blkName = fallbackBlock ? resolveLocationLabel(fallbackBlock) : "";
+    if(blkName && !_looksTech(blkName)) return blkName;
+    return "";
+  }catch(_){
+    return "";
+  }
 }
 
 
@@ -21852,7 +22429,26 @@ function updateHeaderForService(serviceId){
 }
 
 function _depSvcName(id){ return state.services.find(s=>s.id===id)?.name || id || "-"; }
-function _depLocName(id){ return state.locations.find(l=>l.id===id)?.name || id || "-"; }
+function _depLocName(id){
+  const lid = String(id || "").trim();
+  const hit = (state.locations||[]).find(l=>String(l.id||"").trim()===lid);
+  const direct = String(
+    hit?.label ||
+    hit?.title ||
+    hit?.displayName ||
+    hit?.locationName ||
+    hit?.nome ||
+    hit?.pavimento ||
+    hit?.name ||
+    lid
+  ).trim();
+  if(direct && direct !== lid) return direct;
+  if(typeof resolveLocationLabel === "function"){
+    const alt = String(resolveLocationLabel(hit || { id:lid }) || "").trim();
+    if(alt) return alt;
+  }
+  return lid || "-";
+}
 function _lineGroupLabel(lineGroup){
   const key = String(lineGroup||"").trim();
   if(key === "area_comum") return "Área Comum";
@@ -22143,6 +22739,18 @@ function _ensureDistinctLocationColors(list){
   }
   return out;
 }
+function _uniqueLocationsById(list){
+  const arr = Array.isArray(list) ? list : [];
+  const seen = new Set();
+  const out = [];
+  for(const loc of arr){
+    const id = String(loc?.id || "").trim();
+    if(!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(loc);
+  }
+  return out;
+}
 function _computeLobTracks(entries, svcById){
   const items = (Array.isArray(entries) ? entries.slice() : []).sort((a,b)=>
     (a.startIdx-b.startIdx) ||
@@ -22167,8 +22775,33 @@ function _computeLobTracks(entries, svcById){
   return Math.max(1, trackEnds.length || 1);
 }
 function _getPlannerLobMeta(){
+  const locById = new Map((Array.isArray(state?.locations) ? state.locations : []).map(loc=>[String(loc?.id || "").trim(), loc]));
+  const locByName = new Map();
+  for(const loc of (Array.isArray(state?.locations) ? state.locations : [])){
+    const names = [
+      loc?.label,
+      loc?.title,
+      loc?.displayName,
+      loc?.locationName,
+      loc?.nome,
+      loc?.pavimento,
+      loc?.cluster,
+      loc?.agrupador,
+      loc?.grupo,
+      loc?.name
+    ].map(v=>String(v || "").trim()).filter(Boolean);
+    for(const nm of names){
+      const key = nm.toLowerCase();
+      if(!locByName.has(key)) locByName.set(key, String(loc?.id || "").trim());
+      const digits = nm.match(/\d+/g);
+      if(digits){
+        const digKey = digits.join("");
+        if(digKey && !locByName.has(digKey)) locByName.set(digKey, String(loc?.id || "").trim());
+      }
+    }
+  }
   const _lobResolveLocationId = (block)=>{
-    return String(
+    const direct = String(
       block?.locationId ??
       block?.locId ??
       block?.location_id ??
@@ -22176,15 +22809,76 @@ function _getPlannerLobMeta(){
       block?.pavimentoId ??
       ""
     ).trim();
+    if(direct) return direct;
+    const raw = String(
+      block?.locationName ??
+      block?.locationTitle ??
+      block?.labelLocation ??
+      block?.locName ??
+      block?.label ??
+      block?.title ??
+      block?.nome ??
+      block?.pavimento ??
+      block?.location ??
+      ""
+    ).trim();
+    if(!raw) return "";
+    const rawKey = raw.toLowerCase();
+    if(locByName.has(rawKey)) return String(locByName.get(rawKey) || "").trim();
+    const digits = raw.match(/\d+/g);
+    if(digits){
+      const digKey = digits.join("");
+      if(locByName.has(digKey)) return String(locByName.get(digKey) || "").trim();
+      const directDigitsHit = locById.has(digKey) ? digKey : "";
+      if(directDigitsHit) return directDigitsHit;
+    }
+    const directNameHit = (Array.isArray(state?.locations) ? state.locations : []).find(loc=>{
+      const names = [
+        loc?.label,
+        loc?.title,
+        loc?.displayName,
+        loc?.locationName,
+        loc?.nome,
+        loc?.pavimento,
+        loc?.name
+      ].map(v=>String(v || "").trim().toLowerCase()).filter(Boolean);
+      return names.includes(rawKey);
+    });
+    return String(directNameHit?.id || raw).trim();
   };
   const _lobResolveServiceId = (block)=>{
-    return String(
+    const direct = String(
       block?.serviceId ??
       block?.srvId ??
       block?.service_id ??
       block?.atividadeId ??
       ""
     ).trim();
+    if(direct) return direct;
+    const raw = String(
+      block?.serviceName ??
+      block?.serviceTitle ??
+      block?.serviceLabel ??
+      block?.labelService ??
+      block?.title ??
+      block?.label ??
+      block?.name ??
+      ""
+    ).trim();
+    if(!raw) return "";
+    const rawKey = raw.toLowerCase();
+    const svcHit = (Array.isArray(state?.services) ? state.services : []).find(svc=>{
+      const names = [
+        svc?.label,
+        svc?.title,
+        svc?.displayName,
+        svc?.serviceName,
+        svc?.name,
+        svc?.code
+      ].map(v=>String(v || "").trim().toLowerCase()).filter(Boolean);
+      return names.includes(rawKey);
+    });
+    return String(svcHit?.id || raw).trim();
   };
   const _lobResolvePlanDateISO = (block, kind)=>{
     try{
@@ -22234,7 +22928,7 @@ function _getPlannerLobMeta(){
       });
     }
   }
-  const locsBase = [...(state.locations||[])].sort((a,b)=>(_locationVisualOrderValue(b) - _locationVisualOrderValue(a)) || String(a.name||"").localeCompare(String(b.name||"")));
+  const locsBase = _uniqueLocationsById([...(state.locations||[])].sort((a,b)=>(_locationVisualOrderValue(b) - _locationVisualOrderValue(a)) || String(a.name||"").localeCompare(String(b.name||""))));
   const allowedLocationIds = locationTerm
     ? new Set(locsBase.filter(l=>{
         const name = String(l?.name||"").toLowerCase();
@@ -22244,36 +22938,137 @@ function _getPlannerLobMeta(){
       }).map(l=>String(l?.id||"").trim()).filter(Boolean))
     : null;
   const __followupResolved = getCanonicalPlannerBlocksForFollowUp();
-  const activePlanBlocks = (Array.isArray(__followupResolved?.blocks) ? __followupResolved.blocks : []).filter(block=>{
+  let activePlanBlocks = (Array.isArray(__followupResolved?.blocks) ? __followupResolved.blocks : []).filter(block=>{
     if(!allowedServiceIds) return true;
     return allowedServiceIds.has(_lobResolveServiceId(block));
   });
-  const baselineBlocks = ((_baselineHasUsableCols() && state.baseline && Array.isArray(state.baseline.blocks)) ? state.baseline.blocks : []).filter(block=>{
+  let baselineBlocks = ((_baselineHasUsableCols() && state.baseline && Array.isArray(state.baseline.blocks)) ? state.baseline.blocks : []).filter(block=>{
     if(!allowedServiceIds) return true;
     return allowedServiceIds.has(_lobResolveServiceId(block));
   });
+  if(!activePlanBlocks.length && Array.isArray(__followupResolved?.blocks) && __followupResolved.blocks.length){
+    activePlanBlocks = __followupResolved.blocks.slice();
+  }
+  if(!baselineBlocks.length && _baselineHasUsableCols() && state.baseline && Array.isArray(state.baseline.blocks) && state.baseline.blocks.length){
+    baselineBlocks = state.baseline.blocks.slice();
+  }
+  const soleLocationId = locsBase.length === 1 ? String(locsBase[0]?.id || "").trim() : "";
+  const _lobCanonicalLocationId = (block)=>{
+    const direct = _lobResolveLocationId(block);
+    if(direct && locsBase.some(l=>String(l?.id||"").trim()===direct)) return direct;
+    if(soleLocationId) return soleLocationId;
+    return direct;
+  };
   const activePlanBlocksFiltered = activePlanBlocks.filter(block=>{
     if(!allowedLocationIds) return true;
-    return allowedLocationIds.has(_lobResolveLocationId(block));
+    return allowedLocationIds.has(_lobCanonicalLocationId(block));
   });
   const baselineBlocksFiltered = baselineBlocks.filter(block=>{
     if(!allowedLocationIds) return true;
-    return allowedLocationIds.has(_lobResolveLocationId(block));
+    return allowedLocationIds.has(_lobCanonicalLocationId(block));
   });
+  const _lobBlockLocationFallbacks = new Map();
+  const _pushFallbackLocation = (block)=>{
+    const locId = _lobCanonicalLocationId(block);
+    if(!locId || _lobBlockLocationFallbacks.has(locId)) return;
+    const rawName = String(
+      block?.locationName ||
+      block?.locationTitle ||
+      block?.labelLocation ||
+      block?.locName ||
+      block?.title ||
+      block?.label ||
+      block?.nome ||
+      block?.pavimento ||
+      block?.cluster ||
+      block?.agrupador ||
+      block?.grupo ||
+      block?.location ||
+      ""
+    ).trim();
+    const name = rawName && !/^\d+$/.test(rawName) && !/^p[0-9a-f]{6,}$/i.test(rawName)
+      ? rawName
+      : "";
+    _lobBlockLocationFallbacks.set(locId, {
+      id: locId,
+      name,
+      label: name,
+      title: name,
+      displayName: name,
+      locationName: name,
+      nome: name,
+      pavimento: name,
+      order: Number(block?.locationOrder || block?.locOrder || block?.order || 0) || 0,
+      visualOrder: Number(block?.locationVisualOrder || block?.locVisualOrder || block?.visualOrder || block?.order || 0) || 0,
+      lineGroup: String(block?.locationLineGroup || block?.locLineGroup || block?.lineGroup || "pavimento_tipo").trim() || "pavimento_tipo",
+      cluster: String(block?.locationCluster || block?.locCluster || block?.cluster || "").trim(),
+      color: String(block?.locationColor || block?.locColor || block?.color || "").trim()
+    });
+  };
+  activePlanBlocksFiltered.forEach(_pushFallbackLocation);
+  baselineBlocksFiltered.forEach(_pushFallbackLocation);
   const relevantLocIds = new Set([]
-    .concat(activePlanBlocksFiltered.map(b=>_lobResolveLocationId(b)))
-    .concat(baselineBlocksFiltered.map(b=>_lobResolveLocationId(b)))
+    .concat(activePlanBlocksFiltered.map(b=>_lobCanonicalLocationId(b)))
+    .concat(baselineBlocksFiltered.map(b=>_lobCanonicalLocationId(b)))
     .filter(Boolean));
   const hasServiceFilter = !!allowedServiceIds;
   const hasLocationFilter = !!allowedLocationIds;
+  const _looksTechLoc = (v)=>{
+    const s = String(v || "").trim();
+    return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+  };
+  const _bestLocName = (loc)=>{
+    const names = [
+      loc?.label,
+      loc?.title,
+      loc?.displayName,
+      loc?.locationName,
+      loc?.nome,
+      loc?.pavimento,
+      loc?.cluster,
+      loc?.agrupador,
+      loc?.grupo,
+      loc?.name
+    ].map(v=>String(v || "").trim()).filter(Boolean);
+    return names.find(v=>!_looksTechLoc(v)) || names[0] || "";
+  };
+  const locByIdMerged = new Map();
+  for(const loc of locsBase){
+    const id = String(loc?.id || "").trim();
+    if(!id) continue;
+    locByIdMerged.set(id, { ...loc });
+  }
+  for(const loc of _lobBlockLocationFallbacks.values()){
+    const id = String(loc?.id || "").trim();
+    if(!id) continue;
+    const cur = locByIdMerged.get(id) || null;
+    if(!cur){
+      locByIdMerged.set(id, { ...loc });
+      continue;
+    }
+    const curName = _bestLocName(cur);
+    const nextName = _bestLocName(loc);
+    if((_looksTechLoc(curName) && !_looksTechLoc(nextName)) || (!curName && nextName)){
+      locByIdMerged.set(id, { ...cur, ...loc, name: nextName || loc.name || cur.name, label: nextName || loc.label || cur.label, title: nextName || loc.title || cur.title, displayName: nextName || loc.displayName || cur.displayName, locationName: nextName || loc.locationName || cur.locationName, nome: nextName || loc.nome || cur.nome, pavimento: nextName || loc.pavimento || cur.pavimento });
+    }
+  }
+  const locsWithFallbacks = Array.from(locByIdMerged.values());
+  const locationDisplayNameById = new Map();
+  for(const loc of locsWithFallbacks){
+    const id = String(loc?.id || "").trim();
+    if(!id) continue;
+    const name = _bestLocName(loc);
+    if(name && !_looksTechLoc(name)) locationDisplayNameById.set(id, name);
+  }
+  try{
+    window.__plannerLocationDisplayNameById = locationDisplayNameById;
+  }catch(_){}
   const locations = (
-    relevantLocIds.size
-      ? locsBase.filter(l=>relevantLocIds.has(String(l.id||"").trim()))
+      relevantLocIds.size
+      ? locsWithFallbacks.filter(l=>relevantLocIds.has(String(l.id||"").trim()))
       : hasLocationFilter
-        ? locsBase.filter(l=>allowedLocationIds.has(String(l.id||"").trim()))
-        : hasServiceFilter
-          ? []
-          : locsBase
+        ? locsWithFallbacks.filter(l=>allowedLocationIds.has(String(l.id||"").trim()))
+        : locsWithFallbacks
   ).slice();
   const dayIndex = new Map(days.map((d,i)=>[String(d?.dateISO||d?.iso||d?.dayISO||""), i]));
   const firstVisibleISO = String(days[0]?.dateISO || days[0]?.iso || days[0]?.dayISO || "").trim();
@@ -22310,7 +23105,7 @@ function _getPlannerLobMeta(){
   const svcById = new Map((state.services||[]).map(s=>[String(s.id||"").trim(), s]));
   const planEntries = [];
   for(const block of activePlanBlocksFiltered){
-    const locId = _lobResolveLocationId(block);
+    const locId = _lobCanonicalLocationId(block);
     const svcId = _lobResolveServiceId(block);
     if(!locId || !svcId || !byLoc.has(locId)) continue;
     const startISO = _lobResolvePlanDateISO(block, "start");
@@ -22337,7 +23132,7 @@ function _getPlannerLobMeta(){
   const trackH = Math.max(18, Math.round(baseRowH * 0.44 * lobZoom));
   const baselineEntries = [];
   for(const block of baselineBlocksFiltered){
-    const locId = _lobResolveLocationId(block);
+    const locId = _lobCanonicalLocationId(block);
     const svcId = _lobResolveServiceId(block);
     if(!locId || !svcId || !rowMetrics.find(x=>x.locId===locId)) continue;
     const startISO = _lobResolveBaselineDateISO(block, "start");
@@ -22382,6 +23177,7 @@ function _getPlannerLobMeta(){
     baselineGapH,
     days,
     locations,
+    locationDisplayNameById,
     totalW: days.length * dayW,
     totalH: locations.length * rowH,
     rowTopByLoc,
@@ -22757,12 +23553,18 @@ function _svcPipelineLocationName(locId){
 function _svcPipelineLocationInfo(locId){
   const hit = (state.locations||[]).find(loc=>String(loc?.id||"").trim()===String(locId||"").trim()) || null;
   const lineGroup = String(hit?.lineGroup || "pavimento_tipo").trim();
+  const cluster = String(hit?.cluster || "").trim();
+  const groupKey = lineGroup === "pavimento_tipo"
+    ? "pavimento_tipo"
+    : `${lineGroup}::${_sanitizeGuidedTemplateKey(cluster || _defaultClusterForLineGroup(lineGroup))}`;
   return {
     id: String(locId||"").trim(),
     name: String(hit?.name || locId || "").trim(),
     lineGroup,
     lineGroupLabel: _lineGroupLabel(lineGroup),
-    cluster: String(hit?.cluster || "").trim()
+    cluster,
+    groupKey,
+    groupLabel: cluster || _defaultClusterForLineGroup(lineGroup)
   };
 }
 function _getSvcCompanySummary(serviceId, teams){
@@ -22791,11 +23593,11 @@ function _renderSvcCycleSummary(cycle){
   const firstLoc = orderedLocIds.length ? _svcPipelineLocationName(orderedLocIds[0]) : "—";
   const lastLoc = orderedLocIds.length ? _svcPipelineLocationName(orderedLocIds[orderedLocIds.length - 1]) : "—";
   const cycleText = orderedLocIds.length
-    ? `${orderedLocIds.length} pavimentos • ${firstLoc} ? ${lastLoc}`
+    ? `${orderedLocIds.length} pavimentos • ${firstLoc} → ${lastLoc}`
     : "Sem pavimentos definidos";
   const companyText = _getSvcCompanySummary(serviceId, teams);
   const orderText = orderedLocIds.length
-    ? orderedLocIds.map(_svcPipelineLocationName).slice(0, 6).join(" ? ") + (orderedLocIds.length > 6 ? ` ? ... (${orderedLocIds.length})` : "")
+    ? orderedLocIds.map(_svcPipelineLocationName).slice(0, 6).join(" • ") + (orderedLocIds.length > 6 ? ` • ... (${orderedLocIds.length})` : "")
     : "Sem ordem de execução";
   const sourceText = String(cycle?.configuredBasis || cycle?.source || cycle?.origin || "").trim() || "eap_configurada";
   boxes[0].textContent = cycleText;
@@ -22963,7 +23765,7 @@ function _renderSvcPipelineEditor(cycle){
     imported.className = "svcPipeInlineSummary";
     imported.innerHTML = `
       <div class="main">${branchLocIds.length} pav.</div>
-      <div class="sub">${branchFirst} ? ${branchLast}</div>
+      <div class="sub">${branchFirst} → ${branchLast}</div>
     `;
     const entryMini = document.createElement("div");
     entryMini.className = "svcPipeEntryMini";
@@ -23011,23 +23813,35 @@ function _renderSvcPipelineEditor(cycle){
       empty.textContent = "Sem pavimentos neste pipeline.";
       lane.appendChild(empty);
     }
-    const grouped = [
-      { key:"pavimento_tipo", label:"Pavimentos tipo", items:[] },
-      { key:"area_comum", label:"Áreas comuns", items:[] },
-      { key:"especial", label:"Especiais", items:[] }
-    ];
+    const grouped = new Map();
     branch.locationIds.forEach((locId)=>{
       const info = _svcPipelineLocationInfo(locId);
-      const bucket = grouped.find(x=>x.key===info.lineGroup) || grouped[2];
-      bucket.items.push(info);
+      const key = String(info.groupKey || info.lineGroup || "pavimento_tipo").trim();
+      if(!grouped.has(key)){
+        grouped.set(key, {
+          key,
+          lineGroup: info.lineGroup,
+          label: info.groupLabel || info.lineGroupLabel || "Grupo",
+          items: []
+        });
+      }
+      grouped.get(key).items.push(info);
     });
-    const nonEmptyGroups = grouped.filter(group=>group.items.length);
+    const nonEmptyGroups = Array.from(grouped.values()).sort((a,b)=>{
+      const order = { pavimento_tipo:0, area_comum:1, especial:2 };
+      const aRoot = String(a.lineGroup || "").trim().toLowerCase();
+      const bRoot = String(b.lineGroup || "").trim().toLowerCase();
+      const ao = Object.prototype.hasOwnProperty.call(order, aRoot) ? order[aRoot] : 99;
+      const bo = Object.prototype.hasOwnProperty.call(order, bRoot) ? order[bRoot] : 99;
+      if(ao !== bo) return ao - bo;
+      return String(a.label || "").localeCompare(String(b.label || ""));
+    }).filter(group=>group.items.length);
     if(nonEmptyGroups.length){
       const track = document.createElement("div");
       track.className = "svcPipeTrack";
       nonEmptyGroups.forEach(group=>{
         const section = document.createElement("div");
-        section.className = `svcPipeSection ${group.key}`;
+        section.className = `svcPipeSection ${group.lineGroup || "especial"}`;
         const head = document.createElement("div");
         head.className = "svcPipeSectionHead";
         head.innerHTML = `<span class="ttl">${group.label}</span><span class="cnt">${group.items.length}</span>`;
@@ -27986,8 +28800,8 @@ function rebuildLocLegend(){
     sw.className="swatch";
     sw.style.background=l.color;
     const tx=document.createElement("div");
-    const typeLabel = l.lineGroup==="area_comum" ? "Área Comum" : l.lineGroup==="especial" ? "Especial" : "Pavimento Tipo";
-    tx.textContent=`${l.name} • ${typeLabel}${l.cluster ? " • "+l.cluster : ""}`;
+    const typeLabel = l.lineGroup==="area_comum" ? (l.cluster || "Área Comum") : l.lineGroup==="especial" ? (l.cluster || "Especial") : "Pavimento Tipo";
+    tx.textContent=`${l.name} • ${typeLabel}`;
     item.appendChild(sw);
     item.appendChild(tx);
     legend2.appendChild(item);
@@ -28305,14 +29119,11 @@ function rebuildLocTable(){
 
     const tdG=document.createElement("td");
     const wrapTipo=document.createElement("label");
-    wrapTipo.style.display="flex";
-    wrapTipo.style.alignItems="center";
-    wrapTipo.style.gap="6px";
-    wrapTipo.style.minHeight="32px";
-    wrapTipo.style.padding="0";
+    wrapTipo.className = "locTipoFlag";
     const inG=document.createElement("input");
     inG.type="checkbox";
     inG.checked=_isTipoLocationLineGroup(l.lineGroup);
+    inG.title = inG.checked ? "Tipo" : "Não tipo";
     const lbG=document.createElement("span");
     lbG.textContent = inG.checked ? "Tipo" : "Não tipo";
     inG.addEventListener("change", ()=>{
@@ -28381,7 +29192,7 @@ function rebuildLocTable(){
     tdA.style.whiteSpace="nowrap";
     const btnTop=document.createElement("button");
     btnTop.className="miniBtn";
-    btnTop.textContent="?";
+    btnTop.textContent="⇑";
     btnTop.title="Mover para o topo";
     btnTop.style.marginRight="4px";
     btnTop.addEventListener("click", ()=>{
@@ -28394,7 +29205,7 @@ function rebuildLocTable(){
     });
     const btnUp=document.createElement("button");
     btnUp.className="miniBtn";
-    btnUp.textContent="?";
+    btnUp.textContent="↑";
     btnUp.title="Subir";
     btnUp.style.marginRight="4px";
     btnUp.addEventListener("click", ()=>{
@@ -28407,7 +29218,7 @@ function rebuildLocTable(){
     });
     const btnDown=document.createElement("button");
     btnDown.className="miniBtn";
-    btnDown.textContent="?";
+    btnDown.textContent="↓";
     btnDown.title="Descer";
     btnDown.style.marginRight="4px";
     btnDown.addEventListener("click", ()=>{
@@ -28420,7 +29231,7 @@ function rebuildLocTable(){
     });
     const btnBottom=document.createElement("button");
     btnBottom.className="miniBtn";
-    btnBottom.textContent="?";
+    btnBottom.textContent="⇓";
     btnBottom.title="Mover para a base";
     btnBottom.style.marginRight="4px";
     btnBottom.addEventListener("click", ()=>{
@@ -31621,17 +32432,50 @@ try{
     _ctx = null;
   }
   function safeNameFromState(kind, id){
+    const raw = String(id || "").trim();
+    const _looksTech = (v)=>{
+      const s = String(v || "").trim();
+      return !s || /^\d+$/.test(s) || /^p[0-9a-f]{6,}$/i.test(s);
+    };
     try{
-if(kind === "service" && Array.isArray(state.services)){
-        const s = state.services.find(x=>String(x.id)===String(id));
-        return (s && s.name) ? s.name : id;
+      if(kind === "service" && Array.isArray(state.services)){
+        const s = state.services.find(x=>String(x.id)===raw);
+        return String(
+          s?.label ||
+          s?.title ||
+          s?.displayName ||
+          s?.serviceName ||
+          s?.name ||
+          raw
+        ).trim() || raw;
       }
       if(kind === "location" && Array.isArray(state.locations)){
-        const l = state.locations.find(x=>String(x.id)===String(id));
-        return (l && l.name) ? l.name : id;
+        const l = state.locations.find(x=>String(x.id)===raw);
+        const cached = (window.__plannerLocationDisplayNameById && window.__plannerLocationDisplayNameById.get)
+          ? String(window.__plannerLocationDisplayNameById.get(raw) || "").trim()
+          : "";
+        if(cached && !_looksTech(cached)) return cached;
+        const direct = String(
+          l?.label ||
+          l?.title ||
+          l?.displayName ||
+          l?.locationName ||
+          l?.nome ||
+          l?.pavimento ||
+          l?.cluster ||
+          l?.agrupador ||
+          l?.grupo ||
+          l?.name ||
+          raw
+        ).trim();
+        if(direct && !_looksTech(direct)) return direct;
+        if(typeof resolveLocationLabel === "function"){
+          const alt = String(resolveLocationLabel(l || { id:raw }) || "").trim();
+          if(alt && !_looksTech(alt)) return alt;
+        }
       }
     }catch(e){}
-    return id;
+    return raw;
   }
 
   
@@ -31855,6 +32699,17 @@ function fill(ctx){
       if(ctx){
         if(typeof _normalizeServiceId==='function') ctx.serviceId = _normalizeServiceId(ctx.serviceId);
         if(typeof _normalizeLocationId==='function') ctx.locationId = _normalizeLocationId(ctx.locationId);
+        const oneLoc = (Array.isArray(state?.locations) && state.locations.length === 1) ? state.locations[0] : null;
+        if(oneLoc){
+          const oneLocId = String(oneLoc?.id || "").trim();
+          if(oneLocId && String(ctx.locationId || "").trim() && String(ctx.locationId || "").trim() !== oneLocId){
+            const exists = Array.isArray(state?.locations) && state.locations.some(l=>String(l?.id||"").trim()===String(ctx.locationId||"").trim());
+            if(!exists){
+              ctx.locationId = oneLocId;
+              ctx.locationName = String(oneLoc?.name || oneLoc?.label || oneLoc?.title || oneLoc?.displayName || oneLoc?.locationName || oneLoc?.nome || oneLoc?.pavimento || "").trim();
+            }
+          }
+        }
       }
     }catch(e){}
     _ctx = ctx;
@@ -31862,7 +32717,26 @@ function fill(ctx){
     if(!U.ov) return;
 
     const svcName = safeNameFromState("service", ctx.serviceId);
-    const pavName = safeNameFromState("location", ctx.locationId);
+    const planBlockForName = findPlanBlock(ctx.serviceId, ctx.locationId) || null;
+    const baseBlockForName = findBaselineBlock(ctx.serviceId, ctx.locationId) || null;
+    const blockForName = planBlockForName || baseBlockForName || null;
+    const pavName = String(
+      ctx.locationName ||
+      ctx.locationLabel ||
+      ctx.pavimentoName ||
+      ctx.pavimento ||
+      (typeof getPlannerLocationDisplayName === "function" ? getPlannerLocationDisplayName(ctx.locationId, blockForName || ctx) : "") ||
+      (typeof resolveLocationLabel === "function" ? resolveLocationLabel(blockForName || ctx) : "") ||
+      blockForName?.locationName ||
+      blockForName?.locationTitle ||
+      blockForName?.labelLocation ||
+      blockForName?.locName ||
+      blockForName?.label ||
+      blockForName?.title ||
+      blockForName?.name ||
+      safeNameFromState("location", ctx.locationId) ||
+      ""
+    ).trim();
 
     if(U.elSvc) U.elSvc.textContent = svcName;
     if(U.elPav) U.elPav.textContent = pavName;
@@ -44913,10 +45787,10 @@ main:has(#viewEAP[style*="block"]){
   display:flex !important;
   align-items:flex-end !important;
   justify-content:space-between !important;
-  gap:18px !important;
-  margin:0 0 18px !important;
-  padding:26px 28px 22px !important;
-  min-height:112px !important;
+  gap:14px !important;
+  margin:0 0 12px !important;
+  padding:16px 20px 14px !important;
+  min-height:78px !important;
   background:rgba(255,255,255,.88) !important;
   border:1px solid var(--pln-v23-border) !important;
   border-radius:var(--pln-v23-radius) !important;
@@ -44926,6 +45800,15 @@ main:has(#viewEAP[style*="block"]){
 #viewPav > section.card > h2{
   flex-wrap:wrap !important;
   align-content:flex-end !important;
+  align-items:flex-start !important;
+  justify-content:flex-start !important;
+  gap:14px !important;
+  margin-bottom:8px !important;
+  padding:12px 18px 10px !important;
+  min-height:60px !important;
+}
+#viewPav > section.card > h2 > button{
+  margin-top:1px !important;
 }
 #viewProject .projectSetupHeroVisual{
   display:none !important;
@@ -44947,8 +45830,8 @@ main:has(#viewEAP[style*="block"]){
 #viewPav > section.card > h2 > span:first-child,
 #viewGuidedPlan .cardHead .title{
   display:block !important;
-  margin-top:22px !important;
-  font-size:22px !important;
+  margin-top:0 !important;
+  font-size:18px !important;
   line-height:1.12 !important;
   font-weight:600 !important;
   letter-spacing:-.018em !important;
@@ -44957,11 +45840,11 @@ main:has(#viewEAP[style*="block"]){
 #viewPav > section.card > h2 > .hint,
 #viewGuidedPlan .cardHead .sub{
   display:block !important;
-  margin-top:8px !important;
-  font-size:14px !important;
+  margin-top:4px !important;
+  font-size:10px !important;
   line-height:1.45 !important;
   color:#475569 !important;
-  max-width:760px !important;
+  max-width:420px !important;
 }
 #viewGuidedPlan > section.card > .cardHead > div:first-child,
 #viewGuidedApply > section.card > .planningApplyToolbar::after,
@@ -45066,17 +45949,24 @@ main:has(#viewEAP[style*="block"]){
   align-items:center !important;
   justify-content:space-between !important;
   gap:14px !important;
-  margin:0 0 16px !important;
-  padding:16px 18px !important;
+  margin:0 0 10px !important;
+  padding:8px 12px !important;
   background:rgba(255,255,255,.92) !important;
   border:1px solid var(--pln-v23-border) !important;
   border-radius:var(--pln-v23-radius) !important;
   box-shadow:var(--pln-v23-shadow) !important;
 }
 #viewPav .body > div:first-child > div:first-child{
-  max-width:760px !important;
-  font-size:13px !important;
+  max-width:420px !important;
+  font-size:11px !important;
   color:#526178 !important;
+}
+
+#viewPav #btnApplyPlanAfterPav{
+  min-height:38px !important;
+  padding:9px 12px !important;
+  font-size:13px !important;
+  white-space:nowrap !important;
 }
 
 /* grid dos formulários: menos apertado e mais legível */
@@ -45749,8 +46639,35 @@ html body.withSideNav.navCollapsed #sideNav .navItem svg{
 #viewGuided .guidedFlowSearchBox,
 #viewGuidedApply .guidedFlowSearchBox,
 #viewGuidedPlan .guidedFlowSearchBox{
+  width:100% !important;
+  max-width:none !important;
+  grid-template-columns:1fr !important;
+  align-items:stretch !important;
+  gap:10px !important;
   padding:14px 16px !important;
   border-radius:18px !important;
+}
+#viewGuided .guidedFlowSearchBox > div:first-child,
+#viewGuidedApply .guidedFlowSearchBox > div:first-child,
+#viewGuidedPlan .guidedFlowSearchBox > div:first-child{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:6px !important;
+}
+#viewGuided .guidedFlowSearchServiceBox,
+#viewGuidedApply .guidedFlowSearchServiceBox,
+#viewGuidedPlan .guidedFlowSearchServiceBox{
+  min-height:68px !important;
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  gap:2px !important;
+}
+#viewGuided .guidedFlowSearchResults,
+#viewGuidedApply .guidedFlowSearchResults,
+#viewGuidedPlan .guidedFlowSearchResults{
+  margin-top:2px !important;
 }
 
 /* Acompanhamento usa toda a largura disponível do shell oficial. */

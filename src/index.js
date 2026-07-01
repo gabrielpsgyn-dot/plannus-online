@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -375,6 +375,95 @@
           role: role.role,
           obras: result.results
         });
+      }
+
+      // ============================================================
+      // ENTREGAS DE UNIDADE — PROJETOS SEPARADOS DE OBRAS
+      // ============================================================
+
+      if (path === "/api/entregas-projetos" && method === "GET") {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const role = await getUserRole(env, email);
+
+        const result = toBool(role.can_view_all_obras)
+          ? await env.DB.prepare(`
+              SELECT id, nome, codigo, descricao, owner_email, revision, status, created_at, updated_at
+              FROM entregas_projetos
+              WHERE status = 'ativo'
+              ORDER BY updated_at DESC
+            `).all()
+          : await env.DB.prepare(`
+              SELECT id, nome, codigo, descricao, owner_email, revision, status, created_at, updated_at
+              FROM entregas_projetos
+              WHERE status = 'ativo'
+                AND owner_email = ?
+              ORDER BY updated_at DESC
+            `).bind(email).all();
+
+        return json({
+          ok: true,
+          usuario: email,
+          projetos: result.results
+        });
+      }
+
+      if (path === "/api/entregas-projetos" && method === "POST") {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const body = await readJson(request);
+        const nome = nullableText(body.nome);
+        const codigo = nullableText(body.codigo);
+        const descricao = nullableText(body.descricao) || "";
+        const state = body.state && typeof body.state === "object" ? body.state : null;
+
+        if (!nome) {
+          return json({
+            ok: false,
+            erro: "Nome do projeto de entregas é obrigatório."
+          }, 400);
+        }
+
+        const projectId = "entrega_" + crypto.randomUUID();
+        const now = new Date().toISOString();
+        const stateJson = JSON.stringify(state || {
+          module: "entregas_unidade",
+          version: 1,
+          obra: { id: projectId, nome, codigo, descricao }
+        });
+
+        await env.DB.prepare(`
+          INSERT INTO entregas_projetos (
+            id, nome, codigo, descricao, owner_email, state_json,
+            revision, status, created_at, updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          projectId,
+          nome,
+          codigo,
+          descricao,
+          email,
+          stateJson,
+          1,
+          "ativo",
+          now,
+          now
+        ).run();
+
+        return json({
+          ok: true,
+          projeto: {
+            id: projectId,
+            nome,
+            codigo,
+            descricao,
+            revision: 1,
+            status: "ativo",
+            updated_at: now,
+            state: safeJsonParse(stateJson)
+          }
+        }, 201);
       }
 
       // ============================================================
@@ -1112,6 +1201,174 @@
         });
       }
 
+      if (
+        parts.length === 4 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        parts[3] === "save" &&
+        method === "POST"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+
+        const current = await env.DB.prepare(`
+          SELECT id, owner_email, revision
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!current) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado."
+          }, 404);
+        }
+
+        const role = await getUserRole(env, email);
+        if (current.owner_email !== email && !toBool(role.can_view_all_obras)) {
+          return json({
+            ok: false,
+            erro: "Usuário sem permissão para editar este projeto de entregas."
+          }, 403);
+        }
+
+        const body = await readJson(request);
+        const state = body.state;
+        const revision = Number(body.revision);
+
+        if (!state || !Number.isInteger(revision)) {
+          return json({
+            ok: false,
+            erro: "Payload inválido. Envie { state, revision }."
+          }, 400);
+        }
+
+        if (Number(current.revision) !== revision) {
+          return json({
+            ok: false,
+            conflito: true,
+            erro: "Existe uma versão mais recente no banco. Carregue o projeto antes de salvar.",
+            revision_banco: Number(current.revision),
+            revision_enviada: revision
+          }, 409);
+        }
+
+        const now = new Date().toISOString();
+        const newRevision = revision + 1;
+        const obra = state.obra || {};
+
+        await env.DB.prepare(`
+          UPDATE entregas_projetos
+          SET nome = ?,
+              codigo = ?,
+              descricao = ?,
+              state_json = ?,
+              revision = ?,
+              updated_at = ?
+          WHERE id = ?
+            AND revision = ?
+        `).bind(
+          nullableText(obra.nome) || "Entregas de Unidade",
+          nullableText(obra.codigo),
+          nullableText(obra.descricao) || "",
+          JSON.stringify(state),
+          newRevision,
+          now,
+          projectId,
+          revision
+        ).run();
+
+        return json({
+          ok: true,
+          projeto_id: projectId,
+          revision: newRevision,
+          updated_at: now
+        });
+      }
+
+      if (
+        parts.length === 3 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        method === "GET"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+        const role = await getUserRole(env, email);
+
+        const project = await env.DB.prepare(`
+          SELECT id, nome, codigo, descricao, owner_email, state_json, revision, status, updated_at
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!project || (project.owner_email !== email && !toBool(role.can_view_all_obras))) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado ou usuário sem permissão."
+          }, 404);
+        }
+
+        return json({
+          ok: true,
+          projeto: {
+            id: project.id,
+            nome: project.nome,
+            codigo: project.codigo,
+            descricao: project.descricao,
+            revision: Number(project.revision),
+            status: project.status,
+            updated_at: project.updated_at,
+            state: safeJsonParse(project.state_json)
+          }
+        });
+      }
+
+      if (
+        parts.length === 3 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        method === "DELETE"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+        const role = await getUserRole(env, email);
+
+        const project = await env.DB.prepare(`
+          SELECT id, owner_email
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!project || (project.owner_email !== email && !toBool(role.can_view_all_obras))) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado ou usuário sem permissão."
+          }, 404);
+        }
+
+        const now = new Date().toISOString();
+        await env.DB.prepare(`
+          UPDATE entregas_projetos
+          SET status = 'excluido',
+              updated_at = ?
+          WHERE id = ?
+        `).bind(now, projectId).run();
+
+        return json({
+          ok: true,
+          projeto_id: projectId,
+          status: "excluido",
+          updated_at: now
+        });
+      }
+
       // ============================================================
       // OBRAS — EXCLUIR / DESATIVAR LOGICAMENTE
       // /api/obras/:id
@@ -1499,6 +1756,28 @@ async function canManageObraPermissions(env, email, obraId) {
   }
 
   return await isOwnerObra(env, email, obraId);
+}
+
+async function ensureDeliveryProjectsSchema(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS entregas_projetos (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      codigo TEXT,
+      descricao TEXT NOT NULL DEFAULT '',
+      owner_email TEXT NOT NULL,
+      state_json TEXT NOT NULL,
+      revision INTEGER NOT NULL DEFAULT 1,
+      status TEXT NOT NULL DEFAULT 'ativo',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `).run();
+
+  await env.DB.prepare(`
+    CREATE INDEX IF NOT EXISTS idx_entregas_projetos_owner_status
+    ON entregas_projetos(owner_email, status, updated_at)
+  `).run();
 }
 
 // ============================================================

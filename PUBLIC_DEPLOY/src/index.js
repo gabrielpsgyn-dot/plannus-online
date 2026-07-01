@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -378,6 +378,95 @@
       }
 
       // ============================================================
+      // ENTREGAS DE UNIDADE — PROJETOS SEPARADOS DE OBRAS
+      // ============================================================
+
+      if (path === "/api/entregas-projetos" && method === "GET") {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const role = await getUserRole(env, email);
+
+        const result = toBool(role.can_view_all_obras)
+          ? await env.DB.prepare(`
+              SELECT id, nome, codigo, descricao, owner_email, revision, status, created_at, updated_at
+              FROM entregas_projetos
+              WHERE status = 'ativo'
+              ORDER BY updated_at DESC
+            `).all()
+          : await env.DB.prepare(`
+              SELECT id, nome, codigo, descricao, owner_email, revision, status, created_at, updated_at
+              FROM entregas_projetos
+              WHERE status = 'ativo'
+                AND owner_email = ?
+              ORDER BY updated_at DESC
+            `).bind(email).all();
+
+        return json({
+          ok: true,
+          usuario: email,
+          projetos: result.results
+        });
+      }
+
+      if (path === "/api/entregas-projetos" && method === "POST") {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const body = await readJson(request);
+        const nome = nullableText(body.nome);
+        const codigo = nullableText(body.codigo);
+        const descricao = nullableText(body.descricao) || "";
+        const state = body.state && typeof body.state === "object" ? body.state : null;
+
+        if (!nome) {
+          return json({
+            ok: false,
+            erro: "Nome do projeto de entregas é obrigatório."
+          }, 400);
+        }
+
+        const projectId = "entrega_" + crypto.randomUUID();
+        const now = new Date().toISOString();
+        const stateJson = JSON.stringify(state || {
+          module: "entregas_unidade",
+          version: 1,
+          obra: { id: projectId, nome, codigo, descricao }
+        });
+
+        await env.DB.prepare(`
+          INSERT INTO entregas_projetos (
+            id, nome, codigo, descricao, owner_email, state_json,
+            revision, status, created_at, updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          projectId,
+          nome,
+          codigo,
+          descricao,
+          email,
+          stateJson,
+          1,
+          "ativo",
+          now,
+          now
+        ).run();
+
+        return json({
+          ok: true,
+          projeto: {
+            id: projectId,
+            nome,
+            codigo,
+            descricao,
+            revision: 1,
+            status: "ativo",
+            updated_at: now,
+            state: safeJsonParse(stateJson)
+          }
+        }, 201);
+      }
+
+      // ============================================================
       // OBRAS — CRIAR OBRA REAL NO D1
       // ============================================================
 
@@ -410,6 +499,117 @@
         return json({
           ok: true,
           services: saved,
+          total: saved.length
+        });
+      }
+
+      if (path === "/api/eap" && method === "GET") {
+        const templates = await loadEapTemplatesFromDb(env);
+
+        return json({
+          ok: true,
+          templates
+        });
+      }
+
+      if (path === "/api/eap" && method === "POST") {
+        const actorEmail = getUserEmail(request);
+        const body = await readJson(request);
+        const incoming = Array.isArray(body.templates)
+          ? body.templates
+          : body?.template
+            ? [body.template]
+            : [];
+        const normalized = incoming
+          .map((template, idx) => normalizeEapTemplateInput(template, idx))
+          .filter((template) => template.key && template.label);
+
+        if (!normalized.length) {
+          return json({
+            ok: false,
+            erro: "Catálogo de EAP vazio."
+          }, 400);
+        }
+
+        const saved = await replaceEapTemplates(env, normalized, actorEmail);
+
+        return json({
+          ok: true,
+          templates: saved,
+          total: saved.length
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "GET") {
+        const key = decodeURIComponent(parts[2] || "").trim();
+        const templates = await loadEapTemplatesFromDb(env);
+        const template = templates.find((row) => row.key === key) || null;
+
+        if (!template) {
+          return json({
+            ok: false,
+            erro: "EAP não encontrada."
+          }, 404);
+        }
+
+        return json({
+          ok: true,
+          template
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "POST") {
+        const actorEmail = getUserEmail(request);
+        const key = decodeURIComponent(parts[2] || "").trim();
+        const body = await readJson(request);
+        const normalized = normalizeEapTemplateInput({
+          ...body,
+          key: body?.key || key
+        }, 0);
+
+        if (!normalized.key || !normalized.label) {
+          return json({
+            ok: false,
+            erro: "Chave e título da EAP são obrigatórios."
+          }, 400);
+        }
+
+        const saved = await replaceEapTemplates(env, [normalized], actorEmail);
+        const template = saved.find((row) => row.key === normalized.key) || null;
+
+        return json({
+          ok: true,
+          template,
+          templates: saved,
+          total: saved.length
+        });
+      }
+
+      if (parts.length === 3 && parts[0] === "api" && parts[1] === "eap" && method === "DELETE") {
+        const actorEmail = getUserEmail(request);
+        const key = decodeURIComponent(parts[2] || "").trim();
+
+        if (!key) {
+          return json({
+            ok: false,
+            erro: "Chave da EAP obrigatória."
+          }, 400);
+        }
+
+        const existing = await loadEapTemplatesFromDb(env);
+        const remaining = existing.filter((row) => row.key !== key);
+
+        if (remaining.length === existing.length) {
+          return json({
+            ok: false,
+            erro: "EAP não encontrada."
+          }, 404);
+        }
+
+        const saved = await replaceEapTemplates(env, remaining, actorEmail);
+        return json({
+          ok: true,
+          templates: saved,
           total: saved.length
         });
       }
@@ -1001,6 +1201,174 @@
         });
       }
 
+      if (
+        parts.length === 4 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        parts[3] === "save" &&
+        method === "POST"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+
+        const current = await env.DB.prepare(`
+          SELECT id, owner_email, revision
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!current) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado."
+          }, 404);
+        }
+
+        const role = await getUserRole(env, email);
+        if (current.owner_email !== email && !toBool(role.can_view_all_obras)) {
+          return json({
+            ok: false,
+            erro: "Usuário sem permissão para editar este projeto de entregas."
+          }, 403);
+        }
+
+        const body = await readJson(request);
+        const state = body.state;
+        const revision = Number(body.revision);
+
+        if (!state || !Number.isInteger(revision)) {
+          return json({
+            ok: false,
+            erro: "Payload inválido. Envie { state, revision }."
+          }, 400);
+        }
+
+        if (Number(current.revision) !== revision) {
+          return json({
+            ok: false,
+            conflito: true,
+            erro: "Existe uma versão mais recente no banco. Carregue o projeto antes de salvar.",
+            revision_banco: Number(current.revision),
+            revision_enviada: revision
+          }, 409);
+        }
+
+        const now = new Date().toISOString();
+        const newRevision = revision + 1;
+        const obra = state.obra || {};
+
+        await env.DB.prepare(`
+          UPDATE entregas_projetos
+          SET nome = ?,
+              codigo = ?,
+              descricao = ?,
+              state_json = ?,
+              revision = ?,
+              updated_at = ?
+          WHERE id = ?
+            AND revision = ?
+        `).bind(
+          nullableText(obra.nome) || "Entregas de Unidade",
+          nullableText(obra.codigo),
+          nullableText(obra.descricao) || "",
+          JSON.stringify(state),
+          newRevision,
+          now,
+          projectId,
+          revision
+        ).run();
+
+        return json({
+          ok: true,
+          projeto_id: projectId,
+          revision: newRevision,
+          updated_at: now
+        });
+      }
+
+      if (
+        parts.length === 3 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        method === "GET"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+        const role = await getUserRole(env, email);
+
+        const project = await env.DB.prepare(`
+          SELECT id, nome, codigo, descricao, owner_email, state_json, revision, status, updated_at
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!project || (project.owner_email !== email && !toBool(role.can_view_all_obras))) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado ou usuário sem permissão."
+          }, 404);
+        }
+
+        return json({
+          ok: true,
+          projeto: {
+            id: project.id,
+            nome: project.nome,
+            codigo: project.codigo,
+            descricao: project.descricao,
+            revision: Number(project.revision),
+            status: project.status,
+            updated_at: project.updated_at,
+            state: safeJsonParse(project.state_json)
+          }
+        });
+      }
+
+      if (
+        parts.length === 3 &&
+        parts[0] === "api" &&
+        parts[1] === "entregas-projetos" &&
+        method === "DELETE"
+      ) {
+        await ensureDeliveryProjectsSchema(env);
+        const email = getUserEmail(request);
+        const projectId = parts[2];
+        const role = await getUserRole(env, email);
+
+        const project = await env.DB.prepare(`
+          SELECT id, owner_email
+          FROM entregas_projetos
+          WHERE id = ?
+            AND status = 'ativo'
+        `).bind(projectId).first();
+
+        if (!project || (project.owner_email !== email && !toBool(role.can_view_all_obras))) {
+          return json({
+            ok: false,
+            erro: "Projeto de entregas não encontrado ou usuário sem permissão."
+          }, 404);
+        }
+
+        const now = new Date().toISOString();
+        await env.DB.prepare(`
+          UPDATE entregas_projetos
+          SET status = 'excluido',
+              updated_at = ?
+          WHERE id = ?
+        `).bind(now, projectId).run();
+
+        return json({
+          ok: true,
+          projeto_id: projectId,
+          status: "excluido",
+          updated_at: now
+        });
+      }
+
       // ============================================================
       // OBRAS — EXCLUIR / DESATIVAR LOGICAMENTE
       // /api/obras/:id
@@ -1390,6 +1758,28 @@ async function canManageObraPermissions(env, email, obraId) {
   return await isOwnerObra(env, email, obraId);
 }
 
+async function ensureDeliveryProjectsSchema(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS entregas_projetos (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      codigo TEXT,
+      descricao TEXT NOT NULL DEFAULT '',
+      owner_email TEXT NOT NULL,
+      state_json TEXT NOT NULL,
+      revision INTEGER NOT NULL DEFAULT 1,
+      status TEXT NOT NULL DEFAULT 'ativo',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `).run();
+
+  await env.DB.prepare(`
+    CREATE INDEX IF NOT EXISTS idx_entregas_projetos_owner_status
+    ON entregas_projetos(owner_email, status, updated_at)
+  `).run();
+}
+
 // ============================================================
 // HELPERS GERAIS
 // ============================================================
@@ -1424,6 +1814,45 @@ const DEFAULT_SERVICE_CATALOG = [
     source_kind: "custom",
     ordem: 2,
     ativo: 1
+  }
+];
+
+const DEFAULT_EAP_TEMPLATES = [
+  {
+    key: "residencial_vertical_padrao",
+    label: "Residencial vertical padrão",
+    description: "Modelo inicial da obra com serviços comuns já cadastrados.",
+    source_kind: "builtin",
+    base_template_key: "residencial_vertical_padrao",
+    draft_defaults: {
+      clusterName: "Torre Principal",
+      executionDirection: "baixo_alto",
+      floorStart: 800,
+      floorEnd: 3600,
+      floorStep: 100,
+      floorPrefix: "PAV",
+      commonAreas: "HALL\nLAZER",
+      specialAreas: "SS1\nÁTICO"
+    },
+    services: DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
+  },
+  {
+    key: "condominio_horizontal_padrao",
+    label: "Condomínio horizontal padrão",
+    description: "Modelo simplificado para blocos horizontais e áreas de apoio.",
+    source_kind: "builtin",
+    base_template_key: "condominio_horizontal_padrao",
+    draft_defaults: {
+      clusterName: "Bloco Horizontal",
+      executionDirection: "esquerda_direita",
+      floorStart: 1,
+      floorEnd: 40,
+      floorStep: 1,
+      floorPrefix: "UN",
+      commonAreas: "PORTARIA\nGARAGEM",
+      specialAreas: "CHURRASQUEIRA\nLAZER"
+    },
+    services: DEFAULT_SERVICE_CATALOG.map((svc, idx) => normalizeServiceCatalogInput(svc, idx))
   }
 ];
 
@@ -1496,37 +1925,9 @@ function buildDefaultObraSeed(obraId, serviceCatalog = null) {
     importTeamBranches: [],
     teamScopes: []
   }));
-  const eapLibraryItem = {
-    key: 'residencial_vertical_padrao',
-    label: 'Residencial vertical padrão',
-    sourceKind: 'builtin',
-    description: 'Modelo inicial da obra com serviços comuns já cadastrados.',
-    draftDefaults: {
-      clusterName: 'Torre Principal',
-      executionDirection: 'baixo_alto',
-      floorStart: 800,
-      floorEnd: 3600,
-      floorStep: 100,
-      floorPrefix: 'PAV',
-      commonAreas: 'HALL\nLAZER',
-      specialAreas: 'SS1\nÁTICO'
-    },
-    services: JSON.parse(JSON.stringify(guidedDraftServices))
-  };
   return {
     services: JSON.parse(JSON.stringify(serviceBaseCatalog)),
     serviceBaseCatalog: JSON.parse(JSON.stringify(serviceBaseCatalog)),
-    eap: {
-      draft: {
-        templateKey: 'residencial_vertical_padrao',
-        templateLabel: 'Residencial vertical padrão',
-        services: guidedDraftServices
-      },
-      library: [eapLibraryItem],
-      activeTemplateId: 'residencial_vertical_padrao',
-      lastSavedTemplate: null,
-      updatedAtISO: nowIso
-    },
     dependencies,
     cycles
   };
@@ -1554,7 +1955,6 @@ function buildInitialObraState({ id, nome, codigo, descricao }, serviceCatalog =
     },
     deps: seeded.dependencies,
     cycles: seeded.cycles,
-    eap: seeded.eap,
     acompanhamento: {},
     config: {}
   };
@@ -1617,6 +2017,52 @@ function normalizeServiceCatalogRow(row, idx = 0) {
   };
 }
 
+function normalizeEapTemplateInput(template, idx = 0) {
+  const key = String(template?.key || template?.template_key || "").trim() ||
+    `eap_${slugify(`${template?.label || template?.name || "template"}_${idx + 1}`)}`;
+  const services = Array.isArray(template?.services)
+    ? template.services.map((svc, serviceIdx) => normalizeServiceCatalogInput(svc, serviceIdx))
+    : [];
+  const draftDefaults = template?.draft_defaults && typeof template.draft_defaults === "object"
+    ? template.draft_defaults
+    : template?.draft && typeof template.draft === "object"
+      ? template.draft
+      : {};
+
+  return {
+    key,
+    label: String(template?.label || template?.name || key).trim(),
+    description: String(template?.description || "").trim(),
+    sourceKind: String(template?.source_kind || template?.sourceKind || "custom").trim() || "custom",
+    baseTemplateKey: String(template?.base_template_key || template?.baseTemplateKey || "").trim(),
+    orderIndex: Number(template?.order_index || template?.orderIndex || idx + 1) || idx + 1,
+    ativo: toBool(template?.ativo ?? template?.active ?? 1) ? 1 : 0,
+    draftJson: JSON.stringify(draftDefaults || {}),
+    servicesJson: JSON.stringify(services),
+  };
+}
+
+function normalizeEapTemplateRow(row, idx = 0) {
+  const draftDefaults = safeJsonParse(row?.draft_json || row?.draft_defaults || "{}");
+  const services = safeJsonParse(row?.services_json || row?.services || "[]");
+
+  return {
+    key: String(row?.key || "").trim(),
+    label: String(row?.label || "").trim(),
+    description: String(row?.description || "").trim(),
+    source_kind: String(row?.source_kind || "custom").trim() || "custom",
+    base_template_key: String(row?.base_template_key || "").trim(),
+    order_index: Number(row?.order_index || idx + 1) || idx + 1,
+    ativo: toBool(row?.ativo),
+    draft_defaults: draftDefaults && typeof draftDefaults === "object" ? draftDefaults : {},
+    services: Array.isArray(services)
+      ? services.map((svc, serviceIdx) => normalizeServiceCatalogInput(svc, serviceIdx))
+      : [],
+    created_at: row?.created_at || null,
+    updated_at: row?.updated_at || null
+  };
+}
+
 async function ensureServiceCatalogSchema(env) {
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS servicos_base (
@@ -1633,6 +2079,24 @@ async function ensureServiceCatalogSchema(env) {
       source_kind TEXT NOT NULL DEFAULT 'custom',
       order_index INTEGER NOT NULL DEFAULT 0,
       ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `).run();
+}
+
+async function ensureEapTemplateSchema(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS eap_templates (
+      key TEXT PRIMARY KEY,
+      label TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      source_kind TEXT NOT NULL DEFAULT 'custom',
+      base_template_key TEXT NOT NULL DEFAULT '',
+      order_index INTEGER NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      draft_json TEXT NOT NULL DEFAULT '{}',
+      services_json TEXT NOT NULL DEFAULT '[]',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
@@ -1698,6 +2162,104 @@ async function loadServiceCatalogFromDb(env) {
   `).all();
 
   return (result.results || []).map((row, idx) => normalizeServiceCatalogRow(row, idx));
+}
+
+async function loadEapTemplatesFromDb(env) {
+  await ensureEapTemplateSchema(env);
+
+  const countResult = await env.DB.prepare(`
+    SELECT COUNT(*) AS total
+    FROM eap_templates
+  `).first();
+
+  if (!Number(countResult?.total || 0)) {
+    const now = new Date().toISOString();
+    const seedRows = DEFAULT_EAP_TEMPLATES.map((template, idx) => normalizeEapTemplateInput(template, idx));
+
+    await env.DB.batch(seedRows.map((template) => env.DB.prepare(`
+      INSERT OR REPLACE INTO eap_templates (
+        key, label, description, source_kind, base_template_key, order_index,
+        ativo, draft_json, services_json, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      template.key,
+      template.label,
+      template.description,
+      template.sourceKind,
+      template.baseTemplateKey,
+      template.orderIndex,
+      template.ativo,
+      template.draftJson,
+      template.servicesJson,
+      now,
+      now
+    )));
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT
+      key,
+      label,
+      description,
+      source_kind,
+      base_template_key,
+      order_index,
+      ativo,
+      draft_json,
+      services_json,
+      created_at,
+      updated_at
+    FROM eap_templates
+    ORDER BY order_index ASC, label COLLATE NOCASE ASC, key ASC
+  `).all();
+
+  return (result.results || []).map((row, idx) => normalizeEapTemplateRow(row, idx));
+}
+
+async function replaceEapTemplates(env, templates, actorEmail = null) {
+  await ensureEapTemplateSchema(env);
+  const now = new Date().toISOString();
+  const rows = (Array.isArray(templates) ? templates : [])
+    .map((template, idx) => normalizeEapTemplateInput(template, idx))
+    .filter((template) => template.key && template.label);
+
+  if (!rows.length) {
+    return [];
+  }
+
+  const queries = [
+    env.DB.prepare(`DELETE FROM eap_templates`)
+  ];
+
+  for (const template of rows) {
+    queries.push(env.DB.prepare(`
+      INSERT OR REPLACE INTO eap_templates (
+        key, label, description, source_kind, base_template_key, order_index,
+        ativo, draft_json, services_json, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      template.key,
+      template.label,
+      template.description,
+      template.sourceKind,
+      template.baseTemplateKey,
+      template.orderIndex,
+      template.ativo,
+      template.draftJson,
+      template.servicesJson,
+      now,
+      now
+    ));
+  }
+
+  await env.DB.batch(queries);
+
+  const saved = await loadEapTemplatesFromDb(env);
+  console.log("[API][EAP]", {
+    actorEmail,
+    total: saved.length
+  });
+  return saved;
 }
 
 async function replaceServiceCatalog(env, services, actorEmail = null) {

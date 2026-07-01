@@ -1513,6 +1513,31 @@
         };
       }
 
+      function mergeDeliveryProjectLists(remoteProjects, localProjects) {
+        const map = new Map();
+        const push = (project) => {
+          const row = projectListRow(project);
+          const key = String(row.id || "").trim()
+            || `${normalizeKey(row.codigo || "")}::${normalizeKey(row.nome || "")}`;
+          if (!key) return;
+          const current = map.get(key);
+          if (!current) {
+            map.set(key, row);
+            return;
+          }
+          const currentStamp = String(current.updatedAt || "");
+          const nextStamp = String(row.updatedAt || "");
+          const currentRevision = Number(current.revision || 0) || 0;
+          const nextRevision = Number(row.revision || 0) || 0;
+          if (nextRevision > currentRevision || (nextRevision === currentRevision && nextStamp > currentStamp)) {
+            map.set(key, row);
+          }
+        };
+        (Array.isArray(remoteProjects) ? remoteProjects : []).forEach(push);
+        (Array.isArray(localProjects) ? localProjects : []).forEach(push);
+        return Array.from(map.values()).sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+      }
+
       function shouldUseDeliveryApi() {
         return location.protocol === "https:";
       }
@@ -1719,8 +1744,13 @@
             renderOnlineWorks();
             return;
           }
-          state.onlineWorks = Array.isArray(result.data?.projetos) ? result.data.projetos : [];
-          setOnlineWorksStatus(`${state.onlineWorks.length} projeto(s) de entregas online encontrado(s).`, "ok");
+          const remoteProjects = Array.isArray(result.data?.projetos) ? result.data.projetos : [];
+          const localProjects = loadDeliveryProjects();
+          state.onlineWorks = mergeDeliveryProjectLists(remoteProjects, localProjects);
+          const remoteCount = remoteProjects.length;
+          const localCount = localProjects.length;
+          const suffix = localCount > remoteCount ? ` (${localCount} no navegador)` : "";
+          setOnlineWorksStatus(`${state.onlineWorks.length} projeto(s) de entregas encontrado(s).${suffix}`, "ok");
           renderOnlineWorks();
           return;
         }
@@ -1781,6 +1811,7 @@
           setSyncPill("ok", "online entregas");
           setSavePill("ok", `rev ${state.sync.revision}`);
           setSaveStateMode("clean");
+          await listOnlineWorks();
           return;
         }
         const projects = loadDeliveryProjects();

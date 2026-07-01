@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Plannus | Acompanhamento</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --surface:#ffffff;
+      --surface-2:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#d7e1ee;
+      --primary:#e11d48;
+      --primary-2:#be123c;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#dc2626;
+      --plain:#94a3b8;
+      --shadow:0 12px 30px rgba(15,23,42,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#f8fbff 0%,#eef3f9 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select,textarea{font:inherit}
+    body{min-height:100vh}
+    .shell{max-width:980px;margin:0 auto;padding:14px 14px 28px}
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter:blur(14px);
+      background:rgba(244,247,251,.88);
+      border-bottom:1px solid rgba(215,225,238,.8);
+      margin:0 -14px 14px;
+      padding:12px 14px;
+    }
+    .topbar-inner{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      max-width:980px;margin:0 auto;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;min-width:0;
+    }
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;background:#0f172a;color:#fff;
+      display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)
+    }
+    .brand-text{min-width:0}
+    .brand-text h1{margin:0;font-size:18px;line-height:1.1;letter-spacing:-.03em}
+    .brand-text p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .pill{
+      display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;
+      border:1px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:#0f172a;
+      box-shadow:0 2px 8px rgba(15,23,42,.03)
+    }
+    .pill.ok{border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.08);color:#0f7a35}
+    .pill.warn{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.08);color:#b45309}
+    .pill.bad{border-color:rgba(220,38,38,.25);background:rgba(220,38,38,.08);color:#b91c1c}
+    .panel{
+      background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:14px;margin-bottom:12px
+    }
+    .panel.sticky{position:sticky;top:78px;z-index:5}
+    .stack{display:grid;gap:10px}
+    .project-bar{display:grid;grid-template-columns:1.2fr .8fr auto;gap:10px;align-items:end}
+    .field{display:grid;gap:6px}
+    .field label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:900;color:#334155}
+    .field input,.field select,.field textarea{
+      width:100%;min-height:44px;border-radius:14px;border:1px solid var(--line);padding:10px 12px;background:#fff;color:var(--text)
+    }
+    .field textarea{min-height:86px;resize:vertical}
+    .actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+    .btn{
+      border:1px solid var(--line);background:#fff;color:#0f172a;border-radius:14px;
+      min-height:44px;padding:0 14px;font-weight:800;cursor:pointer
+    }
+    .btn.primary{background:linear-gradient(180deg,var(--primary) 0%,var(--primary-2) 100%);border-color:transparent;color:#fff}
+    .btn.ghost{background:#fff}
+    .toolbar{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap
+    }
+    .toolbar.compact{align-items:flex-end}
+    .title-block h2{margin:0;font-size:20px;letter-spacing:-.03em}
+    .title-block p{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .filters{
+      display:grid;
+      grid-template-columns:minmax(220px,1.3fr) repeat(4,minmax(0,.8fr)) minmax(120px,.72fr) auto;
+      gap:8px;align-items:end
+    }
+    .legend{display:flex;gap:8px;flex-wrap:wrap}
+    .legend .dot{
+      display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+      background:#fff;border:1px solid var(--line);font-size:12px;font-weight:800
+    }
+    .legend .sw{width:10px;height:10px;border-radius:50%}
+    .sw.plain{background:var(--plain)}
+    .sw.warn{background:var(--warn)}
+    .sw.bad{background:var(--bad)}
+    .sw.good{background:var(--good)}
+    .building-shell{
+      display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:16px;
+      background:linear-gradient(180deg,#fff,#f8fafc)
+    }
+    .building-head{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap
+    }
+    .building-head h3{margin:0;font-size:16px;letter-spacing:-.02em}
+    .building-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .building-grid{display:grid;gap:8px}
+    .floor-row{
+      display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;align-items:stretch;
+      padding:8px;border:1px solid #e6ecf3;border-radius:14px;background:#fff
+    }
+    .floor-tag{
+      display:flex;align-items:center;justify-content:center;text-align:center;
+      font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#64748b;
+      border-right:1px solid #eef2f7;padding-right:6px
+    }
+    .floor-body{display:grid;gap:6px}
+    .floor-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .floor-title strong{font-size:13px;line-height:1.1}
+    .floor-title .floor-meta{font-size:11px;color:var(--muted)}
+    .unit-grid{display:grid;gap:6px}
+    .unit-bar{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      min-height:40px;padding:8px 10px;border-radius:12px;border:1px solid #dbe3ee;background:#fff;cursor:pointer
+    }
+    .unit-bar strong{font-size:13px;line-height:1.1}
+    .unit-bar .mini{font-size:11px;color:var(--muted);line-height:1.2}
+    .unit-bar .status-dot{width:10px;height:10px;border-radius:50%}
+    .unit-bar.status-programado{border-left:8px solid var(--plain)}
+    .unit-bar.status-programado .status-dot{background:var(--plain)}
+    .unit-bar.status-andamento{border-left:8px solid var(--warn);background:#fffbeb}
+    .unit-bar.status-andamento .status-dot{background:var(--warn)}
+    .unit-bar.status-atrasado{border-left:8px solid var(--bad);background:#fef2f2}
+    .unit-bar.status-atrasado .status-dot{background:var(--bad)}
+    .unit-bar.status-concluido{border-left:8px solid var(--good);background:#ecfdf3}
+    .unit-bar.status-concluido .status-dot{background:var(--good)}
+    .unit-bar.is-active{box-shadow:0 0 0 2px rgba(225,29,72,.10) inset}
+    .unit-count{
+      min-width:40px;padding:7px 9px;border:1px solid var(--line);border-radius:11px;background:#fff;font-size:11px;font-weight:900;color:#334155;text-align:center
+    }
+    .selected-detail{
+      display:grid;gap:10px;padding:12px;border:1px solid #dbe3ee;border-radius:16px;background:#fff
+    }
+    .selected-detail.is-empty{color:var(--muted);font-size:12px}
+    .selected-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .selected-detail-head h4{margin:0;font-size:15px;line-height:1.15;letter-spacing:-.02em}
+    .selected-detail-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .selected-detail-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .list{display:grid;gap:10px}
+    .card{
+      background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+      overflow:hidden
+    }
+    .card-head{
+      display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 12px 8px;cursor:pointer
+    }
+    .card-title{display:grid;gap:4px}
+    .card-title h3{margin:0;font-size:16px;line-height:1.2;letter-spacing:-.02em}
+    .card-title .sub{color:var(--muted);font-size:12px;line-height:1.35}
+    .status-chip{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;font-size:12px;font-weight:900;
+      border:1px solid var(--line);background:#fff;white-space:nowrap
+    }
+    .status-chip .ball{width:10px;height:10px;border-radius:50%}
+    .status-programado{color:#475569}
+    .status-programado .ball{background:var(--plain)}
+    .status-andamento{color:#92400e}
+    .status-andamento .ball{background:var(--warn)}
+    .status-atrasado{color:#991b1b}
+    .status-atrasado .ball{background:var(--bad)}
+    .status-concluido{color:#166534}
+    .status-concluido .ball{background:var(--good)}
+    .card-body{display:none;padding:0 12px 12px}
+    .card.open .card-body{display:block}
+    .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .chip{
+      display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#f8fafc;border:1px solid var(--line);
+      font-size:12px;font-weight:800;color:#334155
+    }
+    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .mini-grid .field input,.mini-grid .field textarea{min-height:42px;border-radius:12px}
+    .row-full{grid-column:1/-1}
+    .empty,.loading{
+      background:#fff;border:1px dashed var(--line);border-radius:18px;padding:18px;color:var(--muted);text-align:center
+    }
+    .footer-note{color:var(--muted);font-size:12px;text-align:center;padding:8px 0 2px}
+    .detail-card{display:grid;gap:10px}
+    .detail-card .detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .detail-card .detail-head h3{margin:0;font-size:18px;letter-spacing:-.03em}
+    .detail-card .detail-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    @media (max-width: 760px){
+      .panel.sticky{top:66px}
+      .project-bar,.filters,.mini-grid{grid-template-columns:1fr}
+      .actions{justify-content:stretch}
+      .actions .btn{width:100%}
+      .topbar-inner{align-items:flex-start}
+      .card-head{grid-template-columns:1fr}
+      .status-chip{justify-self:flex-start}
+      .floor-row{grid-template-columns:54px 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">P.</div>
+        <div class="brand-text">
+          <h1>Acompanhamento</h1>
+          <p>Visão móvel dos pacotes com foco na obra ativa.</p>
+        </div>
+      </div>
+      <div class="pill-row">
+        <span id="syncPill" class="pill">Local</span>
+        <span id="savePill" class="pill">Sem revisão</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <section class="panel">
+      <div class="toolbar" style="margin-bottom:12px">
+        <div class="title-block">
+          <h2>Obra ativa</h2>
+          <p>Escolha a obra e acompanhe os pacotes do plano no celular.</p>
+        </div>
+        <div class="actions">
+          <button id="btnRefresh" class="btn">Atualizar lista</button>
+          <button id="btnOpenFull" class="btn primary">Abrir módulo completo</button>
+        </div>
+      </div>
+
+      <div class="project-bar">
+        <div class="field">
+          <label>Projeto</label>
+          <select id="projectSelect"></select>
+        </div>
+        <div class="field">
+          <label>Busca rápida</label>
+          <input id="searchInput" placeholder="Local, serviço ou código" />
+        </div>
+        <div class="actions">
+          <button id="btnReloadProject" class="btn ghost">Recarregar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel sticky">
+      <div class="toolbar compact" style="margin-bottom:10px">
+        <div class="title-block">
+          <h2 id="projectTitle">Carregando...</h2>
+          <p id="projectSub">Aguardando projeto selecionado.</p>
+        </div>
+        <div class="field" style="min-width:168px;max-width:220px">
+          <label>Data de referência</label>
+          <input id="referenceDate" type="date" />
+        </div>
+      </div>
+
+      <div class="filters" style="margin-bottom:10px">
+        <div class="field">
+          <label>Status</label>
+          <select id="statusFilter">
+            <option value="">Todos</option>
+            <option value="programado">Programado</option>
+            <option value="andamento">Em andamento</option>
+            <option value="atrasado">Atrasado</option>
+            <option value="concluido">Medido</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Local</label>
+          <select id="unitFilter"><option value="">Todos</option></select>
+        </div>
+        <div class="field">
+          <label>Serviço</label>
+          <select id="serviceFilter"><option value="">Todos</option></select>
+        </div>
+        <div class="field">
+          <label>Exibição</label>
+          <select id="datesMode">
+            <option value="sim">Mostrar datas</option>
+            <option value="nao">Ocultar datas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <div class="legend">
+            <span class="dot"><span class="sw plain"></span>Programado</span>
+            <span class="dot"><span class="sw warn"></span>Em andamento</span>
+            <span class="dot"><span class="sw bad"></span>Atrasado</span>
+            <span class="dot"><span class="sw good"></span>Medido</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btnClearFilters" class="btn">Limpar</button>
+        </div>
+      </div>
+
+      <div class="building-shell" style="margin-bottom:10px">
+        <div class="building-head">
+          <div>
+            <h3>Visão do prédio</h3>
+            <p>Toque em um pavimento para abrir o pacote e editar as datas reais abaixo.</p>
+          </div>
+          <span id="buildingSummary" class="pill">0 pavimentos</span>
+        </div>
+        <div id="selectedDetail" class="selected-detail is-empty">Selecione um local na visão do prédio para editar início e fim reais.</div>
+        <div id="buildingView" class="building-grid"></div>
+      </div>
+
+      <div id="statusLine" class="footer-note" style="text-align:left;margin-bottom:8px"></div>
+      <div id="loadingBox" class="loading">Carregando projeto...</div>
+      <div id="packagesList" class="list" style="display:none"></div>
+      <div id="emptyBox" class="empty" style="display:none">Nenhum pacote encontrado para este projeto.</div>
+    </section>
+
+    <div class="footer-note">As alterações desta tela salvam no mesmo projeto de Entregas.</div>
+  </div>
+
+  <script>
+    (() => {
+      const API_BASE = "https://plannus-api.gabrielpsgyn.workers.dev";
+      const ACTIVE_KEY = "entregas.unidade.activeProject.v1";
+      const PROJECTS_KEY = "entregas.unidade.projects.v1";
+      const DEFAULT_DATE = () => new Date().toISOString().slice(0, 10);
+
+      const $ = (id) => document.getElementById(id);
+      const els = {
+        syncPill: $("syncPill"),
+        savePill: $("savePill"),
+        btnRefresh: $("btnRefresh"),
+        btnReloadProject: $("btnReloadProject"),
+        btnOpenFull: $("btnOpenFull"),
+        projectSelect: $("projectSelect"),
+        projectTitle: $("projectTitle"),
+        projectSub: $("projectSub"),
+        searchInput: $("searchInput"),
+        statusFilter: $("statusFilter"),
+        unitFilter: $("unitFilter"),
+        serviceFilter: $("serviceFilter"),
+        referenceDate: $("referenceDate"),
+        datesMode: $("datesMode"),
+        btnClearFilters: $("btnClearFilters"),
+        buildingSummary: $("buildingSummary"),
+        selectedDetail: $("selectedDetail"),
+        buildingView: $("buildingView"),
+        statusLine: $("statusLine"),
+        loadingBox: $("loadingBox"),
+        packagesList: $("packagesList"),
+        emptyBox: $("emptyBox"),
+      };
+
+      const state = {
+        projects: [],
+        project: null,
+        remoteState: null,
+        rows: [],
+        filters: {
+          search: "",
+          status: "",
+          unit: "",
+          service: "",
+          referenceDate: DEFAULT_DATE(),
+          showDates: true,
+        },
+        openKey: "",
+        saveTimer: null,
+        saving: false,
+        lastMessage: "",
+      };
+
+      function normalize(text) {
+        return String(text || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function esc(text) {
+        return String(text ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function safeGet(storage, key) {
+        try { return storage.getItem(key) || ""; } catch (_) { return ""; }
+      }
+
+      function safeSet(storage, key, value) {
+        try { storage.setItem(key, value); return true; } catch (_) { return false; }
+      }
+
+      function fmtBR(value) {
+        if (!value) return "-";
+        const d = new Date(String(value));
+        return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString("pt-BR");
+      }
+
+      function api(path, options = {}) {
+        return fetch(`${API_BASE}${path}`, {
+          credentials: "omit",
+          mode: "cors",
+          headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+          ...options,
+        }).then(async (response) => {
+          let data = null;
+          try { data = await response.json(); } catch (_) {}
+          return { ok: response.ok && data?.ok !== false, status: response.status, data };
+        }).catch((error) => ({ ok: false, status: 0, data: { erro: String(error?.message || error || "Falha de rede") } }));
+      }
+
+      function setSync(kind, text) {
+        els.syncPill.className = `pill ${kind || ""}`.trim();
+        els.syncPill.textContent = text || "Local";
+      }
+
+      function setSave(kind, text) {
+        els.savePill.className = `pill ${kind || ""}`.trim();
+        els.savePill.textContent = text || "Sem revisão";
+      }
+
+      function readProjects() {
+        try {
+          const raw = safeGet(localStorage, PROJECTS_KEY) || safeGet(sessionStorage, PROJECTS_KEY) || "[]";
+          const list = JSON.parse(raw);
+          return Array.isArray(list) ? list : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function storeProjects(projects) {
+        const raw = JSON.stringify(Array.isArray(projects) ? projects : []);
+        if (!safeSet(localStorage, PROJECTS_KEY, raw)) safeSet(sessionStorage, PROJECTS_KEY, raw);
+      }
+
+      function activeProjectId() {
+        return String(new URLSearchParams(location.search).get("projectId") || safeGet(localStorage, ACTIVE_KEY) || safeGet(sessionStorage, ACTIVE_KEY) || "").trim();
+      }
+
+      function setActiveProjectId(id) {
+        if (!id) return;
+        if (!safeSet(localStorage, ACTIVE_KEY, id)) safeSet(sessionStorage, ACTIVE_KEY, id);
+      }
+
+      async function listProjects() {
+        els.statusLine.textContent = "Buscando obras...";
+        const result = await api("/api/entregas-projetos");
+        if (!result.ok) {
+          setSync("bad", "Falha");
+          els.statusLine.textContent = result.data?.erro || "Falha ao listar projetos.";
+          els.loadingBox.style.display = "block";
+          els.loadingBox.textContent = "Não foi possível carregar os projetos.";
+          return [];
+        }
+        const remote = Array.isArray(result.data?.projetos) ? result.data.projetos : [];
+        const local = readProjects();
+        const map = new Map();
+        [...remote, ...local].forEach((project) => {
+          const id = String(project?.id || "").trim();
+          if (!id) return;
+          const current = map.get(id);
+          const next = {
+            id,
+            nome: project.nome || project.state?.obra?.nome || "-",
+            codigo: project.codigo || project.state?.obra?.codigo || "-",
+            revision: Number(project.revision || project.state?.sync?.revision || 0) || 0,
+            updated_at: project.updated_at || project.updatedAt || project.createdAt || "",
+          };
+          if (!current) map.set(id, next);
+          else if (Number(next.revision) >= Number(current.revision) && String(next.updated_at) >= String(current.updated_at)) map.set(id, next);
+        });
+        const list = Array.from(map.values()).sort((a, b) => String(b.updated_at || "").localeCompare(String(a.updated_at || "")));
+        state.projects = list;
+        storeProjects(list);
+        renderProjectSelect();
+        return list;
+      }
+
+      function renderProjectSelect() {
+        const current = activeProjectId();
+        els.projectSelect.innerHTML = state.projects.length
+          ? state.projects.map((project) => `<option value="${esc(project.id)}"${project.id === current ? " selected" : ""}>${esc(project.nome)} — ${esc(project.codigo)}</option>`).join("")
+          : `<option value="">Nenhuma obra encontrada</option>`;
+      }
+
+      async function loadProject(projectId) {
+        const id = String(projectId || activeProjectId() || "").trim();
+        if (!id) {
+          setSync("warn", "Sem obra");
+          els.projectTitle.textContent = "Selecione uma obra";
+          els.projectSub.textContent = "Nenhum projeto ativo encontrado.";
+          els.loadingBox.style.display = "block";
+          els.loadingBox.textContent = "Nenhuma obra ativa.";
+          els.packagesList.style.display = "none";
+          els.emptyBox.style.display = "none";
+          return false;
+        }
+        setActiveProjectId(id);
+        els.projectSelect.value = id;
+        els.loadingBox.style.display = "block";
+        els.loadingBox.textContent = "Carregando pacote e status...";
+        const result = await api(`/api/entregas-projetos/${encodeURIComponent(id)}`);
+        if (!result.ok) {
+          setSync("bad", "Falha");
+          els.projectTitle.textContent = "Erro ao carregar";
+          els.projectSub.textContent = result.data?.erro || "Projeto não encontrado.";
+          els.loadingBox.textContent = result.data?.erro || "Falha ao carregar projeto.";
+          els.packagesList.style.display = "none";
+          els.emptyBox.style.display = "none";
+          return false;
+        }
+        const project = result.data?.projeto || {};
+        const remoteState = project.state || {};
+        state.project = project;
+        state.remoteState = remoteState;
+        state.rows = Array.isArray(remoteState?.plan?.rows) ? remoteState.plan.rows.slice() : [];
+        state.openKey = "";
+        const obra = remoteState?.obra || {};
+        els.projectTitle.textContent = `${obra.codigo || project.codigo || "-"} | ${obra.nome || project.nome || "Entregas"}`;
+        els.projectSub.textContent = `Revisão ${project.revision || 0} • Atualizado em ${fmtBR(project.updated_at || project.updatedAt)}`;
+        setSync("ok", "Online");
+        setSave(project.revision ? "ok" : "warn", project.revision ? `rev ${project.revision}` : "sem revisão");
+        state.filters.referenceDate = (remoteState?.obra?.startDate || DEFAULT_DATE());
+        els.referenceDate.value = state.filters.referenceDate;
+        if (!els.datesMode.value) els.datesMode.value = "sim";
+        els.loadingBox.style.display = "none";
+        renderFiltersFromState();
+        renderPackages();
+        return true;
+      }
+
+      function renderFiltersFromState() {
+        const units = [];
+        const services = [];
+        const seenU = new Set();
+        const seenS = new Set();
+        state.rows.forEach((row) => {
+          const unit = String(row.unitLabel || row.unitCode || "").trim();
+          const service = String(row.serviceLabel || row.serviceCode || "").trim();
+          if (unit && !seenU.has(unit)) { seenU.add(unit); units.push(unit); }
+          if (service && !seenS.has(service)) { seenS.add(service); services.push(service); }
+        });
+        els.unitFilter.innerHTML = `<option value="">Todos</option>${units.map((item) => `<option value="${esc(item)}">${esc(item)}</option>`).join("")}`;
+        els.serviceFilter.innerHTML = `<option value="">Todos</option>${services.map((item) => `<option value="${esc(item)}">${esc(item)}</option>`).join("")}`;
+      }
+
+      function unitRowsFor(unitId) {
+        return state.rows.filter((row) => String(row.unitId || "") === String(unitId || ""));
+      }
+
+      function unitStatus(rows) {
+        const statuses = rows.map((row) => statusOf(row));
+        if (!statuses.length) return "programado";
+        if (statuses.includes("atrasado")) return "atrasado";
+        if (statuses.includes("andamento")) return "andamento";
+        if (statuses.every((status) => status === "concluido")) return "concluido";
+        return "programado";
+      }
+
+      function floorLabel(floor) {
+        const n = Number(floor);
+        if (!Number.isFinite(n) || n === 0) return "Térreo";
+        if (n < 0) return `Subsolo ${Math.abs(n)}`;
+        return `Pav. ${n}`;
+      }
+
+      function buildingGroups() {
+        const source = Array.isArray(state.remoteState?.units) ? state.remoteState.units.slice() : [];
+        const units = source.length ? source : state.rows.reduce((acc, row) => {
+          const id = String(row.unitId || row.unitCode || row.unitLabel || "").trim();
+          if (!id || acc.some((item) => String(item.id) === id)) return acc;
+          acc.push({
+            id,
+            code: row.unitCode || row.unitLabel || id,
+            name: row.unitLabel || row.unitCode || id,
+            floor: Number(row.floor || row.unitFloor || 0) || 0,
+            order: Number(row.order || row.unitOrder || acc.length + 1) || (acc.length + 1),
+          });
+          return acc;
+        }, []);
+
+        const groups = new Map();
+        units.forEach((unit) => {
+          const floor = Number(unit.floor || 0) || 0;
+          if (!groups.has(floor)) groups.set(floor, []);
+          groups.get(floor).push(unit);
+        });
+        return Array.from(groups.entries())
+          .sort((a, b) => Number(b[0]) - Number(a[0]))
+          .map(([floor, items]) => ({
+            floor,
+            items: items.slice().sort((a, b) => (Number(a.order || 0) - Number(b.order || 0)) || String(a.code || a.name || "").localeCompare(String(b.code || b.name || ""), "pt-BR")),
+          }));
+      }
+
+      function renderSelectedDetail() {
+        const row = state.rows.find((item) => planRowKey(item) === state.openKey);
+        if (!row) {
+          els.selectedDetail.className = "selected-detail is-empty";
+          els.selectedDetail.innerHTML = "Selecione um local na visão do prédio para editar início e fim reais.";
+          return;
+        }
+        const status = statusOf(row);
+        const range = plannedRange(row);
+        const override = getOverride(row);
+        els.selectedDetail.className = "selected-detail";
+        els.selectedDetail.innerHTML = `
+          <div class="selected-detail-head">
+            <div>
+              <h4>${esc(row.unitLabel || row.unitCode || "-")} • ${esc(row.serviceLabel || "-")}</h4>
+              <p>${esc(fmtBR(range.start))} até ${esc(fmtBR(range.end))} • ${esc(row.criticality || "-")} • ${esc(statusText(status))}</p>
+            </div>
+            <span class="status-chip status-${esc(status)}"><span class="ball"></span>${esc(statusText(status))}</span>
+          </div>
+          <div class="selected-detail-meta">
+            <span class="chip">Local ${esc(row.unitCode || "-")}</span>
+            <span class="chip">Serviço ${esc(row.serviceCode || "-")}</span>
+            <span class="chip">${esc(row.teams || row.requiredTeams || 0)} equipe(s)</span>
+          </div>
+          <div class="mini-grid">
+            <label class="field">
+              <label>Início real</label>
+              <input type="date" value="${esc(override.actualStartDate || "")}" data-actual-start="${esc(planRowKey(row))}" />
+            </label>
+            <label class="field">
+              <label>Fim real</label>
+              <input type="date" value="${esc(override.actualEndDate || "")}" data-actual-end="${esc(planRowKey(row))}" />
+            </label>
+            <label class="field row-full">
+              <label>Observação</label>
+              <textarea data-note="${esc(planRowKey(row))}" placeholder="Observação do pacote ou do local">${esc(override.note || "")}</textarea>
+            </label>
+          </div>
+        `;
+      }
+
+      function renderBuildingView() {
+        const groups = buildingGroups();
+        const totalFloors = groups.length;
+        const totalUnits = groups.reduce((sum, group) => sum + group.items.length, 0);
+        els.buildingSummary.textContent = `${totalFloors} pavimento(s) • ${totalUnits} local(is)`;
+        if (!groups.length) {
+          els.buildingView.innerHTML = `<div class="empty">Nenhum local cadastrado para montar a visão do prédio.</div>`;
+          renderSelectedDetail();
+          return;
+        }
+        els.buildingView.innerHTML = groups.map((group) => {
+          const floorRows = group.items.map((unit) => {
+            const rows = unitRowsFor(unit.id || unit.code || unit.name);
+            const status = unitStatus(rows);
+            const visibleRow = rows[0] || {};
+            const countText = `${rows.length || 0} serviço(s)`;
+            const dateText = rows.length ? `${fmtBR(plannedRange(rows[0]).start)} → ${fmtBR(plannedRange(rows[rows.length - 1]).end)}` : "-";
+            const isActive = rows.some((row) => planRowKey(row) === state.openKey);
+            const label = unit.code || unit.name || "-";
+            return `
+              <button type="button" class="unit-bar status-${esc(status)}${isActive ? " is-active" : ""}" data-unit-key="${esc(planRowKey(visibleRow) || "")}">
+                <div style="min-width:0;display:grid;gap:2px;text-align:left;flex:1">
+                  <strong>${esc(label)}</strong>
+                  <div class="mini">${esc(countText)}${els.datesMode.value !== "nao" && rows.length ? ` • ${esc(dateText)}` : ""}</div>
+                </div>
+                <span class="status-dot"></span>
+              </button>
+            `;
+          }).join("");
+          return `
+            <div class="floor-row">
+              <div class="floor-tag">${esc(floorLabel(group.floor))}</div>
+              <div class="floor-body">
+                <div class="floor-title">
+                  <strong>${esc(floorLabel(group.floor))}</strong>
+                  <span class="floor-meta">${group.items.length} local(is)</span>
+                </div>
+                <div class="unit-grid">${floorRows}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+        renderSelectedDetail();
+      }
+
+      function planRowKey(row) {
+        return String(row?.key || `${row?.unitId || ""}::${row?.serviceId || ""}`);
+      }
+
+      function getOverride(row) {
+        const key = planRowKey(row);
+        return state.remoteState?.plan?.overrides?.[key] || {};
+      }
+
+      function projectStartDate() {
+        const value = String(state.remoteState?.obra?.startDate || "").trim();
+        if (!value) return null;
+        const date = new Date(`${value}T00:00:00`);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function referenceDateObject() {
+        const value = String(els.referenceDate.value || state.filters.referenceDate || DEFAULT_DATE()).trim();
+        const date = new Date(`${value}T00:00:00`);
+        return Number.isNaN(date.getTime()) ? new Date() : date;
+      }
+
+      function statusOf(row) {
+        const base = projectStartDate();
+        const ref = referenceDateObject();
+        const override = getOverride(row);
+        const actualStart = String(override.actualStartDate || "").trim();
+        const actualEnd = String(override.actualEndDate || "").trim();
+        const startDay = Number(row.startDay || 1) || 1;
+        const endDay = Number(row.endDay || 1) || 1;
+        const plannedStart = base ? new Date(base.getTime() + ((startDay - 1) * 86400000)) : null;
+        const plannedEnd = base ? new Date(base.getTime() + ((endDay - 1) * 86400000)) : null;
+        if (actualEnd) return "concluido";
+        if (!actualStart) {
+          if (plannedStart && ref < plannedStart) return "programado";
+          return "atrasado";
+        }
+        if (plannedEnd && ref > plannedEnd) return "atrasado";
+        return "andamento";
+      }
+
+      function statusText(status) {
+        if (status === "concluido") return "Medido";
+        if (status === "andamento") return "Em andamento";
+        if (status === "atrasado") return "Atrasado";
+        return "Programado";
+      }
+
+      function packageMatches(row, status) {
+        const f = state.filters;
+        const text = normalize([row.unitLabel, row.unitCode, row.serviceLabel, row.serviceCode, row.criticality, row.blocker].join(" "));
+        if (f.search && !text.includes(normalize(f.search))) return false;
+        if (f.status && f.status !== status) return false;
+        if (f.unit && normalize(row.unitLabel) !== normalize(f.unit)) return false;
+        if (f.service && normalize(row.serviceLabel) !== normalize(f.service)) return false;
+        return true;
+      }
+
+      function plannedRange(row) {
+        const base = projectStartDate();
+        if (!base) return { start: null, end: null };
+        const start = new Date(base.getTime() + ((Number(row.startDay || 1) - 1) * 86400000));
+        const end = new Date(base.getTime() + ((Number(row.endDay || 1) - 1) * 86400000));
+        return { start, end };
+      }
+
+      function rowCardHTML(row) {
+        const status = statusOf(row);
+        const ok = status === "concluido";
+        const open = state.openKey === planRowKey(row);
+        const override = getOverride(row);
+        const range = plannedRange(row);
+        const showDates = els.datesMode.value !== "nao";
+        return `
+          <article class="card${open ? " open" : ""}" data-rowkey="${esc(planRowKey(row))}">
+            <div class="card-head" data-toggle-row="${esc(planRowKey(row))}">
+              <div class="card-title">
+                <h3>${esc(row.unitLabel || "-")}</h3>
+                <div class="sub">${esc(row.serviceLabel || "-")} • ${esc(row.criticality || "-")}${row.blocker ? ` • ${esc(row.blocker)}` : ""}</div>
+                ${showDates ? `<div class="sub"><strong>${esc(fmtBR(range.start))}</strong> até <strong>${esc(fmtBR(range.end))}</strong></div>` : ""}
+              </div>
+              <div class="status-chip status-${esc(status)}">
+                <span class="ball"></span>${esc(statusText(status))}
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="meta-row">
+                <span class="chip">Local ${esc(row.unitCode || "-")}</span>
+                <span class="chip">Serviço ${esc(row.serviceCode || "-")}</span>
+                <span class="chip">${esc(statusText(status))}</span>
+              </div>
+              <div class="mini-grid">
+                <label class="field">
+                  <label>Início real</label>
+                  <input type="date" value="${esc(override.actualStartDate || "")}" data-actual-start="${esc(planRowKey(row))}" />
+                </label>
+                <label class="field">
+                  <label>Fim real</label>
+                  <input type="date" value="${esc(override.actualEndDate || "")}" data-actual-end="${esc(planRowKey(row))}" />
+                </label>
+                <label class="field row-full">
+                  <label>Observação</label>
+                  <textarea data-note="${esc(planRowKey(row))}" placeholder="Observação do pacote ou do local">${esc(override.note || "")}</textarea>
+                </label>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderPackages() {
+        const rows = Array.isArray(state.rows) ? state.rows.slice() : [];
+        const ref = referenceDateObject();
+        const filtered = rows.filter((row) => packageMatches(row, statusOf(row, ref)));
+        renderBuildingView();
+        els.packagesList.innerHTML = filtered.length ? filtered.map(rowCardHTML).join("") : "";
+        els.packagesList.style.display = filtered.length ? "grid" : "none";
+        els.emptyBox.style.display = filtered.length ? "none" : "block";
+        els.statusLine.textContent = `${filtered.length} pacote(s) exibido(s) de ${rows.length}.`;
+      }
+
+      function scheduleSave() {
+        setSave("warn", "alterações pendentes");
+        clearTimeout(state.saveTimer);
+        state.saveTimer = setTimeout(saveProject, 500);
+      }
+
+      async function saveProject() {
+        clearTimeout(state.saveTimer);
+        state.saveTimer = null;
+        if (!state.project?.id || !state.remoteState) return;
+        state.saving = true;
+        setSave("warn", "salvando...");
+        const payload = {
+          ...state.remoteState,
+          plan: {
+            ...(state.remoteState.plan || {}),
+            overrides: { ...(state.remoteState.plan?.overrides || {}) },
+            rows: Array.isArray(state.remoteState.plan?.rows) ? state.remoteState.plan.rows : [],
+          },
+        };
+        const result = await api(`/api/entregas-projetos/${encodeURIComponent(state.project.id)}/save`, {
+          method: "POST",
+          body: JSON.stringify({ revision: Number(state.project.revision || 0) || 0, state: payload }),
+        });
+        state.saving = false;
+        if (!result.ok) {
+          setSave("bad", "falha");
+          els.statusLine.textContent = result.data?.erro || "Falha ao salvar.";
+          return;
+        }
+        state.project.revision = Number(result.data?.revision || state.project.revision || 0) || 0;
+        state.project.updated_at = result.data?.updated_at || new Date().toISOString();
+        setSave("ok", `rev ${state.project.revision}`);
+        els.statusLine.textContent = "Salvo online.";
+        await listProjects();
+      }
+
+      function applyOverride(rowKey, patch) {
+        if (!state.remoteState) return;
+        if (!state.remoteState.plan || typeof state.remoteState.plan !== "object") state.remoteState.plan = {};
+        if (!state.remoteState.plan.overrides || typeof state.remoteState.plan.overrides !== "object") state.remoteState.plan.overrides = {};
+        const current = { ...(state.remoteState.plan.overrides[rowKey] || {}) };
+        state.remoteState.plan.overrides[rowKey] = { ...current, ...patch };
+        scheduleSave();
+      }
+
+      function clearFilters() {
+        els.searchInput.value = "";
+        els.statusFilter.value = "";
+        els.unitFilter.value = "";
+        els.serviceFilter.value = "";
+        els.referenceDate.value = state.filters.referenceDate || DEFAULT_DATE();
+        els.datesMode.value = "sim";
+        state.filters.search = "";
+        state.filters.status = "";
+        state.filters.unit = "";
+        state.filters.service = "";
+        state.openKey = "";
+        renderPackages();
+      }
+
+      function bindEvents() {
+        els.btnRefresh.addEventListener("click", async () => {
+          await listProjects();
+          await loadProject(els.projectSelect.value || activeProjectId());
+        });
+        els.btnReloadProject.addEventListener("click", async () => {
+          await loadProject(els.projectSelect.value || activeProjectId());
+        });
+        els.btnOpenFull.addEventListener("click", () => {
+          location.href = "./entregas.html";
+        });
+        els.projectSelect.addEventListener("change", async () => {
+          await loadProject(els.projectSelect.value);
+        });
+        els.searchInput.addEventListener("input", () => { state.filters.search = els.searchInput.value; renderPackages(); });
+        els.statusFilter.addEventListener("change", () => { state.filters.status = els.statusFilter.value; renderPackages(); });
+        els.unitFilter.addEventListener("change", () => { state.filters.unit = els.unitFilter.value; renderPackages(); });
+        els.serviceFilter.addEventListener("change", () => { state.filters.service = els.serviceFilter.value; renderPackages(); });
+        els.referenceDate.addEventListener("change", () => { state.filters.referenceDate = els.referenceDate.value || DEFAULT_DATE(); renderPackages(); });
+        els.datesMode.addEventListener("change", () => { renderPackages(); });
+        els.btnClearFilters.addEventListener("click", clearFilters);
+
+        document.addEventListener("click", (event) => {
+          const unitToggle = event.target.closest?.("[data-unit-key]");
+          if (unitToggle) {
+            const key = String(unitToggle.getAttribute("data-unit-key") || "");
+            if (key) {
+              const row = state.rows.find((item) => planRowKey(item) === key) || null;
+              const unitValue = String(row?.unitLabel || row?.unitCode || "").trim();
+              const isSame = state.openKey === key && state.filters.unit === unitValue;
+              state.openKey = isSame ? "" : key;
+              state.filters.unit = isSame ? "" : unitValue;
+              els.unitFilter.value = state.filters.unit;
+              renderPackages();
+            }
+            return;
+          }
+          const rowToggle = event.target.closest?.("[data-toggle-row]");
+          if (rowToggle) {
+            const key = String(rowToggle.getAttribute("data-toggle-row") || "");
+            state.openKey = state.openKey === key ? "" : key;
+            renderPackages();
+            return;
+          }
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) return;
+          if (target.hasAttribute("data-actual-start")) {
+            const key = target.getAttribute("data-actual-start") || "";
+            applyOverride(key, { actualStartDate: String(target.value || "").trim() });
+          } else if (target.hasAttribute("data-actual-end")) {
+            const key = target.getAttribute("data-actual-end") || "";
+            applyOverride(key, { actualEndDate: String(target.value || "").trim() });
+          } else if (target.hasAttribute("data-note")) {
+            const key = target.getAttribute("data-note") || "";
+            applyOverride(key, { note: String(target.value || "").trim() });
+          } else if (!target.closest(".card") && !target.closest(".unit-bar")) {
+            if (state.openKey) {
+              state.openKey = "";
+              state.filters.unit = "";
+              els.unitFilter.value = "";
+              renderPackages();
+            }
+          }
+        });
+      }
+
+      async function bootstrap() {
+        bindEvents();
+        els.referenceDate.value = DEFAULT_DATE();
+        state.filters.referenceDate = els.referenceDate.value;
+        await listProjects();
+        const chosen = activeProjectId() || state.projects[0]?.id || "";
+        if (chosen) {
+          await loadProject(chosen);
+        } else {
+          els.loadingBox.textContent = "Nenhuma obra de Entregas encontrada.";
+          setSync("warn", "Sem obra");
+          setSave("warn", "sem revisão");
+        }
+      }
+
+      bootstrap();
+    })();
+  </script>
+</body>
+</html>
